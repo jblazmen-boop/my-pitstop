@@ -10,21 +10,21 @@ header {
 }
 .header-content {
   display: flex;
-  flex-direction: column; /* Ponemos el logo arriba y el texto abajo */
-  align-items: center;    /* Centrado horizontal */
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
   gap: 10px;
   max-width: 1100px;
   margin: 0 auto;
 }
 .logo-img {
-  width: 100px;         /* Tamaño controlado para que no se coma la pantalla */
+  width: 100px;
   height: 100px;
   border-radius: 20px;
   box-shadow: 0 6px 15px rgba(0,0,0,0.4);
   object-fit: cover;
   background-color: white;
-  border: 3px solid #ffffff; /* Un borde blanco le da un toque muy limpio */
+  border: 3px solid #ffffff;
 }
 header h1 { 
   margin: 0; 
@@ -123,4 +123,11 @@ td button { margin-right: 4px; }
 }
 .cerrar-modal:hover {
   color: #ccc;
+}
+
+/* Estilos del Pie de Página (Copyright) */
+footer {
+  border-top: 1px solid #ddd;
+  background-color: #f8f9fa;
+  width: 100%;
 }
