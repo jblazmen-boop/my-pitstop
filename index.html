@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My PitStop - Control de Mantenimiento</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+</head>
+<body>
+
+<header>
+  <div class="header-content">
+    <img src="logo.png" alt="My PitStop Logo" class="logo-img">
+    <h1>My PitStop</h1>
+  </div>
+</header>
+
+<div class="container">
+  <div class="tabs">
+    <button class="tab active" data-tab="vehiculos">Vehículos</button>
+    <button class="tab" data-tab="mantenimientos">Mantenimientos</button>
+    <button class="tab" data-tab="informe">Generar Informe</button>
+    <button class="tab" data-tab="backup">Copia de Seguridad</button>
+  </div>
+
+  <!-- VEHÍCULOS -->
+  <div id="vehiculos" class="panel active">
+    <h2>Vehículos</h2>
+    <div class="form-row">
+      <div class="form-group"><label>Matrícula</label><input id="v_matricula" placeholder="1234ABC"></div>
+      <div class="form-group"><label>Marca</label><input id="v_marca" placeholder="Seat"></div>
+      <div class="form-group"><label>Modelo</label><input id="v_modelo" placeholder="León"></div>
+      <div class="form-group"><label>Nº Bastidor (VIN)</label><input id="v_bastidor" placeholder="WVWZZZ..."></div>
+    </div>
+    <button class="primary" onclick="addVehiculo()">Añadir vehículo</button>
+    <div id="msg_vehiculo"></div>
+    <table id="tabla_vehiculos">
+      <thead><tr><th>Matrícula</th><th>Marca</th><th>Modelo</th><th>Bastidor</th><th>Acciones</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- MANTENIMIENTOS -->
+  <div id="mantenimientos" class="panel">
+    <h2 id="titulo-formulario">Registrar mantenimiento</h2>
+    <div class="grid">
+      <div><label>Vehículo</label><select id="m_vehiculo"></select></div>
+      <div><label>Fecha</label><input type="date" id="m_fecha"></div>
+      <div><label>Km</label><input type="number" id="m_km" placeholder="85000"></div>
+      <div><label>Tipo</label>
+        <select id="m_tipo">
+          <optgroup label="Mantenimiento general">
+            <option>Aceite y Filtros</option><option>Frenos</option><option>Neumáticos</option><option>Suspensión</option><option>Distribución</option><option>Revisión oficial</option><option>ITV</option>
+          </optgroup>
+          <optgroup label="Motor y escape">
+            <option>Bujías / Encendido</option><option>Batería</option><option>Filtro de aire / combustible</option><option>Correa / Cadena</option><option>Escape / Catalizador</option>
+          </optgroup>
+          <optgroup label="Electrónica y climatización">
+            <option>Aire acondicionado (Recarga)</option><option>Filtro de habitáculo</option><option>Luces / Faros</option><option>Escobillas limpiaparabrisas</option><option>Sensores</option>
+          </optgroup>
+          <optgroup label="Carrocería y otros">
+            <option>Chapa y pintura</option><option>Cristales</option><option>Otro</option>
+          </optgroup>
+        </select>
+      </div>
+      <div><label>Taller</label><input id="m_taller" placeholder="Taller Pepe"></div>
+      <div style="grid-column: 1 / -1;"><label>Notas</label><textarea id="m_notas"></textarea></div>
+    </div>
+
+    <!-- SECCIÓN MANO DE OBRA -->
+    <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px;">
+      <h3 style="font-size: 16px; margin-bottom: 8px; color: #1a3a5c;">Mano de Obra</h3>
+      <div class="grid" style="grid-template-columns: 1fr 100px 100px; gap: 8px;">
+        <div><label>Operación</label><input id="o_concepto" placeholder="Ej: Sustituir correa de distribución"></div>
+        <div><label>Precio (€)</label><input type="number" step="0.01" id="o_precio" placeholder="80"></div>
+        <div style="display: flex; align-items: flex-end;"><button type="button" class="secondary" onclick="addManoObra()" style="width:100%;">+ Añadir</button></div>
+      </div>
+      <table id="tabla_mano_obra" style="font-size: 12px; width: 100%; border-collapse: collapse; margin-top: 10px;">
+        <thead><tr style="background:#f4f6f8;"><th style="padding:6px; border:1px solid #ddd;">Operación</th><th style="padding:6px; border:1px solid #ddd;">Precio</th><th style="padding:6px; border:1px solid #ddd;"></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div style="text-align: right; font-weight: bold; margin-top: 8px;">Total Mano de Obra: <span id="total_mano">0.00 €</span></div>
+    </div>
+
+    <!-- SECCIÓN REPUESTOS -->
+    <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px;">
+      <h3 style="font-size: 16px; margin-bottom: 8px; color: #1a3a5c;">Repuestos</h3>
+      <div class="grid" style="grid-template-columns: 80px 1fr 1fr 100px; gap: 8px;">
+        <div><label>Cant.</label><input type="number" id="r_cant" value="1" min="1"></div>
+        <div><label>Descripción</label><input id="r_desc" placeholder="Filtro de aceite"></div>
+        <div><label>Referencia</label><input id="r_ref" placeholder="Ej: MANN-W712"></div>
+        <div><label>Precio (€)</label><input type="number" step="0.01" id="r_precio" placeholder="12.50"></div>
+      </div>
+      
+      <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
+        <div>
+          <label>Subir nueva foto (opcional)</label>
+          <input type="file" id="r_foto" accept="image/*" style="padding:4px; font-size:12px;">
+        </div>
+        <div>
+          <label>O elegir del catálogo (opcional)</label>
+          <select id="r_foto_catalogo">
+            <option value="">— No usar foto —</option>
+          </select>
+        </div>
+      </div>
+      
+      <button type="button" class="secondary" onclick="addRepuesto()" style="margin-top:8px;">+ Añadir Repuesto</button>
+      
+      <table id="tabla_repuestos" style="font-size: 12px; width: 100%; border-collapse: collapse; margin-top: 10px;">
+        <thead><tr style="background:#f4f6f8;"><th style="padding:6px; border:1px solid #ddd;">Foto</th><th style="padding:6px; border:1px solid #ddd;">Cant</th><th style="padding:6px; border:1px solid #ddd;">Descripción</th><th style="padding:6px; border:1px solid #ddd;">Ref</th><th style="padding:6px; border:1px solid #ddd;">Precio</th><th style="padding:6px; border:1px solid #ddd;">Total</th><th style="padding:6px; border:1px solid #ddd;"></th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div style="text-align: right; font-weight: bold; margin-top: 8px;">Total Repuestos: <span id="total_repuestos">0.00 €</span></div>
+    </div>
+
+    <br>
+    <button class="primary" id="btn-guardar" onclick="guardarMantenimiento()">Guardar Mantenimiento</button>
+    <button class="secondary" id="btn-cancelar" onclick="cancelarEdicion()" style="display:none; margin-left: 10px;">Cancelar Edición</button>
+    
+    <div id="msg_mantenimiento"></div>
+
+    <h2 style="margin-top:24px;">Historial de Mantenimientos</h2>
+    <div class="grid">
+      <div><label>Filtrar por vehículo</label><select id="f_vehiculo"><option value="">Todos</option></select></div>
+    </div>
+    <table id="tabla_mantenimientos">
+      <thead><tr><th>Fecha</th><th>Vehículo</th><th>Km</th><th>Tipo</th><th>Operaciones</th><th>Mano</th><th>Piezas</th><th>Total</th><th>Acciones</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- INFORME -->
+  <div id="informe" class="panel">
+    <h2>Generar informe / factura en PDF</h2>
+    <div class="grid">
+      <div>
+        <label>Tipo de Informe</label>
+        <select id="i_tipo_informe">
+          <option value="detallado">Detallado (Factura con precios)</option>
+          <option value="historico">Histórico Técnico (Sin precios)</option>
+        </select>
+      </div>
+      <div><label>Vehículo</label><select id="i_vehiculo"></select></div>
+      <div><label>Fecha desde</label><input type="date" id="i_desde"></div>
+      <div><label>Fecha hasta</label><input type="date" id="i_hasta"></div>
+      <div><label>Nº de factura (opcional)</label><input id="i_factura" placeholder="F-2025-001"></div>
+      <div><label>IVA (%)</label><input type="number" id="i_iva" value="21" step="0.1"></div>
+      <div style="grid-column:1/-1;"><label>Nombre del taller / emisor (opcional)</label><input id="i_taller" placeholder="Taller Pepe S.L. - NIF B12345678"></div>
+    </div>
+    <button class="primary" onclick="generarPDF()">Generar PDF</button>
+    <div id="msg_informe"></div>
+  </div>
+
+  <!-- BACKUP -->
+  <div id="backup" class="panel">
+    <h2>Copia de seguridad</h2>
+    <p>Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.</p>
+    <div class="actions">
+      <button class="secondary" onclick="exportarJSON()">⬇ Exportar copia (JSON)</button>
+      <button class="secondary" onclick="document.getElementById('fileInput').click()">⬆ Importar copia</button>
+      <input type="file" id="fileInput" accept=".json" style="display:none" onchange="importarJSON(event)">
+      <button class="danger" onclick="borrarTodo()">🗑 Borrar todos los datos</button>
+    </div>
+    <div id="msg_backup"></div>
+  </div>
+</div>
+
+<!-- VENTANA FLOTANTE (MODAL) PARA VER LAS FOTOS EN GRANDE -->
+<div id="modal-foto" class="modal" onclick="cerrarModal()">
+  <span class="cerrar-modal">&times;</span>
+  <img class="modal-contenido" id="img-modal">
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
