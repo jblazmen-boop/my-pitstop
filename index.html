@@ -32,10 +32,10 @@
 
 <div class="container">
   <div class="tabs">
-    <button class="tab active" data-tab="vehiculos" title="Vehículos"><img src="icono-coche.png" class="tab-icon" alt="Vehículos"></button>
-    <button class="tab" data-tab="mantenimientos" title="Mantenimientos"><img src="icono-llave.png" class="tab-icon" alt="Mantenimientos"></button>
-    <button class="tab" data-tab="informe" title="Generar Informe"><img src="icono-libro.png" class="tab-icon" alt="Informes"></button>
-    <button class="tab" data-tab="backup" title="Copia de Seguridad"><img src="icono-copia.png" class="tab-icon" alt="Copia"></button>
+    <button class="tab active" data-tab="vehiculos" title="Vehículos" data-i18n-title="vehiculos_titulo"><img src="icono-coche.png" class="tab-icon" alt="Vehículos"></button>
+    <button class="tab" data-tab="mantenimientos" title="Mantenimientos" data-i18n-title="historial"><img src="icono-llave.png" class="tab-icon" alt="Mantenimientos"></button>
+    <button class="tab" data-tab="informe" title="Generar Informe" data-i18n-title="gen_informe"><img src="icono-libro.png" class="tab-icon" alt="Informes"></button>
+    <button class="tab" data-tab="backup" title="Copia de Seguridad" data-i18n-title="copia_seguridad"><img src="icono-copia.png" class="tab-icon" alt="Copia"></button>
   </div>
 
   <!-- VEHÍCULOS -->
@@ -65,32 +65,32 @@
       <div><label data-i18n="tipo">Tipo</label>
         <select id="m_tipo">
           <optgroup label="Mantenimiento general" data-i18n="opt_general">
-            <option data-i18n="opt_aceite">Aceite y Filtros</option>
-            <option data-i18n="opt_frenos">Frenos</option>
-            <option data-i18n="opt_neumaticos">Neumáticos</option>
-            <option data-i18n="opt_suspension">Suspensión</option>
-            <option data-i18n="opt_distribucion">Distribución</option>
-            <option data-i18n="opt_revision">Revisión oficial</option>
-            <option data-i18n="opt_itv">ITV</option>
+            <option value="Aceite y Filtros" data-i18n="opt_aceite">Aceite y Filtros</option>
+            <option value="Frenos" data-i18n="opt_frenos">Frenos</option>
+            <option value="Neumáticos" data-i18n="opt_neumaticos">Neumáticos</option>
+            <option value="Suspensión" data-i18n="opt_suspension">Suspensión</option>
+            <option value="Distribución" data-i18n="opt_distribucion">Distribución</option>
+            <option value="Revisión oficial" data-i18n="opt_revision">Revisión oficial</option>
+            <option value="ITV" data-i18n="opt_itv">ITV</option>
           </optgroup>
           <optgroup label="Motor y escape" data-i18n="opt_motor">
-            <option data-i18n="opt_bujias">Bujías / Encendido</option>
-            <option data-i18n="opt_bateria">Batería</option>
-            <option data-i18n="opt_filtro_aire">Filtro de aire / combustible</option>
-            <option data-i18n="opt_correa">Correa / Cadena</option>
-            <option data-i18n="opt_escape">Escape / Catalizador</option>
+            <option value="Bujías / Encendido" data-i18n="opt_bujias">Bujías / Encendido</option>
+            <option value="Batería" data-i18n="opt_bateria">Batería</option>
+            <option value="Filtro de aire / combustible" data-i18n="opt_filtro_aire">Filtro de aire / combustible</option>
+            <option value="Correa / Cadena" data-i18n="opt_correa">Correa / Cadena</option>
+            <option value="Escape / Catalizador" data-i18n="opt_escape">Escape / Catalizador</option>
           </optgroup>
           <optgroup label="Electrónica y climatización" data-i18n="opt_electronica">
-            <option data-i18n="opt_aire">Aire acondicionado (Recarga)</option>
-            <option data-i18n="opt_filtro_hab">Filtro de habitáculo</option>
-            <option data-i18n="opt_luces">Luces / Faros</option>
-            <option data-i18n="opt_escobillas">Escobillas limpiaparabrisas</option>
-            <option data-i18n="opt_sensores">Sensores</option>
+            <option value="Aire acondicionado (Recarga)" data-i18n="opt_aire">Aire acondicionado (Recarga)</option>
+            <option value="Filtro de habitáculo" data-i18n="opt_filtro_hab">Filtro de habitáculo</option>
+            <option value="Luces / Faros" data-i18n="opt_luces">Luces / Faros</option>
+            <option value="Escobillas limpiaparabrisas" data-i18n="opt_escobillas">Escobillas limpiaparabrisas</option>
+            <option value="Sensores" data-i18n="opt_sensores">Sensores</option>
           </optgroup>
           <optgroup label="Carrocería y otros" data-i18n="opt_carroceria">
-            <option data-i18n="opt_chapa">Chapa y pintura</option>
-            <option data-i18n="opt_cristales">Cristales</option>
-            <option data-i18n="opt_otro">Otro</option>
+            <option value="Chapa y pintura" data-i18n="opt_chapa">Chapa y pintura</option>
+            <option value="Cristales" data-i18n="opt_cristales">Cristales</option>
+            <option value="Otro" data-i18n="opt_otro">Otro</option>
           </optgroup>
         </select>
       </div>

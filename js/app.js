@@ -82,6 +82,14 @@ function translatePage() {
     }
   });
 
+  // Traducir los textos flotantes (tooltips) de los iconos
+  document.querySelectorAll('[data-i18n-title]').forEach(el => {
+    const key = el.getAttribute('data-i18n-title');
+    if (translations[currentLang][key]) {
+      el.title = translations[currentLang][key];
+    }
+  });
+
   // Actualizar el título del formulario si estamos editando
   if(editandoMantenimientoId) {
       document.getElementById('titulo-formulario').textContent = currentLang === 'es' ? 'Editando Mantenimiento' : 'Editing Maintenance';
