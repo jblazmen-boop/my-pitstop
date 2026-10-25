@@ -40,7 +40,7 @@ header h1 {
 /* CONTENEDOR DE LAS PESTAÑAS */
 .tabs { 
   display: flex; 
-  gap: 25px; /* Más espacio entre iconos para que no se toquen */
+  gap: 20px; 
   margin-bottom: 25px; 
   flex-wrap: wrap; 
   justify-content: center; 
@@ -57,25 +57,27 @@ header h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 15px;
-}
-.tab:hover {
-  transform: translateY(-4px) scale(1.05); /* Efecto de elevación al pasar el ratón */
 }
 
-/* TAMAÑO DE LOS ICONOS (MÁS GRANDES Y A COLOR) */
+/* TAMAÑO Y ESTILO BASE DE LOS ICONOS */
 .tab-icon {
-  height: 75px; /* Tamaño intermedio, con mucha presencia */
+  height: 75px; 
   width: 75px;  
   object-fit: contain; 
-  border-radius: 15px; 
+  border-radius: 12px; 
+  box-shadow: 0 0 0 4px #1a3a5c, 0 6px 12px rgba(0,0,0,0.2); 
   transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Sombra suave para dar relieve */
+  background-color: white; 
 }
 
-/* Efecto cuando la pestaña está seleccionada (el halo azul) */
+/* EFECTO AL PASAR EL RATÓN (El que te gusta) */
+.tab:hover .tab-icon {
+  transform: translateY(-5px) scale(1.05);
+}
+
+/* EFECTO CUANDO LA PESTAÑA ESTÁ SELECCIONADA */
 .tab.active .tab-icon {
-  box-shadow: 0 0 0 4px #1a3a5c, 0 6px 12px rgba(0,0,0,0.3); 
+  box-shadow: 0 0 0 4px #2a4a6c, 0 0 15px rgba(26, 58, 92, 0.6); 
   transform: scale(1.05);
 }
 
