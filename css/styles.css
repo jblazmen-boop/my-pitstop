@@ -36,14 +36,22 @@ header h1 {
 }
 
 .container { max-width: 1100px; margin: 20px auto; padding: 0 16px; }
-.tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; justify-content: center; }
 
-/* ESTILOS DE LAS PESTAÑAS */
+/* CONTENEDOR DE LAS PESTAÑAS */
+.tabs { 
+  display: flex; 
+  gap: 10px; 
+  margin-bottom: 20px; 
+  flex-wrap: wrap; /* Si la pantalla es pequeña, bajan a la siguiente línea */
+  justify-content: center; 
+}
+
+/* ESTILO DE CADA PESTAÑA */
 .tab { 
-  padding: 10px 18px; 
+  padding: 8px 15px; 
   background: #eef2f5; 
   border: none; 
-  border-radius: 6px; 
+  border-radius: 8px; 
   cursor: pointer; 
   font-size: 14px; 
   font-weight: 600; 
@@ -51,7 +59,7 @@ header h1 {
   transition: all 0.3s ease; 
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px; /* Espacio entre el icono y el texto */
 }
 .tab:hover {
   background: #dde3ea;
@@ -63,11 +71,12 @@ header h1 {
   box-shadow: 0 4px 10px rgba(26, 58, 92, 0.3); 
 }
 
-/* ESTILO PARA LOS ICONOS DE LAS PESTAÑAS */
+/* REGLA PARA QUE LOS ICONOS SE VEAN PEQUEÑOS Y CUADRADOS */
 .tab-icon {
-  height: 24px;
-  width: auto;
-  object-fit: contain;
+  height: 32px; 
+  width: 32px;  
+  object-fit: contain; 
+  border-radius: 4px; 
 }
 
 .panel { display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
