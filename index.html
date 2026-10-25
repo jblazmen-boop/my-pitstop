@@ -15,9 +15,10 @@
 <body>
 
 <header>
-  <!-- BOTÓN DE IDIOMA -->
-  <div class="lang-switch" onclick="toggleLanguage()" id="btn-lang" title="Cambiar idioma">
-    🇬🇧 EN
+  <!-- SELECTOR DE IDIOMA CON DOS BOTONES -->
+  <div class="lang-switch">
+    <button class="lang-btn active" id="lang-es" onclick="setLanguage('es')" title="Español">🇪🇸 ES</button>
+    <button class="lang-btn" id="lang-en" onclick="setLanguage('en')" title="English">🇬🇧 EN</button>
   </div>
 
   <div class="header-content">

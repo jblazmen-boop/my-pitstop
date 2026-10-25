@@ -72,10 +72,6 @@ function translatePage() {
     }
   });
 
-  // Cambiar el texto del botón de idioma
-  const btnLang = document.getElementById('btn-lang');
-  btnLang.textContent = currentLang === 'es' ? '🇬🇧 EN' : '🇪🇸 ES';
-  
   // Actualizar el título del formulario si estamos editando
   if(editandoMantenimientoId) {
       document.getElementById('titulo-formulario').textContent = currentLang === 'es' ? 'Editando Mantenimiento' : 'Editing Maintenance';
@@ -88,8 +84,15 @@ function translatePage() {
   document.documentElement.lang = currentLang;
 }
 
-function toggleLanguage() {
-  currentLang = currentLang === 'es' ? 'en' : 'es';
+function setLanguage(lang) {
+  currentLang = lang;
+  
+  // Actualizar estilos de los botones
+  document.getElementById('lang-es').classList.remove('active');
+  document.getElementById('lang-en').classList.remove('active');
+  document.getElementById('lang-' + lang).classList.add('active');
+  
+  // Traducir la página
   translatePage();
 }
 // ============ FIN TRADUCCIONES ============
@@ -271,3 +274,22 @@ function guardarRepuesto(cant, desc, ref, precio, fotoBase64, fotoId) {
   repuestosTemporales.push({ cant, desc, ref, precio, foto: fotoBase64, fotoId: fotoId });
   document.getElementById('r_cant').value = 1;
   document.getElementById('r_desc').value = '';
+  document.getElementById('r_ref').value = '';
+  document.getElementById('r_precio').value = '';
+  document.getElementById('r_foto').value = '';
+  document.getElementById('r_foto_catalogo').value = '';
+  renderRepuestosTemporales();
+}
+
+function eliminarRepuestoTemporal(index) {
+  repuestosTemporales.splice(index, 1);
+  renderRepuestosTemporales();
+}
+
+function renderRepuestosTemporales() {
+  const tbody = document.querySelector('#tabla_repuestos tbody');
+  tbody.innerHTML = '';
+  let total = 0;
+  
+  if (repuestosTemporales.length === 0) {
+    t
