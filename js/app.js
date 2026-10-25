@@ -24,17 +24,13 @@ const translations = {
     btn_gen_pdf: "Generar PDF", copia_seguridad: "Copia de seguridad", copia_texto: "Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.",
     exportar: "⬇ Exportar copia (JSON)", importar: "⬆ Importar copia", borrar: "🗑 Borrar todos los datos",
     derechos: "Todos los derechos reservados.", selecciona: "— Selecciona —", no_foto: "— No usar foto —",
+    ej_operacion: "Ej: Sustituir correa", ej_referencia: "Ej: MANN-W712",
     pdf_informe: "INFORME DE MANTENIMIENTO", pdf_factura: "INFORME / FACTURA DE MANTENIMIENTO",
     pdf_vehiculo: "Vehículo:", pdf_matricula: "Matrícula:", pdf_bastidor: "Nº Bastidor:", pdf_fecha_inf: "Fecha informe:",
     pdf_periodo: "Periodo:", pdf_mano_obra: "Desglose de Mano de Obra", pdf_concepto: "Concepto", pdf_importe: "Importe",
     pdf_repuestos: "Desglose de Repuestos", pdf_desc: "Descripción", pdf_precio_ud: "Precio Ud.", pdf_base: "Base imponible:",
     pdf_iva: "IVA", pdf_total: "TOTAL FACTURA:", pdf_servicios: "Servicio / Mano de Obra", pdf_materiales: "Materiales / Repuestos",
-    pdf_ope_realizadas: "Operaciones Realizadas", pdf_taller_txt: "Taller:",
-    // Desplegables
-    opt_general: "Mantenimiento general", opt_aceite: "Aceite y Filtros", opt_frenos: "Frenos", opt_neumaticos: "Neumáticos", opt_suspension: "Suspensión", opt_distribucion: "Distribución", opt_revision: "Revisión oficial", opt_itv: "ITV",
-    opt_motor: "Motor y escape", opt_bujias: "Bujías / Encendido", opt_bateria: "Batería", opt_filtro_aire: "Filtro de aire / combustible", opt_correa: "Correa / Cadena", opt_escape: "Escape / Catalizador",
-    opt_electronica: "Electrónica y climatización", opt_aire: "Aire acondicionado (Recarga)", opt_filtro_hab: "Filtro de habitáculo", opt_luces: "Luces / Faros", opt_escobillas: "Escobillas limpiaparabrisas", opt_sensores: "Sensores",
-    opt_carroceria: "Carrocería y otros", opt_chapa: "Chapa y pintura", opt_cristales: "Cristales", opt_otro: "Otro"
+    pdf_ope_realizadas: "Operaciones Realizadas", pdf_taller_txt: "Taller:"
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -52,17 +48,13 @@ const translations = {
     btn_gen_pdf: "Generate PDF", copia_seguridad: "Backup", copia_texto: "Data is stored in this browser. If you clear your history or change devices, it will be lost. Export a backup regularly.",
     exportar: "⬇ Export backup (JSON)", importar: "⬆ Import backup", borrar: "🗑 Delete all data",
     derechos: "All rights reserved.", selecciona: "— Select —", no_foto: "— No photo —",
+    ej_operacion: "Ex: Replace belt", ej_referencia: "Ex: MANN-W712",
     pdf_informe: "MAINTENANCE REPORT", pdf_factura: "MAINTENANCE REPORT / INVOICE",
     pdf_vehiculo: "Vehicle:", pdf_matricula: "Plate:", pdf_bastidor: "VIN:", pdf_fecha_inf: "Report date:",
     pdf_periodo: "Period:", pdf_mano_obra: "Labor Breakdown", pdf_concepto: "Concept", pdf_importe: "Amount",
     pdf_repuestos: "Parts Breakdown", pdf_desc: "Description", pdf_precio_ud: "Unit Price", pdf_base: "Subtotal:",
     pdf_iva: "VAT", pdf_total: "TOTAL INVOICE:", pdf_servicios: "Service / Labor", pdf_materiales: "Materials / Parts",
-    pdf_ope_realizadas: "Operations Performed", pdf_taller_txt: "Workshop:",
-    // Desplegables
-    opt_general: "General maintenance", opt_aceite: "Oil & Filters", opt_frenos: "Brakes", opt_neumaticos: "Tires", opt_suspension: "Suspension", opt_distribucion: "Timing Belt", opt_revision: "Official Service", opt_itv: "Inspection (MOT)",
-    opt_motor: "Engine & Exhaust", opt_bujias: "Spark Plugs / Ignition", opt_bateria: "Battery", opt_filtro_aire: "Air / Fuel Filter", opt_correa: "Belt / Chain", opt_escape: "Exhaust / Catalytic",
-    opt_electronica: "Electronics & AC", opt_aire: "Air Conditioning (Recharge)", opt_filtro_hab: "Cabin Filter", opt_luces: "Lights / Headlights", opt_escobillas: "Wiper Blades", opt_sensores: "Sensors",
-    opt_carroceria: "Body & Other", opt_chapa: "Bodywork & Paint", opt_cristales: "Glass", opt_otro: "Other"
+    pdf_ope_realizadas: "Operations Performed", pdf_taller_txt: "Workshop:"
   }
 };
 
@@ -78,6 +70,13 @@ function translatePage() {
     }
   });
 
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (translations[currentLang][key]) {
+      el.placeholder = translations[currentLang][key];
+    }
+  });
+
   document.querySelectorAll('[data-i18n-title]').forEach(el => {
     const key = el.getAttribute('data-i18n-title');
     if (translations[currentLang][key]) {
@@ -85,24 +84,45 @@ function translatePage() {
     }
   });
 
-  // TRADUCIR MANUALMENTE LOS DESPLEGABLES
-  const selTipo = document.getElementById('m_tipo');
-  if (selTipo) {
-    const groups = selTipo.querySelectorAll('optgroup');
-    const groupKeys = ['opt_general', 'opt_motor', 'opt_electronica', 'opt_carroceria'];
-    const optKeys = [
-      ['opt_aceite', 'opt_frenos', 'opt_neumaticos', 'opt_suspension', 'opt_distribucion', 'opt_revision', 'opt_itv'],
-      ['opt_bujias', 'opt_bateria', 'opt_filtro_aire', 'opt_correa', 'opt_escape'],
-      ['opt_aire', 'opt_filtro_hab', 'opt_luces', 'opt_escobillas', 'opt_sensores'],
-      ['opt_chapa', 'opt_cristales', 'opt_otro']
-    ];
-    groups.forEach((group, i) => {
-      group.label = translations[currentLang][groupKeys[i]];
-      const options = group.querySelectorAll('option');
-      options.forEach((opt, j) => {
-        opt.textContent = translations[currentLang][optKeys[i][j]];
-      });
-    });
+  // TRADUCCIÓN MANUAL DE LOS DESPLEGABLES
+  const groups = ['group-1', 'group-2', 'group-3', 'group-4'];
+  const groupTextsEs = ["Mantenimiento general", "Motor y escape", "Electrónica y climatización", "Carrocería y otros"];
+  const groupTextsEn = ["General maintenance", "Engine & Exhaust", "Electronics & AC", "Body & Other"];
+  
+  groups.forEach((id, i) => {
+    const groupEl = document.getElementById(id);
+    if (groupEl) groupEl.label = currentLang === 'es' ? groupTextsEs[i] : groupTextsEn[i];
+  });
+
+  const optionTexts = {
+    "opt-1-1": { es: "Aceite y Filtros", en: "Oil & Filters" },
+    "opt-1-2": { es: "Frenos", en: "Brakes" },
+    "opt-1-3": { es: "Neumáticos", en: "Tires" },
+    "opt-1-4": { es: "Suspensión", en: "Suspension" },
+    "opt-1-5": { es: "Distribución", en: "Timing Belt" },
+    "opt-1-6": { es: "Revisión oficial", en: "Official Service" },
+    "opt-1-7": { es: "ITV", en: "Inspection (MOT)" },
+    "opt-2-1": { es: "Bujías / Encendido", en: "Spark Plugs / Ignition" },
+    "opt-2-2": { es: "Batería", en: "Battery" },
+    "opt-2-3": { es: "Filtro de aire / combustible", en: "Air / Fuel Filter" },
+    "opt-2-4": { es: "Correa / Cadena", en: "Belt / Chain" },
+    "opt-2-5": { es: "Escape / Catalizador", en: "Exhaust / Catalytic" },
+    "opt-3-1": { es: "Aire acondicionado (Recarga)", en: "Air Conditioning (Recharge)" },
+    "opt-3-2": { es: "Filtro de habitáculo", en: "Cabin Filter" },
+    "opt-3-3": { es: "Luces / Faros", en: "Lights / Headlights" },
+    "opt-3-4": { es: "Escobillas limpiaparabrisas", en: "Wiper Blades" },
+    "opt-3-5": { es: "Sensores", en: "Sensors" },
+    "opt-4-1": { es: "Chapa y pintura", en: "Bodywork & Paint" },
+    "opt-4-2": { es: "Cristales", en: "Glass" },
+    "opt-4-3": { es: "Otro", en: "Other" }
+  };
+
+  for (const [id, texts] of Object.entries(optionTexts)) {
+    const optEl = document.getElementById(id);
+    if (optEl) {
+      optEl.textContent = texts[currentLang];
+      optEl.value = texts[currentLang]; // También actualizamos el value para que no falle al guardar
+    }
   }
 
   if(editandoMantenimientoId) {
@@ -424,7 +444,11 @@ function cancelarEdicion() {
   document.getElementById('m_taller').value = '';
   document.getElementById('m_notas').value = '';
   document.getElementById('m_vehiculo').value = ''; 
-  document.getElementById('m_tipo').value = 'Aceite y Filtros'; 
+  
+  // Restaurar la primera opción del desplegable según el idioma
+  const selTipo = document.getElementById('m_tipo');
+  if (currentLang === 'es') selTipo.value = "Aceite y Filtros";
+  else selTipo.value = "Oil & Filters";
 
   document.getElementById('btn-guardar').textContent = translations[currentLang].guardar_mant;
   document.getElementById('btn-cancelar').style.display = 'none';
@@ -539,7 +563,7 @@ function mostrarMsg(id, texto, tipo) {
 function generarPDF() {
   const { jsPDF } = window.jspdf;
   const tipoInforme = document.getElementById('i_tipo_informe').value;
-  const t = translations[currentLang]; // Atajo para las traducciones
+  const t = translations[currentLang]; 
   
   const vehiculoId = document.getElementById('i_vehiculo').value;
   const desde = document.getElementById('i_desde').value;

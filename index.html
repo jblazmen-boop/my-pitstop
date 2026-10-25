@@ -64,33 +64,33 @@
       <div><label data-i18n="km">Km</label><input type="number" id="m_km" placeholder="85000"></div>
       <div><label data-i18n="tipo">Tipo</label>
         <select id="m_tipo">
-          <optgroup label="Mantenimiento general">
-            <option value="Aceite y Filtros">Aceite y Filtros</option>
-            <option value="Frenos">Frenos</option>
-            <option value="Neumáticos">Neumáticos</option>
-            <option value="Suspensión">Suspensión</option>
-            <option value="Distribución">Distribución</option>
-            <option value="Revisión oficial">Revisión oficial</option>
-            <option value="ITV">ITV</option>
+          <optgroup label="Mantenimiento general" id="group-1">
+            <option value="Aceite y Filtros" id="opt-1-1">Aceite y Filtros</option>
+            <option value="Frenos" id="opt-1-2">Frenos</option>
+            <option value="Neumáticos" id="opt-1-3">Neumáticos</option>
+            <option value="Suspensión" id="opt-1-4">Suspensión</option>
+            <option value="Distribución" id="opt-1-5">Distribución</option>
+            <option value="Revisión oficial" id="opt-1-6">Revisión oficial</option>
+            <option value="ITV" id="opt-1-7">ITV</option>
           </optgroup>
-          <optgroup label="Motor y escape">
-            <option value="Bujías / Encendido">Bujías / Encendido</option>
-            <option value="Batería">Batería</option>
-            <option value="Filtro de aire / combustible">Filtro de aire / combustible</option>
-            <option value="Correa / Cadena">Correa / Cadena</option>
-            <option value="Escape / Catalizador">Escape / Catalizador</option>
+          <optgroup label="Motor y escape" id="group-2">
+            <option value="Bujías / Encendido" id="opt-2-1">Bujías / Encendido</option>
+            <option value="Batería" id="opt-2-2">Batería</option>
+            <option value="Filtro de aire / combustible" id="opt-2-3">Filtro de aire / combustible</option>
+            <option value="Correa / Cadena" id="opt-2-4">Correa / Cadena</option>
+            <option value="Escape / Catalizador" id="opt-2-5">Escape / Catalizador</option>
           </optgroup>
-          <optgroup label="Electrónica y climatización">
-            <option value="Aire acondicionado (Recarga)">Aire acondicionado (Recarga)</option>
-            <option value="Filtro de habitáculo">Filtro de habitáculo</option>
-            <option value="Luces / Faros">Luces / Faros</option>
-            <option value="Escobillas limpiaparabrisas">Escobillas limpiaparabrisas</option>
-            <option value="Sensores">Sensores</option>
+          <optgroup label="Electrónica y climatización" id="group-3">
+            <option value="Aire acondicionado (Recarga)" id="opt-3-1">Aire acondicionado (Recarga)</option>
+            <option value="Filtro de habitáculo" id="opt-3-2">Filtro de habitáculo</option>
+            <option value="Luces / Faros" id="opt-3-3">Luces / Faros</option>
+            <option value="Escobillas limpiaparabrisas" id="opt-3-4">Escobillas limpiaparabrisas</option>
+            <option value="Sensores" id="opt-3-5">Sensores</option>
           </optgroup>
-          <optgroup label="Carrocería y otros">
-            <option value="Chapa y pintura">Chapa y pintura</option>
-            <option value="Cristales">Cristales</option>
-            <option value="Otro">Otro</option>
+          <optgroup label="Carrocería y otros" id="group-4">
+            <option value="Chapa y pintura" id="opt-4-1">Chapa y pintura</option>
+            <option value="Cristales" id="opt-4-2">Cristales</option>
+            <option value="Otro" id="opt-4-3">Otro</option>
           </optgroup>
         </select>
       </div>
@@ -102,7 +102,7 @@
     <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px;">
       <h3 style="font-size: 16px; margin-bottom: 8px; color: #1a3a5c;" data-i18n="mano_obra">Mano de Obra</h3>
       <div class="grid" style="grid-template-columns: 1fr 100px 100px; gap: 8px;">
-        <div><label data-i18n="operacion">Operación</label><input id="o_concepto" placeholder="Ej: Sustituir correa"></div>
+        <div><label data-i18n="operacion">Operación</label><input id="o_concepto" placeholder="Ej: Sustituir correa" data-i18n-placeholder="ej_operacion"></div>
         <div><label data-i18n="precio">Precio (€)</label><input type="number" step="0.01" id="o_precio" placeholder="80"></div>
         <div style="display: flex; align-items: flex-end;"><button type="button" class="secondary" data-i18n="add_btn" onclick="addManoObra()" style="width:100%;">+ Añadir</button></div>
       </div>
@@ -119,7 +119,7 @@
       <div class="grid" style="grid-template-columns: 80px 1fr 1fr 100px; gap: 8px;">
         <div><label data-i18n="cant">Cant.</label><input type="number" id="r_cant" value="1" min="1"></div>
         <div><label data-i18n="descripcion">Descripción</label><input id="r_desc" placeholder="Filtro de aceite"></div>
-        <div><label data-i18n="referencia">Referencia</label><input id="r_ref" placeholder="Ej: MANN-W712"></div>
+        <div><label data-i18n="referencia">Referencia</label><input id="r_ref" placeholder="Ej: MANN-W712" data-i18n-placeholder="ej_referencia"></div>
         <div><label data-i18n="precio">Precio (€)</label><input type="number" step="0.01" id="r_precio" placeholder="12.50"></div>
       </div>
       
