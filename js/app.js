@@ -25,6 +25,12 @@ const translations = {
     btn_gen_pdf: "Generar PDF", copia_seguridad: "Copia de seguridad", copia_texto: "Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.",
     exportar: "⬇ Exportar copia (JSON)", importar: "⬆ Importar copia", borrar: "🗑 Borrar todos los datos",
     derechos: "Todos los derechos reservados.",
+    // Desplegables
+    opt_general: "Mantenimiento general", opt_aceite: "Aceite y Filtros", opt_frenos: "Frenos", opt_neumaticos: "Neumáticos", opt_suspension: "Suspensión", opt_distribucion: "Distribución", opt_revision: "Revisión oficial", opt_itv: "ITV",
+    opt_motor: "Motor y escape", opt_bujias: "Bujías / Encendido", opt_bateria: "Batería", opt_filtro_aire: "Filtro de aire / combustible", opt_correa: "Correa / Cadena", opt_escape: "Escape / Catalizador",
+    opt_electronica: "Electrónica y climatización", opt_aire: "Aire acondicionado (Recarga)", opt_filtro_hab: "Filtro de habitáculo", opt_luces: "Luces / Faros", opt_escobillas: "Escobillas limpiaparabrisas", opt_sensores: "Sensores",
+    opt_carroceria: "Carrocería y otros", opt_chapa: "Chapa y pintura", opt_cristales: "Cristales", opt_otro: "Otro",
+    // Textos del PDF
     pdf_informe: "INFORME DE MANTENIMIENTO", pdf_factura: "INFORME / FACTURA DE MANTENIMIENTO",
     pdf_vehiculo: "Vehículo:", pdf_matricula: "Matrícula:", pdf_bastidor: "Nº Bastidor:", pdf_fecha_inf: "Fecha informe:",
     pdf_periodo: "Periodo:", pdf_mano_obra: "Desglose de Mano de Obra", pdf_concepto: "Concepto", pdf_importe: "Importe",
@@ -48,6 +54,12 @@ const translations = {
     btn_gen_pdf: "Generate PDF", copia_seguridad: "Backup", copia_texto: "Data is stored in this browser. If you clear your history or change devices, it will be lost. Export a backup regularly.",
     exportar: "⬇ Export backup (JSON)", importar: "⬆ Import backup", borrar: "🗑 Delete all data",
     derechos: "All rights reserved.",
+    // Desplegables
+    opt_general: "General maintenance", opt_aceite: "Oil & Filters", opt_frenos: "Brakes", opt_neumaticos: "Tires", opt_suspension: "Suspension", opt_distribucion: "Timing Belt", opt_revision: "Official Service", opt_itv: "Inspection (MOT)",
+    opt_motor: "Engine & Exhaust", opt_bujias: "Spark Plugs / Ignition", opt_bateria: "Battery", opt_filtro_aire: "Air / Fuel Filter", opt_correa: "Belt / Chain", opt_escape: "Exhaust / Catalytic",
+    opt_electronica: "Electronics & AC", opt_aire: "Air Conditioning (Recharge)", opt_filtro_hab: "Cabin Filter", opt_luces: "Lights / Headlights", opt_escobillas: "Wiper Blades", opt_sensores: "Sensors",
+    opt_carroceria: "Body & Other", opt_chapa: "Bodywork & Paint", opt_cristales: "Glass", opt_otro: "Other",
+    // Textos del PDF
     pdf_informe: "MAINTENANCE REPORT", pdf_factura: "MAINTENANCE REPORT / INVOICE",
     pdf_vehiculo: "Vehicle:", pdf_matricula: "Plate:", pdf_bastidor: "VIN:", pdf_fecha_inf: "Report date:",
     pdf_periodo: "Period:", pdf_mano_obra: "Labor Breakdown", pdf_concepto: "Concept", pdf_importe: "Amount",
