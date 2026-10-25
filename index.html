@@ -59,7 +59,7 @@
   <div id="mantenimientos" class="panel">
     <h2 id="titulo-formulario" data-i18n="reg_mantenimiento">Registrar mantenimiento</h2>
     <div class="grid">
-      <div><label data-i18n="vehiculo">Vehículo</label><select id="m_vehiculo"></select></div>
+      <div><label data-i18n="vehiculo">Vehículo</label><select id="m_vehiculo"><option value="" data-i18n="selecciona">— Selecciona —</option></select></div>
       <div><label data-i18n="fecha">Fecha</label><input type="date" id="m_fecha"></div>
       <div><label data-i18n="km">Km</label><input type="number" id="m_km" placeholder="85000"></div>
       <div><label data-i18n="tipo">Tipo</label>
@@ -131,7 +131,7 @@
         <div>
           <label data-i18n="cat_foto">O elegir del catálogo (opcional)</label>
           <select id="r_foto_catalogo">
-            <option value="">— No usar foto —</option>
+            <option value="" data-i18n="no_foto">— No usar foto —</option>
           </select>
         </div>
       </div>
@@ -172,7 +172,7 @@
           <option value="historico" data-i18n="historico">Histórico Técnico (Sin precios)</option>
         </select>
       </div>
-      <div><label data-i18n="vehiculo">Vehículo</label><select id="i_vehiculo"></select></div>
+      <div><label data-i18n="vehiculo">Vehículo</label><select id="i_vehiculo"><option value="" data-i18n="selecciona">— Selecciona —</option></select></div>
       <div><label data-i18n="fecha_desde">Fecha desde</label><input type="date" id="i_desde"></div>
       <div><label data-i18n="fecha_hasta">Fecha hasta</label><input type="date" id="i_hasta"></div>
       <div><label data-i18n="num_factura">Nº de factura (opcional)</label><input id="i_factura" placeholder="F-2025-001"></div>

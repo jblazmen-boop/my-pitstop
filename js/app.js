@@ -24,7 +24,7 @@ const translations = {
     num_factura: "Nº de factura (opcional)", iva: "IVA (%)", nombre_taller: "Nombre del taller / emisor (opcional)",
     btn_gen_pdf: "Generar PDF", copia_seguridad: "Copia de seguridad", copia_texto: "Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.",
     exportar: "⬇ Exportar copia (JSON)", importar: "⬆ Importar copia", borrar: "🗑 Borrar todos los datos",
-    derechos: "Todos los derechos reservados.",
+    derechos: "Todos los derechos reservados.", selecciona: "— Selecciona —", no_foto: "— No usar foto —",
     // Desplegables
     opt_general: "Mantenimiento general", opt_aceite: "Aceite y Filtros", opt_frenos: "Frenos", opt_neumaticos: "Neumáticos", opt_suspension: "Suspensión", opt_distribucion: "Distribución", opt_revision: "Revisión oficial", opt_itv: "ITV",
     opt_motor: "Motor y escape", opt_bujias: "Bujías / Encendido", opt_bateria: "Batería", opt_filtro_aire: "Filtro de aire / combustible", opt_correa: "Correa / Cadena", opt_escape: "Escape / Catalizador",
@@ -53,7 +53,7 @@ const translations = {
     num_factura: "Invoice No. (optional)", iva: "VAT (%)", nombre_taller: "Workshop name / issuer (optional)",
     btn_gen_pdf: "Generate PDF", copia_seguridad: "Backup", copia_texto: "Data is stored in this browser. If you clear your history or change devices, it will be lost. Export a backup regularly.",
     exportar: "⬇ Export backup (JSON)", importar: "⬆ Import backup", borrar: "🗑 Delete all data",
-    derechos: "All rights reserved.",
+    derechos: "All rights reserved.", selecciona: "— Select —", no_foto: "— No photo —",
     // Desplegables
     opt_general: "General maintenance", opt_aceite: "Oil & Filters", opt_frenos: "Brakes", opt_neumaticos: "Tires", opt_suspension: "Suspension", opt_distribucion: "Timing Belt", opt_revision: "Official Service", opt_itv: "Inspection (MOT)",
     opt_motor: "Engine & Exhaust", opt_bujias: "Spark Plugs / Ignition", opt_bateria: "Battery", opt_filtro_aire: "Air / Fuel Filter", opt_correa: "Belt / Chain", opt_escape: "Exhaust / Catalytic",
@@ -322,7 +322,7 @@ function renderRepuestosTemporales() {
 function actualizarDesplegableFotos() {
   const sel = document.getElementById('r_foto_catalogo');
   const prev = sel.value;
-  sel.innerHTML = `<option value="">— ${currentLang === 'es' ? 'No usar foto' : 'No photo'} —</option>`;
+  sel.innerHTML = `<option value="" data-i18n="no_foto">${translations[currentLang].no_foto}</option>`;
   state.catalogoFotos.forEach(f => {
     const opt = document.createElement('option');
     opt.value = f.id;
@@ -501,12 +501,12 @@ function renderSelects() {
   ['m_vehiculo','i_vehiculo'].forEach(id => {
     const sel = document.getElementById(id);
     const prev = sel.value;
-    sel.innerHTML = `<option value="">— ${currentLang === 'es' ? 'Selecciona' : 'Select'} —</option>` + opts;
+    sel.innerHTML = `<option value="" data-i18n="selecciona">${translations[currentLang].selecciona}</option>` + opts;
     if (prev) sel.value = prev;
   });
   const filtro = document.getElementById('f_vehiculo');
   const prevF = filtro.value;
-  filtro.innerHTML = `<option value="">${translations[currentLang].todos}</option>` + opts;
+  filtro.innerHTML = `<option value="" data-i18n="todos">${translations[currentLang].todos}</option>` + opts;
   if (prevF) filtro.value = prevF;
   
   actualizarDesplegableFotos();
