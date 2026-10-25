@@ -97,9 +97,30 @@ function translatePage() {
     "group-10": { es: "Otro", en: "Other" }
   };
 
+  const optionTexts = {
+    "opt-1": { es: "Revisión / Mantenimiento", en: "Service / Maintenance" },
+    "opt-2": { es: "Motor", en: "Engine" },
+    "opt-3": { es: "Transmisión", en: "Transmission" },
+    "opt-4": { es: "Suspensión, Dirección y Frenos", en: "Suspension, Steering & Brakes" },
+    "opt-5": { es: "Electricidad / Electrónica", en: "Electrical / Electronics" },
+    "opt-6": { es: "Climatización", en: "Air Conditioning" },
+    "opt-7": { es: "Escape", en: "Exhaust" },
+    "opt-8": { es: "Interior, Habitáculo y Seguridad", en: "Interior, Cabin & Safety" },
+    "opt-9": { es: "Chasis y Carrocería", en: "Chassis & Bodywork" },
+    "opt-10": { es: "Otro", en: "Other" }
+  };
+
   for (const [id, texts] of Object.entries(groupTexts)) {
     const el = document.getElementById(id);
     if (el) el.label = texts[currentLang];
+  }
+
+  for (const [id, texts] of Object.entries(optionTexts)) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = texts[currentLang];
+      el.value = texts[currentLang];
+    }
   }
 
   if(editandoMantenimientoId) {

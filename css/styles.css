@@ -42,7 +42,7 @@ header h1 {
   color: #ffffff;
 }
 
-/* --- BANDERAS CON COLORES CSS (SIN IMÁGENES) --- */
+/* --- BANDERAS CON IMÁGENES REALES --- */
 .lang-switch {
   display: flex !important;
   gap: 10px !important;
@@ -56,30 +56,20 @@ header h1 {
   border-radius: 4px !important;
   cursor: pointer !important;
   border: 2px solid #ffffff !important;
-  font-size: 0 !important; /* Ocultamos el texto */
+  font-size: 0 !important;
   padding: 0 !important;
   box-shadow: 0 4px 6px rgba(0,0,0,0.3) !important;
   transition: transform 0.2s !important;
+  background-size: cover !important;
+  background-position: center !important;
 }
 
-/* Bandera de España (Rojo, Amarillo, Rojo) */
 #lang-es {
-  background: linear-gradient(to bottom, #C60B1E 25%, #FFC400 25%, #FFC400 75%, #C60B1E 75%) !important;
+  background-image: url('https://flagcdn.com/w80/es.png') !important;
 }
 
-/* Bandera del Reino Unido (Azul con cruz roja y blanca) */
 #lang-en {
-  background: #00247D !important; /* Fondo azul */
-  position: relative;
-}
-#lang-en::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(to bottom, transparent 40%, #CF142B 40%, #CF142B 60%, transparent 60%),
-              linear-gradient(to right, transparent 40%, #CF142B 40%, #CF142B 60%, transparent 60%),
-              linear-gradient(to bottom, transparent 45%, #FFFFFF 45%, #FFFFFF 55%, transparent 55%),
-              linear-gradient(to right, transparent 45%, #FFFFFF 45%, #FFFFFF 55%, transparent 55%);
+  background-image: url('https://flagcdn.com/w80/gb.png') !important;
 }
 
 .lang-btn:hover {
@@ -156,6 +146,25 @@ h2 {
   font-weight: 800 !important;
   border-bottom: 2px solid #1a3a5c;
   padding-bottom: 5px;
+}
+
+/* Botón personalizado para subir archivos */
+.file-btn {
+  display: inline-block;
+  background: #eee;
+  border: 1px solid #ccc;
+  padding: 8px 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+  width: 100%;
+  transition: 0.2s;
+}
+.file-btn:hover {
+  background: #ddd;
 }
 
 /* --- MÓVILES --- */
