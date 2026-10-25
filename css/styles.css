@@ -40,14 +40,14 @@ header h1 {
 /* CONTENEDOR DE LAS PESTAÑAS */
 .tabs { 
   display: flex; 
-  gap: 15px; 
-  margin-bottom: 20px; 
+  gap: 25px; /* Más espacio entre iconos para que no se toquen */
+  margin-bottom: 25px; 
   flex-wrap: wrap; 
   justify-content: center; 
   align-items: center;
 }
 
-/* ESTILO DE CADA PESTAÑA (AHORA SOLO ICONO) */
+/* ESTILO DE CADA PESTAÑA */
 .tab { 
   background: transparent; 
   border: none; 
@@ -57,28 +57,26 @@ header h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
+  border-radius: 15px;
 }
 .tab:hover {
-  transform: translateY(-3px) scale(1.05); /* Efecto de elevación */
-}
-.tab.active { 
-  background: transparent; /* Sin fondo blanco, solo el icono */
-  box-shadow: none;
+  transform: translateY(-4px) scale(1.05); /* Efecto de elevación al pasar el ratón */
 }
 
-/* TAMAÑO DE LOS ICONOS (IGUAL QUE EL LOGO PRINCIPAL) */
+/* TAMAÑO DE LOS ICONOS (MÁS GRANDES Y A COLOR) */
 .tab-icon {
-  height: 60px; 
-  width: 60px;  
+  height: 75px; /* Tamaño intermedio, con mucha presencia */
+  width: 75px;  
   object-fit: contain; 
-  border-radius: 12px; 
-  filter: grayscale(20%); /* Un pelín apagados si no están seleccionados */
-  transition: filter 0.3s;
+  border-radius: 15px; 
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1); /* Sombra suave para dar relieve */
 }
+
+/* Efecto cuando la pestaña está seleccionada (el halo azul) */
 .tab.active .tab-icon {
-  filter: grayscale(0%); /* A todo color cuando están seleccionados */
-  box-shadow: 0 0 0 4px #1a3a5c, 0 4px 10px rgba(0,0,0,0.3); /* Un halo azul para el activo */
+  box-shadow: 0 0 0 4px #1a3a5c, 0 6px 12px rgba(0,0,0,0.3); 
+  transform: scale(1.05);
 }
 
 .panel { display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
