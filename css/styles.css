@@ -42,33 +42,46 @@ header h1 {
   color: #ffffff;
 }
 
-/* --- BOTONES DE IDIOMA --- */
+/* --- BANDERAS REALES (IMÁGENES) --- */
 .lang-switch {
-  display: flex;
-  gap: 10px;
-  width: 150px;
-  justify-content: flex-end;
+  display: flex !important;
+  gap: 15px !important;
+  z-index: 1000 !important;
+  position: relative !important;
 }
+
 .lang-btn {
-  background: #ffffff; 
-  border: 2px solid #ffffff;
-  color: #1a3a5c;
-  padding: 8px 14px;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 14px;
-  transition: all 0.2s;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+  width: 45px !important;
+  height: 30px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  border: 2px solid #ffffff !important;
+  font-size: 0 !important; /* Ocultamos el texto */
+  padding: 0 !important;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3) !important;
+  transition: transform 0.2s !important;
 }
+
+#lang-es {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Spain.svg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
+#lang-en {
+  background-image: url('https://upload.wikimedia.org/wikipedia/commons/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg') !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+
 .lang-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 10px rgba(0,0,0,0.3);
+  transform: scale(1.1) !important;
 }
+
 .lang-btn.active {
-  background: #e6f4ea;
-  border-color: #1e6b32;
-  color: #1e6b32;
+  border-color: #1e6b32 !important;
+  box-shadow: 0 0 10px #1e6b32 !important;
+  transform: scale(1.1) !important;
 }
 
 /* --- CONTENEDOR PRINCIPAL --- */

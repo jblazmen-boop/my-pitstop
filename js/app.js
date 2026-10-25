@@ -84,44 +84,58 @@ function translatePage() {
     }
   });
 
-  // TRADUCCIÓN MANUAL DE LOS DESPLEGABLES
-  const groups = ['group-1', 'group-2', 'group-3', 'group-4'];
-  const groupTextsEs = ["Mantenimiento general", "Motor y escape", "Electrónica y climatización", "Carrocería y otros"];
-  const groupTextsEn = ["General maintenance", "Engine & Exhaust", "Electronics & AC", "Body & Other"];
-  
-  groups.forEach((id, i) => {
-    const groupEl = document.getElementById(id);
-    if (groupEl) groupEl.label = currentLang === 'es' ? groupTextsEs[i] : groupTextsEn[i];
-  });
+  const groupTexts = {
+    "group-1": { es: "Revisión / Mantenimiento", en: "Service / Maintenance" },
+    "group-2": { es: "Motor", en: "Engine" },
+    "group-3": { es: "Transmisión", en: "Transmission" },
+    "group-4": { es: "Suspensión, Dirección y Frenos", en: "Suspension, Steering & Brakes" },
+    "group-5": { es: "Electricidad / Electrónica", en: "Electrical / Electronics" },
+    "group-6": { es: "Climatización", en: "Air Conditioning" },
+    "group-7": { es: "Escape", en: "Exhaust" },
+    "group-8": { es: "Interior, Habitáculo y Seguridad", en: "Interior, Cabin & Safety" },
+    "group-9": { es: "Chasis y Carrocería", en: "Chassis & Bodywork" },
+    "group-10": { es: "Otro", en: "Other" }
+  };
 
   const optionTexts = {
-    "opt-1-1": { es: "Aceite y Filtros", en: "Oil & Filters" },
-    "opt-1-2": { es: "Frenos", en: "Brakes" },
-    "opt-1-3": { es: "Neumáticos", en: "Tires" },
-    "opt-1-4": { es: "Suspensión", en: "Suspension" },
-    "opt-1-5": { es: "Distribución", en: "Timing Belt" },
-    "opt-1-6": { es: "Revisión oficial", en: "Official Service" },
-    "opt-1-7": { es: "ITV", en: "Inspection (MOT)" },
+    "opt-1-1": { es: "Revisión / Mantenimiento", en: "Service / Maintenance" },
+    "opt-1-2": { es: "Aceite y Filtros", en: "Oil & Filters" },
+    "opt-1-3": { es: "Distribución", en: "Timing Belt" },
     "opt-2-1": { es: "Bujías / Encendido", en: "Spark Plugs / Ignition" },
     "opt-2-2": { es: "Batería", en: "Battery" },
     "opt-2-3": { es: "Filtro de aire / combustible", en: "Air / Fuel Filter" },
     "opt-2-4": { es: "Correa / Cadena", en: "Belt / Chain" },
-    "opt-2-5": { es: "Escape / Catalizador", en: "Exhaust / Catalytic" },
-    "opt-3-1": { es: "Aire acondicionado (Recarga)", en: "Air Conditioning (Recharge)" },
-    "opt-3-2": { es: "Filtro de habitáculo", en: "Cabin Filter" },
-    "opt-3-3": { es: "Luces / Faros", en: "Lights / Headlights" },
-    "opt-3-4": { es: "Escobillas limpiaparabrisas", en: "Wiper Blades" },
-    "opt-3-5": { es: "Sensores", en: "Sensors" },
-    "opt-4-1": { es: "Chapa y pintura", en: "Bodywork & Paint" },
-    "opt-4-2": { es: "Cristales", en: "Glass" },
-    "opt-4-3": { es: "Otro", en: "Other" }
+    "opt-3-1": { es: "Caja de cambios", en: "Gearbox" },
+    "opt-3-2": { es: "Embrague", en: "Clutch" },
+    "opt-3-3": { es: "Transmisión", en: "Transmission" },
+    "opt-4-1": { es: "Frenos", en: "Brakes" },
+    "opt-4-2": { es: "Suspensión", en: "Suspension" },
+    "opt-4-3": { es: "Dirección", en: "Steering" },
+    "opt-5-1": { es: "Luces / Faros", en: "Lights / Headlights" },
+    "opt-5-2": { es: "Sensores", en: "Sensors" },
+    "opt-5-3": { es: "Alternador / Motor de arranque", en: "Alternator / Starter" },
+    "opt-6-1": { es: "Aire acondicionado (Recarga)", en: "Air Conditioning (Recharge)" },
+    "opt-6-2": { es: "Filtro de habitáculo", en: "Cabin Filter" },
+    "opt-7-1": { es: "Escape / Catalizador", en: "Exhaust / Catalytic" },
+    "opt-8-1": { es: "Interior", en: "Interior" },
+    "opt-8-2": { es: "Seguridad", en: "Safety" },
+    "opt-8-3": { es: "Escobillas limpiaparabrisas", en: "Wiper Blades" },
+    "opt-9-1": { es: "Chapa y pintura", en: "Bodywork & Paint" },
+    "opt-9-2": { es: "Cristales", en: "Glass" },
+    "opt-9-3": { es: "Neumáticos", en: "Tires" },
+    "opt-10-1": { es: "Otro", en: "Other" }
   };
 
+  for (const [id, texts] of Object.entries(groupTexts)) {
+    const el = document.getElementById(id);
+    if (el) el.label = texts[currentLang];
+  }
+
   for (const [id, texts] of Object.entries(optionTexts)) {
-    const optEl = document.getElementById(id);
-    if (optEl) {
-      optEl.textContent = texts[currentLang];
-      optEl.value = texts[currentLang]; // También actualizamos el value para que no falle al guardar
+    const el = document.getElementById(id);
+    if (el) {
+      el.textContent = texts[currentLang];
+      el.value = texts[currentLang];
     }
   }
 
@@ -445,10 +459,9 @@ function cancelarEdicion() {
   document.getElementById('m_notas').value = '';
   document.getElementById('m_vehiculo').value = ''; 
   
-  // Restaurar la primera opción del desplegable según el idioma
   const selTipo = document.getElementById('m_tipo');
-  if (currentLang === 'es') selTipo.value = "Aceite y Filtros";
-  else selTipo.value = "Oil & Filters";
+  if (currentLang === 'es') selTipo.value = "Revisión / Mantenimiento";
+  else selTipo.value = "Service / Maintenance";
 
   document.getElementById('btn-guardar').textContent = translations[currentLang].guardar_mant;
   document.getElementById('btn-cancelar').style.display = 'none';
