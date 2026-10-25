@@ -42,12 +42,12 @@ header h1 {
   color: #ffffff;
 }
 
-/* --- BANDERAS REALES (IMÁGENES) --- */
+/* --- BANDERAS CON COLORES CSS (SIN IMÁGENES) --- */
 .lang-switch {
   display: flex !important;
-  gap: 15px !important;
-  z-index: 1000 !important;
-  position: relative !important;
+  gap: 10px !important;
+  width: 150px;
+  justify-content: flex-end;
 }
 
 .lang-btn {
@@ -62,16 +62,24 @@ header h1 {
   transition: transform 0.2s !important;
 }
 
+/* Bandera de España (Rojo, Amarillo, Rojo) */
 #lang-es {
-  background-image: url('https://upload.wikimedia.org/wikipedia/commons/9/9a/Flag_of_Spain.svg') !important;
-  background-size: cover !important;
-  background-position: center !important;
+  background: linear-gradient(to bottom, #C60B1E 25%, #FFC400 25%, #FFC400 75%, #C60B1E 75%) !important;
 }
 
+/* Bandera del Reino Unido (Azul con cruz roja y blanca) */
 #lang-en {
-  background-image: url('https://upload.wikimedia.org/wikipedia/commons/a/a5/Flag_of_the_United_Kingdom_%281-2%29.svg') !important;
-  background-size: cover !important;
-  background-position: center !important;
+  background: #00247D !important; /* Fondo azul */
+  position: relative;
+}
+#lang-en::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to bottom, transparent 40%, #CF142B 40%, #CF142B 60%, transparent 60%),
+              linear-gradient(to right, transparent 40%, #CF142B 40%, #CF142B 60%, transparent 60%),
+              linear-gradient(to bottom, transparent 45%, #FFFFFF 45%, #FFFFFF 55%, transparent 55%),
+              linear-gradient(to right, transparent 45%, #FFFFFF 45%, #FFFFFF 55%, transparent 55%);
 }
 
 .lang-btn:hover {
@@ -138,6 +146,17 @@ td button { margin-right: 4px; }
 .cerrar-modal:hover { color: #ccc; }
 
 footer { border-top: 1px solid #ddd; background-color: #f8f9fa; width: 100%; }
+
+/* --- MAYÚSCULAS Y ESTILO TALLER --- */
+h2, label, th {
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+}
+h2 {
+  font-weight: 800 !important;
+  border-bottom: 2px solid #1a3a5c;
+  padding-bottom: 5px;
+}
 
 /* --- MÓVILES --- */
 @media (max-width: 600px) {

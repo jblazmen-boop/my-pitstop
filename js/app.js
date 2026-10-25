@@ -97,46 +97,9 @@ function translatePage() {
     "group-10": { es: "Otro", en: "Other" }
   };
 
-  const optionTexts = {
-    "opt-1-1": { es: "Revisión / Mantenimiento", en: "Service / Maintenance" },
-    "opt-1-2": { es: "Aceite y Filtros", en: "Oil & Filters" },
-    "opt-1-3": { es: "Distribución", en: "Timing Belt" },
-    "opt-2-1": { es: "Bujías / Encendido", en: "Spark Plugs / Ignition" },
-    "opt-2-2": { es: "Batería", en: "Battery" },
-    "opt-2-3": { es: "Filtro de aire / combustible", en: "Air / Fuel Filter" },
-    "opt-2-4": { es: "Correa / Cadena", en: "Belt / Chain" },
-    "opt-3-1": { es: "Caja de cambios", en: "Gearbox" },
-    "opt-3-2": { es: "Embrague", en: "Clutch" },
-    "opt-3-3": { es: "Transmisión", en: "Transmission" },
-    "opt-4-1": { es: "Frenos", en: "Brakes" },
-    "opt-4-2": { es: "Suspensión", en: "Suspension" },
-    "opt-4-3": { es: "Dirección", en: "Steering" },
-    "opt-5-1": { es: "Luces / Faros", en: "Lights / Headlights" },
-    "opt-5-2": { es: "Sensores", en: "Sensors" },
-    "opt-5-3": { es: "Alternador / Motor de arranque", en: "Alternator / Starter" },
-    "opt-6-1": { es: "Aire acondicionado (Recarga)", en: "Air Conditioning (Recharge)" },
-    "opt-6-2": { es: "Filtro de habitáculo", en: "Cabin Filter" },
-    "opt-7-1": { es: "Escape / Catalizador", en: "Exhaust / Catalytic" },
-    "opt-8-1": { es: "Interior", en: "Interior" },
-    "opt-8-2": { es: "Seguridad", en: "Safety" },
-    "opt-8-3": { es: "Escobillas limpiaparabrisas", en: "Wiper Blades" },
-    "opt-9-1": { es: "Chapa y pintura", en: "Bodywork & Paint" },
-    "opt-9-2": { es: "Cristales", en: "Glass" },
-    "opt-9-3": { es: "Neumáticos", en: "Tires" },
-    "opt-10-1": { es: "Otro", en: "Other" }
-  };
-
   for (const [id, texts] of Object.entries(groupTexts)) {
     const el = document.getElementById(id);
     if (el) el.label = texts[currentLang];
-  }
-
-  for (const [id, texts] of Object.entries(optionTexts)) {
-    const el = document.getElementById(id);
-    if (el) {
-      el.textContent = texts[currentLang];
-      el.value = texts[currentLang];
-    }
   }
 
   if(editandoMantenimientoId) {
@@ -277,6 +240,7 @@ function renderManoObraTemporal() {
   }
   document.getElementById('total_mano').textContent = fmt(total);
 }
+
 // ============ REPUESTOS ============
 function addRepuesto() {
   const cant = parseInt(document.getElementById('r_cant').value) || 1;
