@@ -58,19 +58,18 @@ header h1 {
   justify-content: center;
 }
 
-/* TAMAÑO Y ESTILO BASE DE LOS ICONOS (TODOS IGUALES CON MARCO AZUL) */
+/* TAMAÑO Y ESTILO BASE DE LOS ICONOS */
 .tab-icon {
   height: 75px; 
   width: 75px;  
   object-fit: contain; 
   border-radius: 12px; 
-  /* AQUÍ ESTÁ EL TRUCO: El marco azul oscuro para TODOS */
   box-shadow: 0 0 0 4px #1a3a5c, 0 4px 10px rgba(0,0,0,0.2); 
   transition: all 0.3s ease;
   background-color: white; 
 }
 
-/* EFECTO AL PASAR EL RATÓN (CREECE Y SE ELEVA) */
+/* EFECTO AL PASAR EL RATÓN */
 .tab:hover .tab-icon {
   transform: translateY(-5px) scale(1.05); 
   box-shadow: 0 0 0 4px #2a4a6c, 0 8px 15px rgba(0,0,0,0.4); 
@@ -78,7 +77,6 @@ header h1 {
 
 /* EFECTO CUANDO LA PESTAÑA ESTÁ SELECCIONADA */
 .tab.active .tab-icon {
-  /* Le damos un poco más de brillo al marco para diferenciarlo */
   box-shadow: 0 0 0 4px #1a3a5c, 0 0 15px rgba(26, 58, 92, 0.8); 
 }
 
@@ -173,4 +171,20 @@ footer {
   border-top: 1px solid #ddd;
   background-color: #f8f9fa;
   width: 100%;
+}
+
+/* --- AJUSTES PARA MÓVILES (Pantallas pequeñas) --- */
+@media (max-width: 600px) {
+  .tabs {
+    gap: 8px; /* Reducimos el espacio entre ellos */
+    margin-bottom: 15px;
+  }
+  .tab-icon {
+    height: 55px; /* Hacemos los iconos un poco más pequeños para que quepan los 4 */
+    width: 55px;
+    box-shadow: 0 0 0 3px #1a3a5c, 0 4px 8px rgba(0,0,0,0.2); 
+  }
+  .container {
+    padding: 0 8px; /* Menos margen a los lados para ganar espacio */
+  }
 }
