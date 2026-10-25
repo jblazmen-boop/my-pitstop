@@ -37,8 +37,32 @@ header h1 {
 
 .container { max-width: 1100px; margin: 20px auto; padding: 0 16px; }
 .tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; justify-content: center; }
-.tab { padding: 10px 18px; background: #dde3ea; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 600; color: #444; transition: 0.2s; }
-.tab.active { background: #1a3a5c; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+
+/* ESTILOS NUEVOS DE LAS PESTAÑAS CON COLOR */
+.tab { 
+  padding: 10px 18px; 
+  background: #eef2f5; 
+  border: none; 
+  border-radius: 6px; 
+  cursor: pointer; 
+  font-size: 14px; 
+  font-weight: 600; 
+  color: #444; 
+  transition: all 0.3s ease; 
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.tab:hover {
+  background: #dde3ea;
+  transform: translateY(-2px);
+}
+.tab.active { 
+  background: #1a3a5c; 
+  color: white; 
+  box-shadow: 0 4px 10px rgba(26, 58, 92, 0.3); 
+}
+
 .panel { display: none; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
 .panel.active { display: block; }
 h2 { margin-top: 0; font-size: 18px; color: #1a3a5c; }
