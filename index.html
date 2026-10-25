@@ -15,15 +15,18 @@
 <body>
 
 <header>
-  <!-- SELECTOR DE IDIOMA CON DOS BOTONES -->
-  <div class="lang-switch">
-    <button class="lang-btn active" id="lang-es" onclick="setLanguage('es')" title="Español">🇪🇸 ES</button>
-    <button class="lang-btn" id="lang-en" onclick="setLanguage('en')" title="English">🇬🇧 EN</button>
-  </div>
+  <div class="header-container">
+    <div class="header-spacer"></div>
+    
+    <div class="header-content">
+      <img src="logo.png" alt="My PitStop Logo" class="logo-img">
+      <h1>My PitStop</h1>
+    </div>
 
-  <div class="header-content">
-    <img src="logo.png" alt="My PitStop Logo" class="logo-img">
-    <h1>My PitStop</h1>
+    <div class="lang-switch">
+      <button class="lang-btn active" id="lang-es" onclick="setLanguage('es')" title="Español">🇪🇸 ES</button>
+      <button class="lang-btn" id="lang-en" onclick="setLanguage('en')" title="English">🇬🇧 EN</button>
+    </div>
   </div>
 </header>
 
