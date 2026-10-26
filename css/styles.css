@@ -1,26 +1,26 @@
 * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 body { 
   margin: 0; 
-  background-color: #1a202c; /* Color de fondo por si la imagen no llena todo */
+  background-color: #111827;
   color: #e2e8f0 !important; 
   min-height: 100vh;
   position: relative;
 }
 
-/* Capa del fondo: Aquí está el truco para que se vea entero y no se estire */
+/* Capa del fondo: 'cover' con tamaño controlado */
 body::before {
   content: "";
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), 
+  background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.75)), 
               url('https://jblazmen-boop.github.io/my-pitstop/fondo.jpg') no-repeat center center;
   
-  /* 'contain' hace que la imagen se vea entera, sin hacer zoom */
-  background-size: contain; 
+  /* Tamaño controlado para que no haga tanto zoom */
+  background-size: 110%; 
   z-index: -1;
 }
 
-/* --- CABECERA (Mismo tamaño) --- */
+/* --- CABECERA --- */
 header { 
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.4) 100%) !important; 
   color: white !important; 
@@ -46,7 +46,7 @@ header {
   gap: 15px;
 }
 
-/* --- LOGO (Mismo tamaño) --- */
+/* --- LOGO --- */
 .logo-container {
   width: 80px; 
   height: 80px;
@@ -66,7 +66,7 @@ header {
   object-position: center; 
 }
 
-/* --- TÍTULO TIPO FIRMA (Mismo tamaño) --- */
+/* --- TÍTULO TIPO FIRMA --- */
 .title-block {
   display: flex;
   flex-direction: column;
@@ -124,7 +124,7 @@ header h1 {
 /* --- CONTENEDOR PRINCIPAL --- */
 .container { max-width: 1100px; margin: 20px auto 30px auto; padding: 0 16px; position: relative; z-index: 10; }
 
-/* --- PESTAÑAS DE ICONOS (Mismo tamaño: 75px) --- */
+/* --- PESTAÑAS DE ICONOS (Mismo tamaño grande: 75px) --- */
 .tabs { display: flex; gap: 25px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center; align-items: center; }
 .tab { background: transparent; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
 .tab-icon {
@@ -151,7 +151,7 @@ header h1 {
 /* --- PANELES --- */
 .panel { 
   display: none; 
-  background: rgba(31, 41, 55, 0.95) !important; /* Un poco más opaco para resaltar sobre el fondo entero */
+  background: rgba(31, 41, 55, 0.9) !important; 
   backdrop-filter: blur(10px) !important; 
   padding: 25px; 
   border-radius: 8px; 
