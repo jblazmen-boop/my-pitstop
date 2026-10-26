@@ -18,7 +18,7 @@ body {
 header { 
   background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
   color: white !important; 
-  padding: 20px 24px; 
+  padding: 20px 24px 30px 24px; /* Más espacio abajo para que respire */
   box-shadow: 0 4px 20px rgba(0,0,0,0.8) !important;
   border-bottom: 4px solid #e11d48 !important; 
   position: relative;
@@ -26,7 +26,7 @@ header {
 .header-container {
   display: flex;
   justify-content: space-between; 
-  align-items: center;
+  align-items: flex-start; /* Alineamos arriba */
   max-width: 1100px;
   margin: 0 auto;
   position: relative;
@@ -37,31 +37,50 @@ header {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px; 
 }
 
-/* --- EL LOGO PERFECTAMENTE CENTRADO Y CUADRADO --- */
-.logo-img {
-  width: 100px;
-  height: 100px;
-  border-radius: 15px;
-  box-shadow: 0 0 20px rgba(225, 29, 72, 0.4) !important; 
-  object-fit: cover; /* Llena el cuadrado sin deformarse */
-  object-position: center; /* Centra el dibujo */
-  background-color: white;
+/* --- LOGO PERFECTAMENTE CENTRADO --- */
+.logo-container {
+  width: 110px;
+  height: 110px;
+  margin-bottom: 10px;
+  border-radius: 20px;
+  background-color: #ffffff;
+  box-shadow: 0 0 25px rgba(225, 29, 72, 0.5) !important; 
   border: 3px solid #e11d48 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+.logo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center; /* Centra el dibujo a la perfección */
 }
 
 /* --- TÍTULO TIPO FIRMA --- */
 header h1 { 
   margin: 0; 
   font-family: 'Great Vibes', cursive !important; 
-  font-size: 55px; 
+  font-size: 60px; 
   font-weight: 400; 
   color: #ffffff !important;
   text-shadow: 0 0 10px rgba(225, 29, 72, 0.8), 0 0 20px rgba(225, 29, 72, 0.4) !important; 
   letter-spacing: 2px;
-  margin-top: -10px; 
+  line-height: 1;
+}
+
+/* --- TEXTO AUTOR --- */
+.author {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+  color: #9ca3af;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-top: -5px;
+  font-weight: 600;
 }
 
 /* --- BANDERAS --- */
@@ -70,6 +89,7 @@ header h1 {
   gap: 10px !important;
   width: 150px;
   justify-content: flex-end;
+  margin-top: 10px;
 }
 .lang-btn {
   width: 45px !important;
@@ -222,11 +242,12 @@ h2 {
 @media (max-width: 600px) {
   .header-container { flex-direction: column; gap: 15px; }
   .header-spacer { display: none; }
-  .lang-switch { width: auto; justify-content: center; }
+  .lang-switch { width: auto; justify-content: center; margin-top: 0; }
   .tabs { gap: 15px; margin-bottom: 20px; }
   .tab-icon { height: 55px; width: 55px; }
   .container { padding: 0 10px; }
   .panel { padding: 15px; border-left-width: 4px; }
   h2 { font-size: 16px; }
   table th, table td { padding: 8px 4px; font-size: 11px; }
+  header h1 { font-size: 45px; }
 }
