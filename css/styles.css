@@ -12,22 +12,20 @@ body::before {
   content: "";
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  /* Usamos tu URL absoluta. El rgba(...,0.6) oscurece la foto un 60% */
-  background: linear-gradient(rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.6)), 
+  /* Usamos tu URL absoluta. El rgba(...,0.7) oscurece la foto un 70% */
+  background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)), 
               url('https://jblazmen-boop.github.io/my-pitstop/fondo.jpg') no-repeat center center;
   background-size: cover;
   z-index: -1;
 }
 
-/* --- CABECERA --- */
+/* --- CABECERA (Limpia, con efecto cristal) --- */
 header { 
-  background: rgba(15, 23, 42, 0.8) !important; /* Fondo oscuro semitransparente */
-  backdrop-filter: blur(5px);
+  background: rgba(15, 23, 42, 0.7) !important; 
+  backdrop-filter: blur(10px); 
   color: white !important; 
   padding: 20px 24px; 
-  border-bottom: 10px solid transparent !important;
-  /* Bandera a cuadros como borde inferior */
-  border-image: repeating-linear-gradient(45deg, #ffffff, #ffffff 15px, #000000 15px, #000000 30px) 10 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important; 
   position: relative;
   z-index: 10;
 }
