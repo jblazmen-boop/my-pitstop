@@ -1,28 +1,18 @@
 * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 body { 
   margin: 0; 
-  /* Fondo de taller de boxes */
-  background: #111827 url('fondo.jpg') no-repeat center center fixed !important; 
+  /* Fondo con degradado oscuro + imagen, todo en una capa para que no se tape */
+  background: linear-gradient(rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.8)), url('fondo.jpg') no-repeat center center fixed !important; 
   background-size: cover !important;
   color: #e2e8f0 !important; 
   min-height: 100vh;
 }
 
-/* Capa oscura para que se lean los textos (hemos bajado la opacidad al 60%) */
-body::before {
-  content: "";
-  position: fixed;
-  top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(15, 23, 42, 0.6); /* 0.6 permite ver más la imagen de fondo */
-  z-index: -1;
-}
-
 /* --- CABECERA --- */
 header { 
-  background: rgba(15, 23, 42, 0.9) !important; /* Fondo oscuro semitransparente */
+  background: transparent !important; /* Transparente para que se vea el fondo */
   color: white !important; 
   padding: 20px 24px 30px 24px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.8) !important;
   position: relative;
 }
 .header-container {
@@ -41,14 +31,14 @@ header {
   justify-content: center;
 }
 
-/* --- BANDERA A CUADROS GRUESA EN EL BORDE --- */
+/* --- BANDERA A CUADROS GRUESA --- */
 .header-container::after {
   content: "";
   position: absolute;
   bottom: -30px;
   left: -24px;
   width: calc(100% + 48px);
-  height: 15px; /* Grosor de la bandera */
+  height: 15px; 
   background-image: repeating-linear-gradient(
     45deg,
     #ffffff 0px, #ffffff 15px,
@@ -164,10 +154,10 @@ header h1 {
   transform: translateY(-2px);
 }
 
-/* --- PANELES --- */
+/* --- PANELES (Efecto Cristal) --- */
 .panel { 
   display: none; 
-  background: rgba(31, 41, 55, 0.85) !important; /* Panel semitransparente */
+  background: rgba(31, 41, 55, 0.85) !important; 
   backdrop-filter: blur(8px) !important; 
   padding: 25px; 
   border-radius: 8px; 
