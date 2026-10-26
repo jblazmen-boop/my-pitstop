@@ -8,26 +8,21 @@ body {
   min-height: 100vh;
 }
 
-/* Capa oscura para que se lean los textos sobre la foto */
+/* Capa oscura para que se lean los textos (hemos bajado la opacidad al 60%) */
 body::before {
   content: "";
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(15, 23, 42, 0.85); /* Oscurece la imagen */
+  background: rgba(15, 23, 42, 0.6); /* 0.6 permite ver más la imagen de fondo */
   z-index: -1;
 }
 
 /* --- CABECERA --- */
 header { 
-  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
+  background: rgba(15, 23, 42, 0.9) !important; /* Fondo oscuro semitransparente */
   color: white !important; 
   padding: 20px 24px 30px 24px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.8) !important;
-  
-  /* Borde de bandera a cuadros */
-  border-bottom: 8px solid transparent !important;
-  border-image: repeating-linear-gradient(45deg, #ffffff, #ffffff 10px, #000000 10px, #000000 20px) 8 !important;
-  
   position: relative;
 }
 .header-container {
@@ -46,6 +41,23 @@ header {
   justify-content: center;
 }
 
+/* --- BANDERA A CUADROS GRUESA EN EL BORDE --- */
+.header-container::after {
+  content: "";
+  position: absolute;
+  bottom: -30px;
+  left: -24px;
+  width: calc(100% + 48px);
+  height: 15px; /* Grosor de la bandera */
+  background-image: repeating-linear-gradient(
+    45deg,
+    #ffffff 0px, #ffffff 15px,
+    #000000 15px, #000000 30px
+  );
+  box-shadow: 0 3px 10px rgba(0,0,0,0.5);
+  z-index: 10;
+}
+
 /* --- LOGO --- */
 .logo-container {
   width: 110px;
@@ -59,6 +71,8 @@ header {
   justify-content: center; 
   align-items: center;     
   overflow: hidden;
+  position: relative;
+  z-index: 11;
 }
 .logo-img {
   width: 100%;
@@ -74,7 +88,6 @@ header {
   align-items: center;
   transform: rotate(-3deg); 
 }
-
 header h1 { 
   margin: 0; 
   font-family: 'Caveat', cursive !important; 
@@ -85,8 +98,6 @@ header h1 {
   line-height: 0.9;
   letter-spacing: 1px;
 }
-
-/* --- TEXTO AUTOR --- */
 .author {
   font-family: 'Caveat', cursive !important;
   font-size: 28px;
@@ -103,6 +114,8 @@ header h1 {
   width: 150px;
   justify-content: flex-end;
   margin-top: 10px;
+  position: relative;
+  z-index: 11;
 }
 .lang-btn {
   width: 45px !important;
@@ -127,7 +140,7 @@ header h1 {
 }
 
 /* --- CONTENEDOR PRINCIPAL --- */
-.container { max-width: 1100px; margin: 30px auto; padding: 0 16px; }
+.container { max-width: 1100px; margin: 50px auto 30px auto; padding: 0 16px; }
 
 /* --- PESTAÑAS DE ICONOS --- */
 .tabs { display: flex; gap: 30px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center; align-items: center; }
@@ -151,11 +164,11 @@ header h1 {
   transform: translateY(-2px);
 }
 
-/* --- PANELES (Efecto Cristal) --- */
+/* --- PANELES --- */
 .panel { 
   display: none; 
-  background: rgba(31, 41, 55, 0.9) !important; /* Semitransparente */
-  backdrop-filter: blur(8px) !important; /* Desenfoque de fondo */
+  background: rgba(31, 41, 55, 0.85) !important; /* Panel semitransparente */
+  backdrop-filter: blur(8px) !important; 
   padding: 25px; 
   border-radius: 8px; 
   box-shadow: 0 10px 25px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1) !important; 
@@ -170,7 +183,7 @@ h2 { margin-top: 0; font-size: 20px; color: #ffffff !important; }
 label { display: block; font-size: 12px; color: #9ca3af !important; margin-bottom: 6px; font-weight: 700; }
 input, select, textarea { 
   width: 100%; padding: 10px; border: 1px solid #374151 !important; border-radius: 4px; font-size: 14px; 
-  background-color: #111827 !important; 
+  background-color: rgba(17, 24, 39, 0.9) !important; 
   color: #ffffff !important; 
   transition: border-color 0.2s, box-shadow 0.2s; 
 }
@@ -195,11 +208,11 @@ button.secondary { background: #374151 !important; border: 1px solid #4b5563 !im
 button.secondary:hover { background: #4b5563 !important; }
 
 /* --- TABLAS --- */
-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 20px; background: #111827 !important; border-radius: 6px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 20px; background: rgba(17, 24, 39, 0.7) !important; border-radius: 6px; overflow: hidden; }
 th, td { border-bottom: 1px solid #374151 !important; padding: 12px 10px; text-align: left; }
-th { background: #111827 !important; font-weight: 700; color: #e11d48 !important; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;}
-tr:nth-child(even) { background: #1f2937 !important; }
-tr:hover { background: #374151 !important; }
+th { background: rgba(17, 24, 39, 0.9) !important; font-weight: 700; color: #e11d48 !important; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;}
+tr:nth-child(even) { background: rgba(31, 41, 55, 0.6) !important; }
+tr:hover { background: rgba(55, 65, 81, 0.8) !important; }
 td { color: #e2e8f0 !important; }
 .empty { text-align: center; color: #9ca3af !important; padding: 20px; font-style: italic; }
 
@@ -260,10 +273,16 @@ h2 {
   .lang-switch { width: auto; justify-content: center; margin-top: 0; }
   .tabs { gap: 15px; margin-bottom: 20px; }
   .tab-icon { height: 55px; width: 55px; }
-  .container { padding: 0 10px; }
+  .container { padding: 0 10px; margin-top: 40px; }
   .panel { padding: 15px; border-left-width: 4px; }
   h2 { font-size: 16px; }
   table th, table td { padding: 8px 4px; font-size: 11px; }
   header h1 { font-size: 50px; }
   .author { font-size: 22px; }
+  .header-container::after {
+    bottom: -20px;
+    left: -10px;
+    width: calc(100% + 20px);
+    height: 10px; 
+  }
 }
