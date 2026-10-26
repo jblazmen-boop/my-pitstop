@@ -18,7 +18,7 @@ body {
 header { 
   background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
   color: white !important; 
-  padding: 20px 24px 30px 24px; /* Más espacio abajo para que respire */
+  padding: 20px 24px 30px 24px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.8) !important;
   border-bottom: 4px solid #e11d48 !important; 
   position: relative;
@@ -26,7 +26,7 @@ header {
 .header-container {
   display: flex;
   justify-content: space-between; 
-  align-items: flex-start; /* Alineamos arriba */
+  align-items: flex-start;
   max-width: 1100px;
   margin: 0 auto;
   position: relative;
@@ -39,48 +39,54 @@ header {
   justify-content: center;
 }
 
-/* --- LOGO PERFECTAMENTE CENTRADO --- */
+/* --- LOGO FORZADO AL CENTRO --- */
 .logo-container {
   width: 110px;
   height: 110px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   border-radius: 20px;
   background-color: #ffffff;
   box-shadow: 0 0 25px rgba(225, 29, 72, 0.5) !important; 
   border: 3px solid #e11d48 !important;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center;     /* Centra verticalmente */
   overflow: hidden;
 }
 .logo-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center; /* Centra el dibujo a la perfección */
+  object-position: center; /* Fuerza a que el dibujo se centre */
 }
 
-/* --- TÍTULO TIPO FIRMA --- */
+/* --- TÍTULO TIPO FIRMA (CAVEAT) --- */
+.title-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: rotate(-3deg); /* Un pequeño giro para darle ese toque de firma real */
+}
+
 header h1 { 
   margin: 0; 
-  font-family: 'Great Vibes', cursive !important; 
-  font-size: 60px; 
-  font-weight: 400; 
+  font-family: 'Caveat', cursive !important; 
+  font-size: 65px; 
+  font-weight: 700; 
   color: #ffffff !important;
   text-shadow: 0 0 10px rgba(225, 29, 72, 0.8), 0 0 20px rgba(225, 29, 72, 0.4) !important; 
-  letter-spacing: 2px;
-  line-height: 1;
+  line-height: 0.9;
+  letter-spacing: 1px;
 }
 
-/* --- TEXTO AUTOR --- */
+/* --- TEXTO AUTOR (MISMA FUENTE) --- */
 .author {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 14px;
-  color: #9ca3af;
-  letter-spacing: 3px;
-  text-transform: uppercase;
+  font-family: 'Caveat', cursive !important;
+  font-size: 28px;
+  color: #e11d48;
   margin-top: -5px;
-  font-weight: 600;
+  font-weight: 700;
+  text-shadow: 0 0 5px rgba(225, 29, 72, 0.5);
 }
 
 /* --- BANDERAS --- */
@@ -249,5 +255,6 @@ h2 {
   .panel { padding: 15px; border-left-width: 4px; }
   h2 { font-size: 16px; }
   table th, table td { padding: 8px 4px; font-size: 11px; }
-  header h1 { font-size: 45px; }
+  header h1 { font-size: 50px; }
+  .author { font-size: 22px; }
 }
