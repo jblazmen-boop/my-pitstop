@@ -1,17 +1,20 @@
 * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 body { 
   margin: 0; 
-  background-color: #111827 !important; 
-  background-image: 
-    repeating-linear-gradient(
-      -45deg,
-      rgba(255, 255, 255, 0.03) 0px,
-      rgba(255, 255, 255, 0.03) 20px,
-      transparent 20px,
-      transparent 40px
-    ) !important;
+  /* Fondo de taller de boxes */
+  background: #111827 url('fondo.jpg') no-repeat center center fixed !important; 
+  background-size: cover !important;
   color: #e2e8f0 !important; 
   min-height: 100vh;
+}
+
+/* Capa oscura para que se lean los textos sobre la foto */
+body::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(15, 23, 42, 0.85); /* Oscurece la imagen */
+  z-index: -1;
 }
 
 /* --- CABECERA --- */
@@ -20,7 +23,11 @@ header {
   color: white !important; 
   padding: 20px 24px 30px 24px;
   box-shadow: 0 4px 20px rgba(0,0,0,0.8) !important;
-  border-bottom: 4px solid #e11d48 !important; 
+  
+  /* Borde de bandera a cuadros */
+  border-bottom: 8px solid transparent !important;
+  border-image: repeating-linear-gradient(45deg, #ffffff, #ffffff 10px, #000000 10px, #000000 20px) 8 !important;
+  
   position: relative;
 }
 .header-container {
@@ -39,33 +46,33 @@ header {
   justify-content: center;
 }
 
-/* --- LOGO FORZADO AL CENTRO --- */
+/* --- LOGO --- */
 .logo-container {
   width: 110px;
   height: 110px;
   margin-bottom: 5px;
   border-radius: 20px;
   background-color: #ffffff;
-  box-shadow: 0 0 25px rgba(225, 29, 72, 0.5) !important; 
-  border: 3px solid #e11d48 !important;
+  box-shadow: 0 0 30px rgba(225, 29, 72, 0.8) !important; 
+  border: 3px solid #ffffff !important;
   display: flex;
-  justify-content: center; /* Centra horizontalmente */
-  align-items: center;     /* Centra verticalmente */
+  justify-content: center; 
+  align-items: center;     
   overflow: hidden;
 }
 .logo-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center; /* Fuerza a que el dibujo se centre */
+  object-position: center; 
 }
 
-/* --- TÍTULO TIPO FIRMA (CAVEAT) --- */
+/* --- TÍTULO TIPO FIRMA --- */
 .title-block {
   display: flex;
   flex-direction: column;
   align-items: center;
-  transform: rotate(-3deg); /* Un pequeño giro para darle ese toque de firma real */
+  transform: rotate(-3deg); 
 }
 
 header h1 { 
@@ -79,7 +86,7 @@ header h1 {
   letter-spacing: 1px;
 }
 
-/* --- TEXTO AUTOR (MISMA FUENTE) --- */
+/* --- TEXTO AUTOR --- */
 .author {
   font-family: 'Caveat', cursive !important;
   font-size: 28px;
@@ -144,14 +151,16 @@ header h1 {
   transform: translateY(-2px);
 }
 
-/* --- PANELES --- */
+/* --- PANELES (Efecto Cristal) --- */
 .panel { 
   display: none; 
-  background: #1f2937 !important; 
+  background: rgba(31, 41, 55, 0.9) !important; /* Semitransparente */
+  backdrop-filter: blur(8px) !important; /* Desenfoque de fondo */
   padding: 25px; 
   border-radius: 8px; 
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1) !important; 
+  box-shadow: 0 10px 25px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1) !important; 
   border-left: 6px solid #e11d48 !important; 
+  border-top: 1px solid rgba(255,255,255,0.1) !important;
 }
 .panel.active { display: block; }
 h2 { margin-top: 0; font-size: 20px; color: #ffffff !important; }
@@ -213,7 +222,7 @@ td button { margin-right: 4px; }
 .cerrar-modal { position: absolute; top: 20px; right: 40px; color: #e11d48 !important; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; }
 .cerrar-modal:hover { color: #fff !important; transform: scale(1.2); }
 
-footer { border-top: 1px solid #374151 !important; background-color: #0f172a !important; width: 100%; color: #9ca3af !important; }
+footer { border-top: 1px solid #374151 !important; background-color: rgba(15, 23, 42, 0.9) !important; width: 100%; color: #9ca3af !important; }
 
 /* --- MAYÚSCULAS Y ESTILO TALLER --- */
 h2, label, th {
