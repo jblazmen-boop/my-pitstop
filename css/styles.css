@@ -1,13 +1,14 @@
 * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 body { 
   margin: 0; 
-  background-color: #111827;
+  /* Color de fondo para los laterales donde no llegue la imagen */
+  background-color: #0f172a; 
   color: #e2e8f0 !important; 
   min-height: 100vh;
   position: relative;
 }
 
-/* Capa del fondo: 'cover' con tamaño controlado */
+/* Capa del fondo: Reducimos el tamaño al 90% para alejar el zoom */
 body::before {
   content: "";
   position: fixed;
@@ -15,8 +16,8 @@ body::before {
   background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.75)), 
               url('https://jblazmen-boop.github.io/my-pitstop/fondo.jpg') no-repeat center center;
   
-  /* Tamaño controlado para que no haga tanto zoom */
-  background-size: 110%; 
+  /* 90% reduce el zoom y muestra más imagen del taller */
+  background-size: 90%; 
   z-index: -1;
 }
 
@@ -124,7 +125,7 @@ header h1 {
 /* --- CONTENEDOR PRINCIPAL --- */
 .container { max-width: 1100px; margin: 20px auto 30px auto; padding: 0 16px; position: relative; z-index: 10; }
 
-/* --- PESTAÑAS DE ICONOS (Mismo tamaño grande: 75px) --- */
+/* --- PESTAÑAS DE ICONOS --- */
 .tabs { display: flex; gap: 25px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center; align-items: center; }
 .tab { background: transparent; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
 .tab-icon {
