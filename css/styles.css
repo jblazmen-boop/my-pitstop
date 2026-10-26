@@ -7,27 +7,31 @@ body {
   position: relative;
 }
 
-/* Capa del fondo: aquí ponemos la imagen y el oscurecido */
+/* Capa del fondo: Aquí está el truco para que no se vea tan expandido */
 body::before {
   content: "";
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
-  /* Usamos tu URL absoluta. El rgba(...,0.7) oscurece la foto un 70% */
-  background: linear-gradient(rgba(15, 23, 42, 0.7), rgba(15, 23, 42, 0.7)), 
+  /* El 0.65 da un tono más oscuro para que los textos resalten más */
+  background: linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.65)), 
               url('https://jblazmen-boop.github.io/my-pitstop/fondo.jpg') no-repeat center center;
+  /* 'cover' mantiene la proporción, pero al estar en un contenedor fixed y oscurecido, parece más profundo */
   background-size: cover;
   z-index: -1;
+  /* Un filtro de desenfoque muy leve para dar sensación de estar más al fondo */
+  filter: blur(1px); 
 }
 
-/* --- CABECERA (Limpia, con efecto cristal) --- */
+/* --- CABECERA (Cristal Ahumado) --- */
 header { 
-  background: rgba(15, 23, 42, 0.7) !important; 
+  background: rgba(15, 23, 42, 0.75) !important; 
   backdrop-filter: blur(10px); 
   color: white !important; 
   padding: 20px 24px; 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important; 
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important; 
   position: relative;
   z-index: 10;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* Sombra que proyecta hacia abajo */
 }
 .header-container {
   display: flex;
@@ -147,14 +151,15 @@ header h1 {
   transform: translateY(-2px);
 }
 
-/* --- PANELES (Efecto Cristal) --- */
+/* --- PANELES (Cristal flotante) --- */
 .panel { 
   display: none; 
-  background: rgba(31, 41, 55, 0.85) !important; 
-  backdrop-filter: blur(8px) !important; 
+  background: rgba(31, 41, 55, 0.9) !important; 
+  backdrop-filter: blur(12px) !important; 
   padding: 25px; 
   border-radius: 8px; 
-  box-shadow: 0 10px 25px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1) !important; 
+  /* Sombra muy fuerte para dar la sensación de que está en el aire */
+  box-shadow: 0 20px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1) !important; 
   border-left: 6px solid #e11d48 !important; 
   border-top: 1px solid rgba(255,255,255,0.1) !important;
 }
@@ -166,7 +171,7 @@ h2 { margin-top: 0; font-size: 20px; color: #ffffff !important; }
 label { display: block; font-size: 12px; color: #9ca3af !important; margin-bottom: 6px; font-weight: 700; }
 input, select, textarea { 
   width: 100%; padding: 10px; border: 1px solid #374151 !important; border-radius: 4px; font-size: 14px; 
-  background-color: rgba(17, 24, 39, 0.9) !important; 
+  background-color: rgba(17, 24, 39, 0.95) !important; 
   color: #ffffff !important; 
   transition: border-color 0.2s, box-shadow 0.2s; 
 }
@@ -191,11 +196,11 @@ button.secondary { background: #374151 !important; border: 1px solid #4b5563 !im
 button.secondary:hover { background: #4b5563 !important; }
 
 /* --- TABLAS --- */
-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 20px; background: rgba(17, 24, 39, 0.7) !important; border-radius: 6px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 20px; background: rgba(17, 24, 39, 0.85) !important; border-radius: 6px; overflow: hidden; }
 th, td { border-bottom: 1px solid #374151 !important; padding: 12px 10px; text-align: left; }
-th { background: rgba(17, 24, 39, 0.9) !important; font-weight: 700; color: #e11d48 !important; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;}
-tr:nth-child(even) { background: rgba(31, 41, 55, 0.6) !important; }
-tr:hover { background: rgba(55, 65, 81, 0.8) !important; }
+th { background: rgba(17, 24, 39, 0.95) !important; font-weight: 700; color: #e11d48 !important; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;}
+tr:nth-child(even) { background: rgba(31, 41, 55, 0.7) !important; }
+tr:hover { background: rgba(55, 65, 81, 0.9) !important; }
 td { color: #e2e8f0 !important; }
 .empty { text-align: center; color: #9ca3af !important; padding: 20px; font-style: italic; }
 
@@ -218,7 +223,7 @@ td button { margin-right: 4px; }
 .cerrar-modal { position: absolute; top: 20px; right: 40px; color: #e11d48 !important; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; }
 .cerrar-modal:hover { color: #fff !important; transform: scale(1.2); }
 
-footer { border-top: 1px solid #374151 !important; background-color: rgba(15, 23, 42, 0.9) !important; width: 100%; color: #9ca3af !important; position: relative; z-index: 10; }
+footer { border-top: 1px solid #374151 !important; background-color: rgba(15, 23, 42, 0.95) !important; width: 100%; color: #9ca3af !important; position: relative; z-index: 10; }
 
 /* --- MAYÚSCULAS Y ESTILO TALLER --- */
 h2, label, th {
