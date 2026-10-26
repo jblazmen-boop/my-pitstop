@@ -1,28 +1,27 @@
 * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 body { 
   margin: 0; 
-  /* Fondo tipo asfalto de boxes con un sutil patrón de líneas de peligro en los laterales */
-  background-color: #1a1e24; 
+  /* Fondo tipo asfalto de boxes */
+  background-color: #111827 !important; 
   background-image: 
     repeating-linear-gradient(
       -45deg,
-      rgba(255, 255, 255, 0.02) 0px,
-      rgba(255, 255, 255, 0.02) 20px,
+      rgba(255, 255, 255, 0.03) 0px,
+      rgba(255, 255, 255, 0.03) 20px,
       transparent 20px,
       transparent 40px
-    );
-  color: #e2e8f0; 
+    ) !important;
+  color: #e2e8f0 !important; 
   min-height: 100vh;
 }
 
 /* --- CABECERA --- */
 header { 
-  /* Rojo de boxes y negro para el logo */
-  background: linear-gradient(180deg, #111 0%, #1f1f1f 100%);
-  color: white; 
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%) !important;
+  color: white !important; 
   padding: 20px 24px; 
-  box-shadow: 0 4px 20px rgba(0,0,0,0.8);
-  border-bottom: 4px solid #e53e3e; /* Línea roja brillante de boxes */
+  box-shadow: 0 4px 20px rgba(0,0,0,0.8) !important;
+  border-bottom: 4px solid #e11d48 !important; /* Línea roja de boxes */
   position: relative;
 }
 .header-container {
@@ -45,10 +44,10 @@ header {
   width: 100px;
   height: 100px;
   border-radius: 15px;
-  box-shadow: 0 0 20px rgba(229, 62, 62, 0.4); /* Resplandor rojo */
+  box-shadow: 0 0 20px rgba(225, 29, 72, 0.4) !important; /* Resplandor rojo */
   object-fit: cover;
   background-color: white;
-  border: 3px solid #e53e3e; /* Borde rojo */
+  border: 3px solid #e11d48 !important;
 }
 header h1 { 
   margin: 0; 
@@ -56,8 +55,8 @@ header h1 {
   letter-spacing: 2px; 
   font-weight: 900; 
   text-transform: uppercase;
-  color: #ffffff;
-  text-shadow: 0 0 10px rgba(255,255,255,0.3);
+  color: #ffffff !important;
+  text-shadow: 0 0 10px rgba(255,255,255,0.3) !important;
 }
 
 /* --- BANDERAS --- */
@@ -84,8 +83,8 @@ header h1 {
 #lang-en { background-image: url('https://flagcdn.com/w80/gb.png') !important; }
 .lang-btn:hover { transform: scale(1.1) !important; }
 .lang-btn.active {
-  border-color: #e53e3e !important;
-  box-shadow: 0 0 10px #e53e3e !important;
+  border-color: #e11d48 !important;
+  box-shadow: 0 0 10px #e11d48 !important;
   transform: scale(1.1) !important;
 }
 
@@ -94,83 +93,80 @@ header h1 {
 
 /* --- PESTAÑAS DE ICONOS --- */
 .tabs { display: flex; gap: 30px; margin-bottom: 30px; flex-wrap: wrap; justify-content: center; align-items: center; }
-.tab { 
-  background: transparent; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center;
-  position: relative;
-}
+.tab { background: transparent; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
 .tab-icon {
   height: 70px; width: 70px; object-fit: contain; border-radius: 10px; 
-  background-color: #2d3748; /* Fondo de placa metálica */
-  border: 2px solid #4a5568;
+  background-color: #1f2937 !important; 
+  border: 2px solid #374151 !important;
   padding: 5px;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 5px 15px rgba(0,0,0,0.6); 
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 5px 15px rgba(0,0,0,0.6) !important; 
   transition: all 0.3s ease;
 }
 .tab:hover .tab-icon { 
   transform: translateY(-5px); 
-  border-color: #e53e3e;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 15px rgba(229, 62, 62, 0.5); 
+  border-color: #e11d48 !important;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 15px rgba(225, 29, 72, 0.5) !important; 
 }
 .tab.active .tab-icon { 
-  border-color: #e53e3e; 
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 20px rgba(229, 62, 62, 0.8); 
+  border-color: #e11d48 !important; 
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 20px rgba(225, 29, 72, 0.8) !important; 
   transform: translateY(-2px);
 }
 
 /* --- PANELES (Cajas de herramientas metálicas) --- */
 .panel { 
   display: none; 
-  background: #2d3748; /* Gris oscuro metálico */
+  background: #1f2937 !important; /* Gris oscuro */
   padding: 25px; 
   border-radius: 8px; 
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1); 
-  border-left: 6px solid #e53e3e; /* Toque rojo de boxes */
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1) !important; 
+  border-left: 6px solid #e11d48 !important; 
 }
 .panel.active { display: block; }
-h2 { margin-top: 0; font-size: 20px; color: #ffffff; }
+h2 { margin-top: 0; font-size: 20px; color: #ffffff !important; }
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
 
 /* --- INPUTS Y ETIQUETAS --- */
-label { display: block; font-size: 12px; color: #a0aec0; margin-bottom: 6px; font-weight: 700; }
+label { display: block; font-size: 12px; color: #9ca3af !important; margin-bottom: 6px; font-weight: 700; }
 input, select, textarea { 
-  width: 100%; padding: 10px; border: 1px solid #4a5568; border-radius: 4px; font-size: 14px; 
-  background-color: #1a202c; /* Fondo oscuro para los inputs */
-  color: #ffffff; 
+  width: 100%; padding: 10px; border: 1px solid #374151 !important; border-radius: 4px; font-size: 14px; 
+  background-color: #111827 !important; 
+  color: #ffffff !important; 
   transition: border-color 0.2s, box-shadow 0.2s; 
 }
 input:focus, select:focus, textarea:focus { 
-  border-color: #e53e3e; 
-  box-shadow: 0 0 8px rgba(229, 62, 62, 0.4);
+  border-color: #e11d48 !important; 
+  box-shadow: 0 0 8px rgba(225, 29, 72, 0.4) !important;
   outline: none; 
 }
 textarea { resize: vertical; min-height: 60px; }
 
 /* --- BOTONES --- */
 button.primary { 
-  background: #e53e3e; color: white; border: none; padding: 12px 24px; border-radius: 6px; 
+  background: #e11d48 !important; color: white !important; border: none; padding: 12px 24px; border-radius: 6px; 
   cursor: pointer; font-size: 15px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;
   transition: 0.2s; 
-  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3) !important;
 }
-button.primary:hover { background: #c53030; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(229, 62, 62, 0.4); }
-button.danger { background: #718096; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
-button.danger:hover { background: #4a5568; }
-button.secondary { background: #4a5568; border: 1px solid #718096; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; color: #fff; transition: 0.2s; }
-button.secondary:hover { background: #718096; }
+button.primary:hover { background: #be123c !important; transform: translateY(-2px); box-shadow: 0 6px 12px rgba(225, 29, 72, 0.4) !important; }
+button.danger { background: #4b5563 !important; color: white !important; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: bold; }
+button.danger:hover { background: #374151 !important; }
+button.secondary { background: #374151 !important; border: 1px solid #4b5563 !important; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; color: #fff !important; transition: 0.2s; }
+button.secondary:hover { background: #4b5563 !important; }
 
 /* --- TABLAS --- */
-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 20px; background: #1a202c; border-radius: 6px; overflow: hidden; }
-th, td { border-bottom: 1px solid #2d3748; padding: 12px 10px; text-align: left; }
-th { background: #1a202c; font-weight: 700; color: #e53e3e; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;}
-tr:nth-child(even) { background: #2d3748; }
-tr:hover { background: #4a5568; }
-td { color: #e2e8f0; }
-.empty { text-align: center; color: #a0aec0; padding: 20px; font-style: italic; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 20px; background: #111827 !important; border-radius: 6px; overflow: hidden; }
+th, td { border-bottom: 1px solid #374151 !important; padding: 12px 10px; text-align: left; }
+th { background: #111827 !important; font-weight: 700; color: #e11d48 !important; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;}
+tr:nth-child(even) { background: #1f2937 !important; }
+tr:hover { background: #374151 !important; }
+td { color: #e2e8f0 !important; }
+.empty { text-align: center; color: #9ca3af !important; padding: 20px; font-style: italic; }
 
 .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
 .msg { padding: 12px; border-radius: 4px; margin-top: 15px; font-size: 13px; font-weight: bold; }
-.msg.ok { background: rgba(72, 187, 120, 0.2); color: #68d391; border: 1px solid #48bb78; }
-.msg.err { background: rgba(245, 101, 101, 0.2); color: #fc8181; border: 1px solid #f56565; }
+.msg.ok { background: rgba(72, 187, 120, 0.2) !important; color: #68d391 !important; border: 1px solid #48bb78 !important; }
+.msg.err { background: rgba(245, 101, 101, 0.2) !important; color: #fc8181 !important; border: 1px solid #f56565 !important; }
 
 #tabla_repuestos th, #tabla_repuestos td, #tabla_mano_obra th, #tabla_mano_obra td { padding: 8px; }
 td button { margin-right: 4px; }
@@ -178,15 +174,15 @@ td button { margin-right: 4px; }
 .form-row { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
 .form-row .form-group { flex: 1; min-width: 200px; }
 
-.foto-miniatura { max-height: 40px; border-radius: 4px; box-shadow: 0 0 5px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.2s; border: 1px solid #4a5568; }
-.foto-miniatura:hover { transform: scale(1.1); border-color: #e53e3e; }
+.foto-miniatura { max-height: 40px; border-radius: 4px; box-shadow: 0 0 5px rgba(0,0,0,0.5) !important; cursor: pointer; transition: transform 0.2s; border: 1px solid #4b5563 !important; }
+.foto-miniatura:hover { transform: scale(1.1); border-color: #e11d48 !important; }
 
-.modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.95); align-items: center; justify-content: center; }
-.modal-contenido { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 0 30px rgba(229, 62, 62, 0.3); background: #1a202c; padding: 10px; border: 2px solid #e53e3e; }
-.cerrar-modal { position: absolute; top: 20px; right: 40px; color: #e53e3e; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; }
-.cerrar-modal:hover { color: #fff; transform: scale(1.2); }
+.modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.95) !important; align-items: center; justify-content: center; }
+.modal-contenido { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 0 30px rgba(225, 29, 72, 0.3) !important; background: #111827 !important; padding: 10px; border: 2px solid #e11d48 !important; }
+.cerrar-modal { position: absolute; top: 20px; right: 40px; color: #e11d48 !important; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+.cerrar-modal:hover { color: #fff !important; transform: scale(1.2); }
 
-footer { border-top: 1px solid #2d3748; background-color: #111; width: 100%; color: #a0aec0; }
+footer { border-top: 1px solid #374151 !important; background-color: #0f172a !important; width: 100%; color: #9ca3af !important; }
 
 /* --- MAYÚSCULAS Y ESTILO TALLER --- */
 h2, label, th {
@@ -195,7 +191,7 @@ h2, label, th {
 }
 h2 {
   font-weight: 900 !important;
-  border-bottom: 2px solid #4a5568;
+  border-bottom: 2px solid #374151 !important;
   padding-bottom: 10px;
   margin-bottom: 20px;
 }
@@ -203,19 +199,19 @@ h2 {
 /* Botón personalizado para subir archivos */
 .file-btn {
   display: inline-block;
-  background: #4a5568;
-  border: 1px solid #718096;
+  background: #374151 !important;
+  border: 1px solid #4b5563 !important;
   padding: 10px 14px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 13px;
   font-weight: bold;
-  color: #fff;
+  color: #fff !important;
   text-align: center;
   width: 100%;
   transition: 0.2s;
 }
-.file-btn:hover { background: #718096; border-color: #e53e3e; }
+.file-btn:hover { background: #4b5563 !important; border-color: #e11d48 !important; }
 
 /* --- MÓVILES --- */
 @media (max-width: 600px) {
@@ -227,5 +223,5 @@ h2 {
   .container { padding: 0 10px; }
   .panel { padding: 15px; border-left-width: 4px; }
   h2 { font-size: 16px; }
-  table th, table td { padding: 8px 4px; font-size: 11px; } /* Tablas más compactas en móvil */
+  table th, table td { padding: 8px 4px; font-size: 11px; }
 }
