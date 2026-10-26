@@ -3,8 +3,9 @@
   "short_name": "My PitStop",
   "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#1a3a5c",
-  "theme_color": "#1a3a5c",
+  "orientation": "any",
+  "background_color": "#111827",
+  "theme_color": "#111827",
   "icons": [
     {
       "src": "logo.png",

@@ -1,23 +1,20 @@
 * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 body { 
   margin: 0; 
-  /* Color de fondo para los laterales donde no llegue la imagen */
   background-color: #0f172a; 
   color: #e2e8f0 !important; 
   min-height: 100vh;
   position: relative;
 }
 
-/* Capa del fondo: Reducimos el tamaño al 90% para alejar el zoom */
+/* Capa del fondo */
 body::before {
   content: "";
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
   background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.75)), 
               url('https://jblazmen-boop.github.io/my-pitstop/fondo.jpg') no-repeat center center;
-  
-  /* 90% reduce el zoom y muestra más imagen del taller */
-  background-size: 90%; 
+  background-size: 90%; /* Tamaño para ordenador */
   z-index: -1;
 }
 
@@ -251,8 +248,12 @@ h2 {
 }
 .file-btn:hover { background: #4b5563 !important; border-color: #e11d48 !important; }
 
-/* --- MÓVILES --- */
+/* --- AJUSTE ESPECÍFICO PARA MÓVILES --- */
 @media (max-width: 768px) {
+  body::before {
+    background-size: cover; 
+  }
+  
   .header-container { flex-direction: column; gap: 10px; }
   .header-spacer { display: none; }
   .header-content { flex-direction: column; gap: 5px; }

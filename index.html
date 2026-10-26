@@ -219,6 +219,15 @@
   <img class="modal-contenido" id="img-modal">
 </div>
 
+<!-- FORZAR ROTACIÓN EN MÓVILES -->
+<script>
+  if (screen.orientation && screen.orientation.lock) {
+    screen.orientation.lock('any').catch(function(error) {
+      console.log('La rotación no está soportada en este navegador o contexto.');
+    });
+  }
+</script>
+
 <script src="js/app.js"></script>
 </body>
 </html>
