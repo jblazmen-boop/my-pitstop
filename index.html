@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My PitStop - Control de Mantenimiento</title>
   
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#1a3a5c">
+  <meta name="theme-color" content="#111827">
   
   <link rel="stylesheet" href="css/styles.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -101,23 +102,23 @@
     </div>
 
     <!-- SECCIÓN MANO DE OBRA -->
-    <div style="margin-top: 10px; border-top: 1px solid #eee; padding-top: 10px;">
-      <h3 style="font-size: 16px; margin-bottom: 8px; color: #1a3a5c;" data-i18n="mano_obra">Mano de Obra</h3>
+    <div style="margin-top: 10px; border-top: 1px solid #374151; padding-top: 10px;">
+      <h3 style="font-size: 16px; margin-bottom: 8px; color: #e11d48; text-transform: uppercase;" data-i18n="mano_obra">Mano de Obra</h3>
       <div class="grid" style="grid-template-columns: 1fr 100px 100px; gap: 8px;">
         <div><label data-i18n="operacion">Operación</label><input id="o_concepto" placeholder="Ej: Sustituir correa" data-i18n-placeholder="ej_operacion"></div>
         <div><label data-i18n="precio">Precio (€)</label><input type="number" step="0.01" id="o_precio" placeholder="80"></div>
         <div style="display: flex; align-items: flex-end;"><button type="button" class="secondary" data-i18n="add_btn" onclick="addManoObra()" style="width:100%;">+ Añadir</button></div>
       </div>
       <table id="tabla_mano_obra" style="font-size: 12px; width: 100%; border-collapse: collapse; margin-top: 10px;">
-        <thead><tr style="background:#f4f6f8;"><th style="padding:6px; border:1px solid #ddd;" data-i18n="operacion">Operación</th><th style="padding:6px; border:1px solid #ddd;" data-i18n="precio">Precio</th><th style="padding:6px; border:1px solid #ddd;"></th></tr></thead>
+        <thead><tr style="background:#111827;"><th style="padding:6px; border:1px solid #374151;" data-i18n="operacion">Operación</th><th style="padding:6px; border:1px solid #374151;" data-i18n="precio">Precio</th><th style="padding:6px; border:1px solid #374151;"></th></tr></thead>
         <tbody></tbody>
       </table>
       <div style="text-align: right; font-weight: bold; margin-top: 8px;"><span data-i18n="total_mano">Total Mano de Obra:</span> <span id="total_mano">0.00 €</span></div>
     </div>
 
     <!-- SECCIÓN REPUESTOS -->
-    <div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px;">
-      <h3 style="font-size: 16px; margin-bottom: 8px; color: #1a3a5c;" data-i18n="repuestos">Repuestos</h3>
+    <div style="margin-top: 20px; border-top: 1px solid #374151; padding-top: 10px;">
+      <h3 style="font-size: 16px; margin-bottom: 8px; color: #e11d48; text-transform: uppercase;" data-i18n="repuestos">Repuestos</h3>
       <div class="grid" style="grid-template-columns: 80px 1fr 1fr 100px; gap: 8px;">
         <div><label data-i18n="cant">Cant.</label><input type="number" id="r_cant" value="1" min="1"></div>
         <div><label data-i18n="descripcion">Descripción</label><input id="r_desc" placeholder="Filtro de aceite"></div>
@@ -142,7 +143,7 @@
       <button type="button" class="secondary" data-i18n="add_repuesto" onclick="addRepuesto()" style="margin-top:8px;">+ Añadir Repuesto</button>
       
       <table id="tabla_repuestos" style="font-size: 12px; width: 100%; border-collapse: collapse; margin-top: 10px;">
-        <thead><tr style="background:#f4f6f8;"><th style="padding:6px; border:1px solid #ddd;" data-i18n="foto">Foto</th><th style="padding:6px; border:1px solid #ddd;" data-i18n="cant">Cant</th><th style="padding:6px; border:1px solid #ddd;" data-i18n="descripcion">Descripción</th><th style="padding:6px; border:1px solid #ddd;" data-i18n="referencia">Ref</th><th style="padding:6px; border:1px solid #ddd;" data-i18n="precio">Precio</th><th style="padding:6px; border:1px solid #ddd;" data-i18n="total">Total</th><th style="padding:6px; border:1px solid #ddd;"></th></tr></thead>
+        <thead><tr style="background:#111827;"><th style="padding:6px; border:1px solid #374151;" data-i18n="foto">Foto</th><th style="padding:6px; border:1px solid #374151;" data-i18n="cant">Cant</th><th style="padding:6px; border:1px solid #374151;" data-i18n="descripcion">Descripción</th><th style="padding:6px; border:1px solid #374151;" data-i18n="referencia">Ref</th><th style="padding:6px; border:1px solid #374151;" data-i18n="precio">Precio</th><th style="padding:6px; border:1px solid #374151;" data-i18n="total">Total</th><th style="padding:6px; border:1px solid #374151;"></th></tr></thead>
         <tbody></tbody>
       </table>
       <div style="text-align: right; font-weight: bold; margin-top: 8px;"><span data-i18n="total_repuestos">Total Repuestos:</span> <span id="total_repuestos">0.00 €</span></div>
@@ -201,7 +202,7 @@
 </div>
 
 <!-- PIE DE PÁGINA (COPYRIGHT) -->
-<footer style="text-align: center; padding: 20px; color: #777; font-size: 12px; margin-top: 20px;">
+<footer style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px; margin-top: 20px; border-top: 1px solid #374151; background-color: #0f172a;">
   © 2026 My PitStop. <span data-i18n="derechos">Todos los derechos reservados.</span>
 </footer>
 

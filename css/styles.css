@@ -1,7 +1,6 @@
 * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 body { 
   margin: 0; 
-  /* Fondo tipo asfalto de boxes */
   background-color: #111827 !important; 
   background-image: 
     repeating-linear-gradient(
@@ -21,7 +20,7 @@ header {
   color: white !important; 
   padding: 20px 24px; 
   box-shadow: 0 4px 20px rgba(0,0,0,0.8) !important;
-  border-bottom: 4px solid #e11d48 !important; /* Línea roja de boxes */
+  border-bottom: 4px solid #e11d48 !important; 
   position: relative;
 }
 .header-container {
@@ -38,25 +37,31 @@ header {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 5px; 
 }
+
+/* --- EL LOGO PERFECTAMENTE CENTRADO Y CUADRADO --- */
 .logo-img {
   width: 100px;
   height: 100px;
   border-radius: 15px;
-  box-shadow: 0 0 20px rgba(225, 29, 72, 0.4) !important; /* Resplandor rojo */
-  object-fit: cover;
+  box-shadow: 0 0 20px rgba(225, 29, 72, 0.4) !important; 
+  object-fit: cover; /* Llena el cuadrado sin deformarse */
+  object-position: center; /* Centra el dibujo */
   background-color: white;
   border: 3px solid #e11d48 !important;
 }
+
+/* --- TÍTULO TIPO FIRMA --- */
 header h1 { 
   margin: 0; 
-  font-size: 32px; 
-  letter-spacing: 2px; 
-  font-weight: 900; 
-  text-transform: uppercase;
+  font-family: 'Great Vibes', cursive !important; 
+  font-size: 55px; 
+  font-weight: 400; 
   color: #ffffff !important;
-  text-shadow: 0 0 10px rgba(255,255,255,0.3) !important;
+  text-shadow: 0 0 10px rgba(225, 29, 72, 0.8), 0 0 20px rgba(225, 29, 72, 0.4) !important; 
+  letter-spacing: 2px;
+  margin-top: -10px; 
 }
 
 /* --- BANDERAS --- */
@@ -113,10 +118,10 @@ header h1 {
   transform: translateY(-2px);
 }
 
-/* --- PANELES (Cajas de herramientas metálicas) --- */
+/* --- PANELES --- */
 .panel { 
   display: none; 
-  background: #1f2937 !important; /* Gris oscuro */
+  background: #1f2937 !important; 
   padding: 25px; 
   border-radius: 8px; 
   box-shadow: 0 10px 25px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1) !important; 
