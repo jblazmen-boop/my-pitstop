@@ -35,8 +35,8 @@ const translations = {
     pdf_taller_txt: "Taller:", modo_generacion: "Modo de generación", por_fechas: "Por rango de fechas", 
     por_seleccion: "Seleccionando mantenimientos", selecciona_mant: "Selecciona los mantenimientos para incluir en la factura",
     estadisticas: "Estadísticas de Gasto", recordatorios: "Avisos y Recordatorios", recordatorios_texto: "Aquí puedes ver y gestionar las fechas de tus próximos mantenimientos e ITV.",
-    fecha_prox_mant: "Fecha del próximo mantenimiento", fecha_prox_itv: "Fecha de la próxima ITV", 
-    prox_mant: "Próximo Mantenimiento", prox_itv: "Próxima ITV",
+    fecha_prox_mant: "Fecha del próximo mantenimiento", km_prox_mant: "Km del próximo mantenimiento", 
+    fecha_prox_itv: "Fecha de la próxima ITV", prox_mant: "Próximo Mantenimiento", prox_itv: "Próxima ITV",
     guardar: "Guardar Fechas", estado: "Estado", 
     itv_ok: "En regla", itv_warn: "Próximo", itv_danger: "Caducado", sin_fecha: "Sin fecha"
   },
@@ -66,8 +66,8 @@ const translations = {
     pdf_taller_txt: "Workshop:", modo_generacion: "Generation mode", por_fechas: "By date range", 
     por_seleccion: "Selecting records", selecciona_mant: "Select maintenance records to include in the invoice",
     estadisticas: "Expense Statistics", recordatorios: "Reminders & Alerts", recordatorios_texto: "Here you can view and manage upcoming maintenance and MOT dates.",
-    fecha_prox_mant: "Next Maintenance Date", fecha_prox_itv: "Next MOT Date", 
-    prox_mant: "Next Maintenance", prox_itv: "Next MOT",
+    fecha_prox_mant: "Next Maintenance Date", km_prox_mant: "Next Maintenance Mileage", 
+    fecha_prox_itv: "Next MOT Date", prox_mant: "Next Maintenance", prox_itv: "Next MOT",
     guardar: "Save Dates", estado: "Status", 
     itv_ok: "Valid", itv_warn: "Due soon", itv_danger: "Expired", sin_fecha: "No date"
   }
@@ -154,6 +154,7 @@ function cargar() {
 
       state.vehiculos.forEach(v => { 
         if (!v.proxMant) v.proxMant = ''; 
+        if (!v.proxKmMant) v.proxKmMant = ''; 
         if (!v.proxItv) v.proxItv = ''; 
       });
 
@@ -211,7 +212,7 @@ function addVehiculo() {
     mostrarMsg('msg_vehiculo', currentLang === 'es' ? 'Ya existe un vehículo con esa matrícula.' : 'A vehicle with that plate already exists.', 'err'); return;
   }
   
-  state.vehiculos.push({ id: uid(), matricula: mat, marca, modelo, bastidor, proxMant: '', proxItv: '' });
+  state.vehiculos.push({ id: uid(), matricula: mat, marca, modelo, bastidor, proxMant: '', proxKmMant: '', proxItv: '' });
   guardar();
   document.getElementById('v_matricula').value = '';
   document.getElementById('v_marca').value = '';
@@ -595,7 +596,7 @@ function mostrarMsg(id, texto, tipo) {
   setTimeout(() => { el.innerHTML = ''; }, 4000);
 }
 
-// ============ NUEVO: GRÁFICO ESTILO RACING ============
+// ============ NUEVO: GRÁFICO ESTILO RACING (CON RELLENO) ============
 function renderGrafico() {
   if (typeof Chart === 'undefined') return; 
 
@@ -620,6 +621,15 @@ function renderGrafico() {
   
   if (miGraficoInstancia) miGraficoInstancia.destroy();
 
+  // Crear degradado para el relleno
+  let gradientMano = ctx.createLinearGradient(0, 0, 0, 400);
+  gradientMano.addColorStop(0, 'rgba(225, 29, 72, 0.5)'); // Rojo arriba
+  gradientMano.addColorStop(1, 'rgba(225, 29, 72, 0.0)'); // Transparente abajo
+
+  let gradientPiezas = ctx.createLinearGradient(0, 0, 0, 400);
+  gradientPiezas.addColorStop(0, 'rgba(56, 189, 248, 0.5)'); // Azul arriba
+  gradientPiezas.addColorStop(1, 'rgba(56, 189, 248, 0.0)'); // Transparente abajo
+
   miGraficoInstancia = new Chart(ctx, {
     type: 'line',
     data: {
@@ -628,31 +638,32 @@ function renderGrafico() {
         {
           label: translations[currentLang].mano_obra,
           data: dataMano,
-          borderColor: '#e11d48', // Rojo PitStop
-          backgroundColor: 'rgba(225, 29, 72, 0.2)',
+          borderColor: '#e11d48', 
+          backgroundColor: gradientMano,
           borderWidth: 3,
           pointBackgroundColor: '#e11d48',
           pointBorderColor: '#fff',
           pointHoverRadius: 6,
-          tension: 0.4, // Curvas suaves
-          fill: false
+          tension: 0.4, // Curva suavizada
+          fill: true // Relleno debajo de la línea
         },
         {
           label: translations[currentLang].repuestos,
           data: dataPiezas,
-          borderColor: '#38bdf8', // Azul neón
-          backgroundColor: 'rgba(56, 189, 248, 0.2)',
+          borderColor: '#38bdf8', 
+          backgroundColor: gradientPiezas,
           borderWidth: 3,
           pointBackgroundColor: '#38bdf8',
           pointBorderColor: '#fff',
           pointHoverRadius: 6,
           tension: 0.4,
-          fill: false
+          fill: true
         }
       ]
     },
     options: {
       responsive: true,
+      maintainAspectRatio: false,
       interaction: {
         mode: 'index',
         intersect: false,
@@ -681,11 +692,12 @@ function renderGrafico() {
   });
 }
 
-// ============ NUEVO: RECORDATORIOS (Mantenimiento e ITV) ============
+// ============ NUEVO: RECORDATORIOS (Km, Fecha e ITV) ============
 function cargarRecordatorios() {
   const sel = document.getElementById('rec_vehiculo');
   if (!sel) return;
   const vehiculoId = sel.value;
+  const kmInput = document.getElementById('rec_km_mant');
   const mantInput = document.getElementById('rec_mant');
   const itvInput = document.getElementById('rec_itv');
   const tbody = document.getElementById('tabla_recordatorios_body');
@@ -694,6 +706,7 @@ function cargarRecordatorios() {
   if (vehiculoId) {
     const v = state.vehiculos.find(x => x.id === vehiculoId);
     if (v) {
+      kmInput.value = v.proxKmMant || '';
       mantInput.value = v.proxMant || '';
       itvInput.value = v.proxItv || '';
     }
@@ -715,9 +728,11 @@ function cargarRecordatorios() {
       return `<span style="color: ${color}; font-weight: bold;">${fechaMostrar}</span>`;
     };
 
+    const kmFormat = v.proxKmMant ? `<span style="color: #38bdf8; font-weight: bold;">${v.proxKmMant} Km</span>` : '—';
+
     const tr = document.createElement('tr');
     tr.innerHTML = `<td>${esc(v.matricula)}</td>
-      <td>${formatDate(v.proxMant)}</td>
+      <td>${kmFormat}<br>${formatDate(v.proxMant)}</td>
       <td>${formatDate(v.proxItv)}</td>`;
     tbody.appendChild(tr);
   });
@@ -725,6 +740,7 @@ function cargarRecordatorios() {
 
 function guardarRecordatorio() {
   const vehiculoId = document.getElementById('rec_vehiculo').value;
+  const km = document.getElementById('rec_km_mant').value;
   const mant = document.getElementById('rec_mant').value;
   const itv = document.getElementById('rec_itv').value;
   
@@ -732,11 +748,12 @@ function guardarRecordatorio() {
   
   const v = state.vehiculos.find(x => x.id === vehiculoId);
   if (v) {
+    v.proxKmMant = km;
     v.proxMant = mant;
     v.proxItv = itv;
     guardar();
     cargarRecordatorios();
-    mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Fechas guardadas.' : 'Dates saved.', 'ok');
+    mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Fechas y Km guardados.' : 'Dates and mileage saved.', 'ok');
   }
 }
 

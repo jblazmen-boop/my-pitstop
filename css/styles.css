@@ -283,7 +283,7 @@ input[type="checkbox"] {
   header h1 { font-size: 45px; }
   .author { font-size: 20px; }
   
-  /* Ajuste para que los 3 inputs de avisos se apilen en móvil */
+  /* Ajuste para que los inputs de avisos se apilen en móvil */
   #recordatorios .grid { grid-template-columns: 1fr; }
 }
 

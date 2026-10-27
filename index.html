@@ -155,17 +155,21 @@
     </table>
   </div>
 
-  <!-- RECORDATORIOS (Ahora con ITV y Mantenimiento) -->
+  <!-- RECORDATORIOS (Con Km y Fecha) -->
   <div id="recordatorios" class="panel">
     <h2 data-i18n="recordatorios">Avisos y Recordatorios</h2>
     <p style="color: #9ca3af; margin-bottom: 20px;" data-i18n="recordatorios_texto">Aquí puedes ver y gestionar las fechas de tus próximos mantenimientos e ITV.</p>
     
-    <div class="grid" style="grid-template-columns: 1fr 1fr 1fr;">
+    <div class="grid" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
       <div>
         <label data-i18n="vehiculo">Vehículo</label>
         <select id="rec_vehiculo" onchange="cargarRecordatorios()">
           <option value="" data-i18n="selecciona">— Selecciona —</option>
         </select>
+      </div>
+      <div>
+        <label data-i18n="km_prox_mant">Km del próximo mantenimiento</label>
+        <input type="number" id="rec_km_mant" placeholder="Ej: 100000">
       </div>
       <div>
         <label data-i18n="fecha_prox_mant">Fecha del próximo mantenimiento</label>
@@ -208,7 +212,7 @@
         </select>
       </div>
     </div>
-    <div style="background: rgba(17, 24, 39, 0.85); padding: 20px; border-radius: 8px; border: 1px solid #374151; margin-top: 20px;">
+    <div style="background: rgba(17, 24, 39, 0.85); padding: 20px; border-radius: 8px; border: 1px solid #374151; margin-top: 20px; height: 400px;">
       <canvas id="miGrafico"></canvas>
     </div>
   </div>
