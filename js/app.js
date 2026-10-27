@@ -583,28 +583,37 @@ function generarPDF() {
 
   const doc = new jsPDF('p', 'mm', 'a4');
   const pageW = doc.internal.pageSize.getWidth();
+  const pageH = doc.internal.pageSize.getHeight();
   let y = 15;
 
-  // ================= CABECERA GENERAL =================
-  doc.setFillColor(15, 23, 42); // Gris muy oscuro
-  doc.rect(0, 0, pageW, 28, 'F');
-  
+  // ================= LOGO COMO MARCA DE AGUA (Fondo) =================
   const logoImg = document.querySelector('.logo-img');
   if (logoImg) {
-    try { doc.addImage(logoImg, 'PNG', 15, 4, 20, 20); } catch(e) { console.log(e); }
+    try {
+      doc.saveGraphicsState();
+      doc.setGState(new doc.GState({opacity: 0.05})); // Transparencia al 5%
+      doc.addImage(logoImg, 'PNG', (pageW - 150) / 2, (pageH - 150) / 2, 150, 150);
+      doc.restoreGraphicsState();
+    } catch(e) { console.log("Error al cargar la marca de agua", e); }
   }
 
+  // ================= CABECERA TUNEADA =================
+  doc.setFillColor(15, 23, 42); // Gris muy oscuro
+  doc.rect(0, 0, pageW, 20, 'F'); // Cabecera más fina
+  
   doc.setTextColor(255,255,255);
   doc.setFontSize(16); doc.setFont(undefined, 'bold');
-  doc.text(tipoInforme === 'historico' ? t.pdf_informe : t.pdf_factura, 40, 16);
+  
+  // Siempre "INFORME DE MANTENIMIENTO" en ambos idiomas
+  doc.text(t.pdf_informe, 15, 13);
   
   if (numFactura && tipoInforme === 'detallado') { 
-    doc.setFontSize(10); doc.text('Nº: ' + numFactura, pageW - 15, 16, {align:'right'}); 
+    doc.setFontSize(10); doc.text('Nº: ' + numFactura, pageW - 15, 13, {align:'right'}); 
   }
 
   doc.setTextColor(0,0,0);
   doc.setFontSize(10); doc.setFont(undefined, 'normal');
-  y = 38;
+  y = 30;
 
   if (tallerEmisor && tipoInforme === 'detallado') { doc.text(tallerEmisor, 15, y); y += 5; }
   doc.setFont(undefined, 'bold'); doc.text(t.pdf_vehiculo, 15, y); doc.setFont(undefined, 'normal');
@@ -629,12 +638,12 @@ function generarPDF() {
       textoTipoYServicio += "• " + (m.manoObra || []).map(o => o.concepto).join("\n• ");
       if (m.taller) textoTipoYServicio += `\n\n(${t.pdf_taller_txt} ${m.taller})`;
       
-      // Columna 2: Repuestos
+      // Columna 2: Repuestos (INVERTIDO: Descripción primero, luego Referencia)
       let textoRepuestos = "—";
       if (m.repuestos && m.repuestos.length > 0) {
         textoRepuestos = m.repuestos.map(r => {
-           const refStr = r.ref ? `- ${r.ref}:` : '-';
-           return `• ${refStr} ${r.desc}`;
+           const refStr = r.ref ? ` (${r.ref})` : '';
+           return `• ${r.desc}${refStr}`;
         }).join("\n");
       }
 
@@ -658,12 +667,11 @@ function generarPDF() {
       margin: { left: 15, right: 15 }
     });
 
-  // ================= 2. INFORME DETALLADO (Facturas Individuales) =================
+  // ================= 2. INFORME DETALLADO =================
   } else {
     let totalGlobalMano = 0;
     let totalGlobalPiezas = 0;
 
-    // Recorremos cada mantenimiento como un bloque de factura independiente
     lista.forEach((m, index) => {
       if (y > 230) { doc.addPage(); y = 20; }
 
@@ -718,10 +726,10 @@ function generarPDF() {
       doc.setFontSize(10); doc.setFont(undefined, 'bold'); doc.setTextColor(225, 29, 72);
       doc.text(`${t.total}: ${fmt(subTotal)}`, pageW - 15, y + 3, {align:'right'});
       doc.setTextColor(0,0,0); doc.setFont(undefined, 'normal');
-      y += 15; // Espacio antes del siguiente bloque
+      y += 15; 
     });
 
-    // --- Totales Globales (Al final del documento) ---
+    // --- Totales Globales ---
     if (y > 250) { doc.addPage(); y = 20; }
     
     const baseGlobal = totalGlobalMano + totalGlobalPiezas;
