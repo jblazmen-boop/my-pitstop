@@ -45,8 +45,8 @@
     <button class="tab active" data-tab="vehiculos" title="Vehículos" data-i18n-title="vehiculos_titulo"><img src="icono-coche.png" class="tab-icon" alt="Vehículos"></button>
     <button class="tab" data-tab="mantenimientos" title="Mantenimientos" data-i18n-title="historial"><img src="icono-llave.png" class="tab-icon" alt="Mantenimientos"></button>
     <button class="tab" data-tab="informe" title="Generar Informe" data-i18n-title="gen_informe"><img src="icono-libro.png" class="tab-icon" alt="Informes"></button>
-    <button class="tab" data-tab="recordatorios" title="Avisos" data-i18n-title="recordatorios"><img src="icono-calendario.png" class="tab-icon" alt="Calendario"></button>
-    <button class="tab" data-tab="grafico" title="Estadísticas" data-i18n-title="estadisticas"><img src="icono-grafico.png" class="tab-icon" alt="Gráfico"></button>
+    <button class="tab" data-tab="recordatorios" title="Avisos" data-i18n-title="recordatorios"><img src="icono-calendario.PNG" class="tab-icon" alt="Calendario"></button>
+    <button class="tab" data-tab="grafico" title="Estadísticas" data-i18n-title="estadisticas"><img src="icono-grafico.PNG" class="tab-icon" alt="Gráfico"></button>
     <button class="tab" data-tab="backup" title="Copia de Seguridad" data-i18n-title="copia_seguridad"><img src="icono-copia.png" class="tab-icon" alt="Copia"></button>
   </div>
 
@@ -155,12 +155,12 @@
     </table>
   </div>
 
-  <!-- RECORDATORIOS (Antes ITV) -->
+  <!-- RECORDATORIOS (Ahora con ITV y Mantenimiento) -->
   <div id="recordatorios" class="panel">
     <h2 data-i18n="recordatorios">Avisos y Recordatorios</h2>
-    <p style="color: #9ca3af; margin-bottom: 20px;" data-i18n="recordatorios_texto">Aquí puedes ver y gestionar las fechas de tus próximos mantenimientos importantes.</p>
+    <p style="color: #9ca3af; margin-bottom: 20px;" data-i18n="recordatorios_texto">Aquí puedes ver y gestionar las fechas de tus próximos mantenimientos e ITV.</p>
     
-    <div class="grid">
+    <div class="grid" style="grid-template-columns: 1fr 1fr 1fr;">
       <div>
         <label data-i18n="vehiculo">Vehículo</label>
         <select id="rec_vehiculo" onchange="cargarRecordatorios()">
@@ -169,11 +169,16 @@
       </div>
       <div>
         <label data-i18n="fecha_prox_mant">Fecha del próximo mantenimiento</label>
+        <input type="date" id="rec_mant">
+      </div>
+      <div>
+        <label data-i18n="fecha_prox_itv">Fecha de la próxima ITV</label>
         <input type="date" id="rec_itv">
       </div>
-      <div style="display: flex; align-items: flex-end;">
-        <button class="primary" data-i18n="guardar" onclick="guardarRecordatorio()">Guardar Fecha</button>
-      </div>
+    </div>
+    
+    <div style="margin-top: 15px;">
+      <button class="primary" data-i18n="guardar" onclick="guardarRecordatorio()">Guardar Fechas</button>
     </div>
     
     <div id="msg_recordatorios"></div>
@@ -182,8 +187,8 @@
       <thead>
         <tr>
           <th data-i18n="vehiculo">Vehículo</th>
-          <th data-i18n="fecha_prox_mant">Próximo Mantenimiento</th>
-          <th data-i18n="estado">Estado</th>
+          <th data-i18n="prox_mant">Próximo Mantenimiento</th>
+          <th data-i18n="prox_itv">Próxima ITV</th>
         </tr>
       </thead>
       <tbody id="tabla_recordatorios_body">

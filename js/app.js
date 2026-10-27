@@ -34,8 +34,10 @@ const translations = {
     pdf_iva: "IVA", pdf_total: "TOTAL FACTURA:", pdf_servicios: "Servicio / Mano de Obra", pdf_materiales: "Materiales / Repuestos",
     pdf_taller_txt: "Taller:", modo_generacion: "Modo de generación", por_fechas: "Por rango de fechas", 
     por_seleccion: "Seleccionando mantenimientos", selecciona_mant: "Selecciona los mantenimientos para incluir en la factura",
-    estadisticas: "Estadísticas de Gasto", recordatorios: "Avisos y Recordatorios", recordatorios_texto: "Aquí puedes ver y gestionar las fechas de tus próximos mantenimientos importantes.",
-    fecha_prox_mant: "Fecha del próximo mantenimiento", guardar: "Guardar Fecha", estado: "Estado", 
+    estadisticas: "Estadísticas de Gasto", recordatorios: "Avisos y Recordatorios", recordatorios_texto: "Aquí puedes ver y gestionar las fechas de tus próximos mantenimientos e ITV.",
+    fecha_prox_mant: "Fecha del próximo mantenimiento", fecha_prox_itv: "Fecha de la próxima ITV", 
+    prox_mant: "Próximo Mantenimiento", prox_itv: "Próxima ITV",
+    guardar: "Guardar Fechas", estado: "Estado", 
     itv_ok: "En regla", itv_warn: "Próximo", itv_danger: "Caducado", sin_fecha: "Sin fecha"
   },
   en: {
@@ -63,8 +65,10 @@ const translations = {
     pdf_iva: "VAT", pdf_total: "TOTAL INVOICE:", pdf_servicios: "Service / Labor", pdf_materiales: "Materials / Parts",
     pdf_taller_txt: "Workshop:", modo_generacion: "Generation mode", por_fechas: "By date range", 
     por_seleccion: "Selecting records", selecciona_mant: "Select maintenance records to include in the invoice",
-    estadisticas: "Expense Statistics", recordatorios: "Reminders & Alerts", recordatorios_texto: "Here you can view and manage upcoming important maintenance dates.",
-    fecha_prox_mant: "Next Maintenance Date", guardar: "Save Date", estado: "Status", 
+    estadisticas: "Expense Statistics", recordatorios: "Reminders & Alerts", recordatorios_texto: "Here you can view and manage upcoming maintenance and MOT dates.",
+    fecha_prox_mant: "Next Maintenance Date", fecha_prox_itv: "Next MOT Date", 
+    prox_mant: "Next Maintenance", prox_itv: "Next MOT",
+    guardar: "Save Dates", estado: "Status", 
     itv_ok: "Valid", itv_warn: "Due soon", itv_danger: "Expired", sin_fecha: "No date"
   }
 };
@@ -148,7 +152,10 @@ function cargar() {
       if (!state.vehiculos) state.vehiculos = [];
       if (!state.mantenimientos) state.mantenimientos = [];
 
-      state.vehiculos.forEach(v => { if (!v.proxItv) v.proxItv = ''; });
+      state.vehiculos.forEach(v => { 
+        if (!v.proxMant) v.proxMant = ''; 
+        if (!v.proxItv) v.proxItv = ''; 
+      });
 
       state.mantenimientos.forEach(m => {
         if (m.tipo && !m.tipo.startsWith('type_')) {
@@ -204,7 +211,7 @@ function addVehiculo() {
     mostrarMsg('msg_vehiculo', currentLang === 'es' ? 'Ya existe un vehículo con esa matrícula.' : 'A vehicle with that plate already exists.', 'err'); return;
   }
   
-  state.vehiculos.push({ id: uid(), matricula: mat, marca, modelo, bastidor, proxItv: '' });
+  state.vehiculos.push({ id: uid(), matricula: mat, marca, modelo, bastidor, proxMant: '', proxItv: '' });
   guardar();
   document.getElementById('v_matricula').value = '';
   document.getElementById('v_marca').value = '';
@@ -627,8 +634,8 @@ function renderGrafico() {
           pointBackgroundColor: '#e11d48',
           pointBorderColor: '#fff',
           pointHoverRadius: 6,
-          tension: 0.4, // Esto hace que las líneas sean curvas (par motor)
-          fill: false // Sin relleno debajo para que se vea más limpio
+          tension: 0.4, // Curvas suaves
+          fill: false
         },
         {
           label: translations[currentLang].repuestos,
@@ -639,7 +646,7 @@ function renderGrafico() {
           pointBackgroundColor: '#38bdf8',
           pointBorderColor: '#fff',
           pointHoverRadius: 6,
-          tension: 0.4, // Curvas
+          tension: 0.4,
           fill: false
         }
       ]
@@ -674,63 +681,62 @@ function renderGrafico() {
   });
 }
 
-// ============ NUEVO: RECORDATORIOS (Próximo Mantenimiento) ============
+// ============ NUEVO: RECORDATORIOS (Mantenimiento e ITV) ============
 function cargarRecordatorios() {
   const sel = document.getElementById('rec_vehiculo');
   if (!sel) return;
   const vehiculoId = sel.value;
+  const mantInput = document.getElementById('rec_mant');
   const itvInput = document.getElementById('rec_itv');
   const tbody = document.getElementById('tabla_recordatorios_body');
   tbody.innerHTML = '';
 
   if (vehiculoId) {
     const v = state.vehiculos.find(x => x.id === vehiculoId);
-    if (v && v.proxItv) itvInput.value = v.proxItv;
-    else itvInput.value = '';
+    if (v) {
+      mantInput.value = v.proxMant || '';
+      itvInput.value = v.proxItv || '';
+    }
   }
 
   state.vehiculos.forEach(v => {
-    let estadoTxt = translations[currentLang].sin_fecha;
-    let claseColor = '#9ca3af'; // Gris
-
-    if (v.proxItv) {
-      const fechaItv = new Date(v.proxItv);
+    const formatDate = (dateStr) => {
+      if (!dateStr) return '—';
+      const fecha = new Date(dateStr);
       const hoy = new Date();
-      const diffDias = Math.ceil((fechaItv - hoy) / (1000 * 60 * 60 * 24));
-      const fechaMostrar = v.proxItv.split('-').reverse().join('/');
+      const diffDias = Math.ceil((fecha - hoy) / (1000 * 60 * 60 * 24));
+      const fechaMostrar = dateStr.split('-').reverse().join('/');
+      
+      let color = '#9ca3af';
+      if (diffDias < 0) color = '#ef4444'; // Rojo
+      else if (diffDias <= 30) color = '#f59e0b'; // Naranja
+      else color = '#10b981'; // Verde
 
-      if (diffDias < 0) {
-        estadoTxt = `${translations[currentLang].itv_danger} (${fechaMostrar})`;
-        claseColor = '#ef4444'; // Rojo
-      } else if (diffDias <= 30) {
-        estadoTxt = `${translations[currentLang].itv_warn} (${fechaMostrar})`;
-        claseColor = '#f59e0b'; // Naranja
-      } else {
-        estadoTxt = `${translations[currentLang].itv_ok} (${fechaMostrar})`;
-        claseColor = '#10b981'; // Verde
-      }
-    }
+      return `<span style="color: ${color}; font-weight: bold;">${fechaMostrar}</span>`;
+    };
 
     const tr = document.createElement('tr');
     tr.innerHTML = `<td>${esc(v.matricula)}</td>
-      <td>${v.proxItv || '—'}</td>
-      <td style="color: ${claseColor}; font-weight: bold;">${estadoTxt}</td>`;
+      <td>${formatDate(v.proxMant)}</td>
+      <td>${formatDate(v.proxItv)}</td>`;
     tbody.appendChild(tr);
   });
 }
 
 function guardarRecordatorio() {
   const vehiculoId = document.getElementById('rec_vehiculo').value;
-  const fecha = document.getElementById('rec_itv').value;
+  const mant = document.getElementById('rec_mant').value;
+  const itv = document.getElementById('rec_itv').value;
   
   if (!vehiculoId) { mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err'); return; }
   
   const v = state.vehiculos.find(x => x.id === vehiculoId);
   if (v) {
-    v.proxItv = fecha;
+    v.proxMant = mant;
+    v.proxItv = itv;
     guardar();
     cargarRecordatorios();
-    mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Fecha guardada.' : 'Date saved.', 'ok');
+    mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Fechas guardadas.' : 'Dates saved.', 'ok');
   }
 }
 

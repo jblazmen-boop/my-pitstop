@@ -274,14 +274,17 @@ input[type="checkbox"] {
   .header-content { flex-direction: column; gap: 5px; }
   .title-block { align-items: center; }
   .lang-switch { width: auto; justify-content: center; margin-top: 10px; }
-  .tabs { gap: 15px; margin-bottom: 20px; }
-  .tab-icon { height: 65px; width: 65px; }
+  .tabs { gap: 10px; margin-bottom: 20px; }
+  .tab-icon { height: 60px; width: 60px; }
   .container { padding: 0 10px; margin-top: 10px; }
   .panel { padding: 15px; border-left-width: 4px; }
   h2 { font-size: 16px; }
   table th, table td { padding: 8px 4px; font-size: 11px; }
   header h1 { font-size: 45px; }
   .author { font-size: 20px; }
+  
+  /* Ajuste para que los 3 inputs de avisos se apilen en móvil */
+  #recordatorios .grid { grid-template-columns: 1fr; }
 }
 
 /* --- ROTACIÓN EN MÓVILES --- */
