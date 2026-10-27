@@ -34,9 +34,9 @@ const translations = {
     pdf_iva: "IVA", pdf_total: "TOTAL FACTURA:", pdf_servicios: "Servicio / Mano de Obra", pdf_materiales: "Materiales / Repuestos",
     pdf_taller_txt: "Taller:", modo_generacion: "Modo de generación", por_fechas: "Por rango de fechas", 
     por_seleccion: "Seleccionando mantenimientos", selecciona_mant: "Selecciona los mantenimientos para incluir en la factura",
-    estadisticas: "Estadísticas de Gasto", recordatorios: "Recordatorios y Avisos", recordatorios_texto: "Aquí puedes ver las fechas importantes de tus vehículos (ITV, Seguro, etc.)",
-    fecha_itv: "Fecha de la próxima ITV", guardar: "Guardar Fecha", estado: "Estado", itv_ok: "En regla", itv_warn: "Próxima", itv_danger: "Caducada", sin_fecha: "Sin fecha",
-    meses: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
+    estadisticas: "Estadísticas de Gasto", recordatorios: "Avisos y Recordatorios", recordatorios_texto: "Aquí puedes ver y gestionar las fechas de tus próximos mantenimientos importantes.",
+    fecha_prox_mant: "Fecha del próximo mantenimiento", guardar: "Guardar Fecha", estado: "Estado", 
+    itv_ok: "En regla", itv_warn: "Próximo", itv_danger: "Caducado", sin_fecha: "Sin fecha"
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -63,9 +63,9 @@ const translations = {
     pdf_iva: "VAT", pdf_total: "TOTAL INVOICE:", pdf_servicios: "Service / Labor", pdf_materiales: "Materials / Parts",
     pdf_taller_txt: "Workshop:", modo_generacion: "Generation mode", por_fechas: "By date range", 
     por_seleccion: "Selecting records", selecciona_mant: "Select maintenance records to include in the invoice",
-    estadisticas: "Expense Statistics", recordatorios: "Reminders & Alerts", recordatorios_texto: "Here you can see important dates for your vehicles (MOT, Insurance, etc.)",
-    fecha_itv: "Next MOT Date", guardar: "Save Date", estado: "Status", itv_ok: "Valid", itv_warn: "Due soon", itv_danger: "Expired", sin_fecha: "No date",
-    meses: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    estadisticas: "Expense Statistics", recordatorios: "Reminders & Alerts", recordatorios_texto: "Here you can view and manage upcoming important maintenance dates.",
+    fecha_prox_mant: "Next Maintenance Date", guardar: "Save Date", estado: "Status", 
+    itv_ok: "Valid", itv_warn: "Due soon", itv_danger: "Expired", sin_fecha: "No date"
   }
 };
 
@@ -126,8 +126,8 @@ function translatePage() {
   
   document.documentElement.lang = currentLang;
   renderAll(); 
-  renderGrafico(); // Actualizar gráfico al cambiar idioma
-  cargarRecordatorios(); // Actualizar tabla de recordatorios
+  renderGrafico(); 
+  cargarRecordatorios(); 
 }
 
 function setLanguage(lang) {
@@ -188,7 +188,6 @@ document.querySelectorAll('.tab').forEach(t => {
     t.classList.add('active');
     document.getElementById(t.dataset.tab).classList.add('active');
     
-    // Al entrar en la pestaña de gráfico o recordatorios, actualizamos
     if (t.dataset.tab === 'grafico') renderGrafico();
     if (t.dataset.tab === 'recordatorios') cargarRecordatorios();
   };
@@ -589,9 +588,9 @@ function mostrarMsg(id, texto, tipo) {
   setTimeout(() => { el.innerHTML = ''; }, 4000);
 }
 
-// ============ NUEVO: GRÁFICO DE GASTOS ============
+// ============ NUEVO: GRÁFICO ESTILO RACING ============
 function renderGrafico() {
-  if (typeof Chart === 'undefined') return; // Si no ha cargado la librería, no hace nada
+  if (typeof Chart === 'undefined') return; 
 
   const vehiculoId = document.getElementById('g_vehiculo').value;
   let lista = state.mantenimientos;
@@ -615,40 +614,67 @@ function renderGrafico() {
   if (miGraficoInstancia) miGraficoInstancia.destroy();
 
   miGraficoInstancia = new Chart(ctx, {
-    type: 'bar',
+    type: 'line',
     data: {
       labels: anios,
       datasets: [
         {
           label: translations[currentLang].mano_obra,
           data: dataMano,
-          backgroundColor: '#e11d48',
-          borderColor: '#be123c',
-          borderWidth: 1
+          borderColor: '#e11d48', // Rojo PitStop
+          backgroundColor: 'rgba(225, 29, 72, 0.2)',
+          borderWidth: 3,
+          pointBackgroundColor: '#e11d48',
+          pointBorderColor: '#fff',
+          pointHoverRadius: 6,
+          tension: 0.4, // Esto hace que las líneas sean curvas (par motor)
+          fill: false // Sin relleno debajo para que se vea más limpio
         },
         {
           label: translations[currentLang].repuestos,
           data: dataPiezas,
-          backgroundColor: '#38bdf8',
-          borderColor: '#0ea5e9',
-          borderWidth: 1
+          borderColor: '#38bdf8', // Azul neón
+          backgroundColor: 'rgba(56, 189, 248, 0.2)',
+          borderWidth: 3,
+          pointBackgroundColor: '#38bdf8',
+          pointBorderColor: '#fff',
+          pointHoverRadius: 6,
+          tension: 0.4, // Curvas
+          fill: false
         }
       ]
     },
     options: {
       responsive: true,
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
       plugins: {
-        legend: { labels: { color: '#e2e8f0' } }
+        legend: { labels: { color: '#e2e8f0', font: { size: 14, weight: 'bold' } } },
+        tooltip: {
+          backgroundColor: 'rgba(15, 23, 42, 0.9)',
+          titleColor: '#fff',
+          bodyColor: '#e2e8f0',
+          borderColor: '#374151',
+          borderWidth: 1
+        }
       },
       scales: {
-        x: { stacked: true, ticks: { color: '#9ca3af' }, grid: { color: '#374151' } },
-        y: { stacked: true, ticks: { color: '#9ca3af' }, grid: { color: '#374151' } }
+        x: { 
+          ticks: { color: '#9ca3af', font: { size: 12 } }, 
+          grid: { color: 'rgba(55, 65, 81, 0.5)' } 
+        },
+        y: { 
+          ticks: { color: '#9ca3af', font: { size: 12 } }, 
+          grid: { color: 'rgba(55, 65, 81, 0.5)' } 
+        }
       }
     }
   });
 }
 
-// ============ NUEVO: RECORDATORIOS ITV ============
+// ============ NUEVO: RECORDATORIOS (Próximo Mantenimiento) ============
 function cargarRecordatorios() {
   const sel = document.getElementById('rec_vehiculo');
   if (!sel) return;
@@ -744,7 +770,7 @@ function renderTablaSeleccion() {
   });
 }
 
-// ============ GENERAR PDF (CON COMPARTIR) ============
+// ============ GENERAR PDF ============
 function generarPDF(compartir = false) {
   try {
     const { jsPDF } = window.jspdf;
@@ -918,7 +944,6 @@ function generarPDF(compartir = false) {
 
     const nombre = tipoInforme === 'historico' ? `Historico_${v.matricula}.pdf` : `Factura_${v.matricula}.pdf`;
     
-    // COMPARTIR POR WHATSAPP / SISTEMA
     if (compartir && navigator.share && navigator.canShare) {
       const pdfBlob = doc.output('blob');
       const file = new File([pdfBlob], nombre, { type: 'application/pdf' });
@@ -932,13 +957,11 @@ function generarPDF(compartir = false) {
           mostrarMsg('msg_informe', currentLang === 'es' ? 'PDF compartido.' : 'PDF shared.', 'ok');
         }).catch((err) => {
           console.log("Error al compartir:", err);
-          // Si cancela, no hacemos nada.
         });
         return;
       }
     }
     
-    // Si no se puede compartir (o es ordenador), se descarga normal
     doc.save(nombre);
     mostrarMsg('msg_informe', currentLang === 'es' ? 'PDF generado y descargado.' : 'PDF generated and downloaded.', 'ok');
 
