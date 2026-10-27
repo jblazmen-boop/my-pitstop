@@ -25,7 +25,11 @@ const translations = {
     exportar: "⬇ Exportar copia (JSON)", importar: "⬆ Importar copia", borrar: "🗑 Borrar todos los datos",
     derechos: "Todos los derechos reservados.", selecciona: "— Selecciona —", no_foto: "— No usar foto —",
     ej_operacion: "Ej: Sustituir correa", ej_referencia: "Ej: MANN-W712", seleccionar_archivo: "Seleccionar archivo",
-    pdf_informe: "INFORME DE MANTENIMIENTO", pdf_factura: "FACTURA DE MANTENIMIENTO",
+    
+    // TÍTULO UNIFICADO SEGÚN TU PETICIÓN
+    pdf_informe: "INFORME DE MANTENIMIENTO / FACTURA", 
+    pdf_factura: "INFORME DE MANTENIMIENTO / FACTURA",
+    
     pdf_vehiculo: "Vehículo:", pdf_matricula: "Matrícula:", pdf_bastidor: "Nº Bastidor:", pdf_fecha_inf: "Fecha informe:",
     pdf_periodo: "Periodo:", pdf_mano_obra: "Desglose de Mano de Obra", pdf_concepto: "Concepto", pdf_importe: "Importe",
     pdf_repuestos: "Desglose de Repuestos", pdf_desc: "Descripción", pdf_precio_ud: "Precio Ud.", pdf_base: "Base imponible:",
@@ -50,7 +54,11 @@ const translations = {
     exportar: "⬇ Export backup (JSON)", importar: "⬆ Import backup", borrar: "🗑 Delete all data",
     derechos: "All rights reserved.", selecciona: "— Select —", no_foto: "— No photo —",
     ej_operacion: "Ex: Replace belt", ej_referencia: "Ex: MANN-W712", seleccionar_archivo: "Select file",
-    pdf_informe: "MAINTENANCE REPORT", pdf_factura: "MAINTENANCE INVOICE",
+    
+    // TÍTULO UNIFICADO EN INGLÉS
+    pdf_informe: "MAINTENANCE REPORT / INVOICE",
+    pdf_factura: "MAINTENANCE REPORT / INVOICE",
+    
     pdf_vehiculo: "Vehicle:", pdf_matricula: "Plate:", pdf_bastidor: "VIN:", pdf_fecha_inf: "Report date:",
     pdf_periodo: "Period:", pdf_mano_obra: "Labor Breakdown", pdf_concepto: "Concept", pdf_importe: "Amount",
     pdf_repuestos: "Parts Breakdown", pdf_desc: "Description", pdf_precio_ud: "Unit Price", pdf_base: "Subtotal:",
@@ -321,7 +329,6 @@ function guardarRepuesto(cant, desc, ref, precio, fotoBase64, fotoId) {
   document.getElementById('r_foto').value = '';
   document.getElementById('r_foto_catalogo').value = '';
   
-  // Resetear el texto del botón de subir archivo
   const fileLabel = document.getElementById('file-btn-label');
   if (fileLabel) fileLabel.textContent = translations[currentLang].seleccionar_archivo;
   
@@ -647,6 +654,21 @@ function generarPDF() {
     const pageH = doc.internal.pageSize.getHeight();
     let y = 15;
 
+    // Diccionario para traducir los tipos de mantenimiento si el PDF está en inglés
+    const tiposTraducidos = {
+      "Revisión / Mantenimiento": "Service / Maintenance",
+      "Motor": "Engine",
+      "Transmisión": "Transmission",
+      "Suspensión, Dirección y Frenos": "Suspension, Steering & Brakes",
+      "Electricidad / Electrónica": "Electrical / Electronics",
+      "Climatización": "Air Conditioning",
+      "Escape": "Exhaust",
+      "Interior, Habitáculo y Seguridad": "Interior, Cabin & Safety",
+      "Chasis y Carrocería": "Chassis & Bodywork",
+      "Otro": "Other"
+    };
+    const getTipoTraducido = (tipo) => (currentLang === 'en' && tiposTraducidos[tipo]) ? tiposTraducidos[tipo] : tipo;
+
     // Marca de agua (Logo)
     const logoImg = document.querySelector('.logo-img');
     if (logoImg && logoImg.src) {
@@ -689,7 +711,7 @@ function generarPDF() {
     if (tipoInforme === 'historico') {
       let bodyHistorial = [];
       lista.forEach(m => {
-        let textoTipoYServicio = m.tipo + "\n";
+        let textoTipoYServicio = getTipoTraducido(m.tipo) + "\n"; // Usamos el tipo traducido
         textoTipoYServicio += "• " + (m.manoObra || []).map(o => o.concepto).join("\n• ");
         if (m.taller) textoTipoYServicio += `\n\n(${t.pdf_taller_txt} ${m.taller})`;
         
@@ -725,7 +747,11 @@ function generarPDF() {
         doc.text(`${t.fecha}: ${m.fecha.split('-').reverse().join('/')}`, 18, y);
         if (m.km) doc.text(`${t.km}: ${m.km}`, 80, y);
         if (m.taller) doc.text(`${t.pdf_taller_txt} ${m.taller}`, pageW - 18, y, {align:'right'});
-        y += 8;
+        
+        // Añadimos el Tipo de Mantenimiento traducido debajo de la fecha
+        doc.setFontSize(9); doc.setFont(undefined, 'normal'); doc.setTextColor(100, 100, 100);
+        doc.text(`${t.tipo}: ${getTipoTraducido(m.tipo)}`, 18, y + 4);
+        y += 9; // Ajustamos un poco el margen
 
         let bodyMano = (m.manoObra || []).map(o => [ o.concepto, fmt(o.precio) ]);
         if (bodyMano.length > 0) {
@@ -826,7 +852,6 @@ renderManoObraTemporal();
 renderRepuestosTemporales();
 renderAll();
 
-// Evento para actualizar el nombre del archivo en el botón de subir foto
 document.getElementById('r_foto').addEventListener('change', function() {
   const fileLabel = document.getElementById('file-btn-label');
   if (this.files && this.files[0]) {
