@@ -142,16 +142,11 @@
 
     <h2 style="margin-top:24px;" data-i18n="historial">Historial de Mantenimientos</h2>
     
-    <!-- NUEVO: Botón para generar factura de los seleccionados -->
-    <div style="margin-bottom: 10px;">
-      <button class="primary" onclick="generarPDFSeleccionados()" style="background: #be123c !important;">📄 Generar Factura de Seleccionados</button>
-    </div>
-
     <div class="grid">
       <div><label data-i18n="filtrar">Filtrar por vehículo</label><select id="f_vehiculo"><option value="" data-i18n="todos">Todos</option></select></div>
     </div>
     <table id="tabla_mantenimientos">
-      <thead><tr><th style="width: 40px; text-align: center;"><input type="checkbox" id="checkAll" onclick="toggleAllChecks(this)"></th><th data-i18n="fecha">Fecha</th><th data-i18n="vehiculo">Vehículo</th><th data-i18n="km">Km</th><th data-i18n="tipo">Tipo</th><th data-i18n="operaciones">Operaciones</th><th data-i18n="mano">Mano</th><th data-i18n="piezas">Piezas</th><th data-i18n="total">Total</th><th data-i18n="acciones">Acciones</th></tr></thead>
+      <thead><tr><th data-i18n="fecha">Fecha</th><th data-i18n="vehiculo">Vehículo</th><th data-i18n="km">Km</th><th data-i18n="tipo">Tipo</th><th data-i18n="operaciones">Operaciones</th><th data-i18n="mano">Mano</th><th data-i18n="piezas">Piezas</th><th data-i18n="total">Total</th><th data-i18n="acciones">Acciones</th></tr></thead>
       <tbody></tbody>
     </table>
   </div>
@@ -159,7 +154,15 @@
   <!-- INFORME -->
   <div id="informe" class="panel">
     <h2 data-i18n="gen_informe">Generar informe / factura en PDF</h2>
+    
     <div class="grid">
+      <div>
+        <label>Modo de generación</label>
+        <select id="i_modo" onchange="toggleModoInforme()">
+          <option value="fechas">Por rango de fechas</option>
+          <option value="seleccion">Seleccionando mantenimientos</option>
+        </select>
+      </div>
       <div>
         <label data-i18n="tipo_informe">Tipo de Informe</label>
         <select id="i_tipo_informe">
@@ -167,13 +170,25 @@
           <option value="historico" data-i18n="historico">Histórico Técnico (Sin precios)</option>
         </select>
       </div>
-      <div><label data-i18n="vehiculo">Vehículo</label><select id="i_vehiculo"><option value="" data-i18n="selecciona">— Selecciona —</option></select></div>
-      <div><label data-i18n="fecha_desde">Fecha desde</label><input type="date" id="i_desde"></div>
-      <div><label data-i18n="fecha_hasta">Fecha hasta</label><input type="date" id="i_hasta"></div>
+      <div><label data-i18n="vehiculo">Vehículo</label><select id="i_vehiculo" onchange="renderTablaSeleccion()"><option value="" data-i18n="selecciona">— Selecciona —</option></select></div>
       <div><label data-i18n="num_factura">Nº de factura (opcional)</label><input id="i_factura" placeholder="F-2025-001"></div>
       <div><label data-i18n="iva">IVA (%)</label><input type="number" id="i_iva" value="21" step="0.1"></div>
       <div style="grid-column:1/-1;"><label data-i18n="nombre_taller">Nombre del taller / emisor (opcional)</label><input id="i_taller" placeholder="Taller Pepe S.L. - NIF B12345678"></div>
     </div>
+
+    <div id="bloque_fechas" class="grid">
+      <div><label data-i18n="fecha_desde">Fecha desde</label><input type="date" id="i_desde"></div>
+      <div><label data-i18n="fecha_hasta">Fecha hasta</label><input type="date" id="i_hasta"></div>
+    </div>
+
+    <div id="bloque_seleccion" style="display:none; margin-bottom: 20px;">
+      <h3 style="font-size: 16px; color: #e11d48; margin-bottom: 10px;">Selecciona los mantenimientos para incluir en la factura</h3>
+      <table id="tabla_seleccion">
+        <thead><tr><th style="width: 40px; text-align: center;"><input type="checkbox" id="checkAll" onclick="toggleAllChecks(this)"></th><th data-i18n="fecha">Fecha</th><th data-i18n="km">Km</th><th data-i18n="tipo">Tipo</th><th data-i18n="operaciones">Operaciones</th><th data-i18n="total">Total</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
     <button class="primary" data-i18n="btn_gen_pdf" onclick="generarPDF()">Generar PDF</button>
     <div id="msg_informe"></div>
   </div>

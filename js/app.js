@@ -510,7 +510,7 @@ function renderMantenimientos() {
   let lista = state.mantenimientos.slice().sort((a,b) => b.fecha.localeCompare(a.fecha));
   if (filtro) lista = lista.filter(m => m.vehiculoId === filtro);
   if (lista.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" class="empty">${currentLang === 'es' ? 'No hay mantenimientos registrados.' : 'No maintenance records found.'}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" class="empty">${currentLang === 'es' ? 'No hay mantenimientos registrados.' : 'No maintenance records found.'}</td></tr>`;
     return;
   }
   lista.forEach(m => {
@@ -518,8 +518,7 @@ function renderMantenimientos() {
     const fechaMostrar = m.fecha ? m.fecha.split('-').reverse().join('/') : '';
     let numOps = (m.manoObra ? m.manoObra.length : 0) + (m.repuestos ? m.repuestos.length : 0);
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td style="text-align:center;"><input type="checkbox" class="check-mant" value="${m.id}"></td>
-      <td>${fechaMostrar}</td><td>${esc(v ? v.matricula : '—')}</td>
+    tr.innerHTML = `<td>${fechaMostrar}</td><td>${esc(v ? v.matricula : '—')}</td>
       <td>${m.km||''}</td><td>${esc(m.tipo)}</td>
       <td><button class="secondary" style="padding:4px 8px; font-size:11px;" onclick="verDesglose('${m.id}')">${currentLang === 'es' ? 'Ver' : 'View'} (${numOps})</button></td>
       <td>${fmt(m.mano)}</td><td>${fmt(m.piezas)}</td><td>${fmt(m.mano+m.piezas)}</td>
@@ -564,30 +563,75 @@ function mostrarMsg(id, texto, tipo) {
   setTimeout(() => { el.innerHTML = ''; }, 4000);
 }
 
-// ============ GENERAR PDF DESDE HISTORIAL (SELECCIONADOS) ============
-function generarPDFSeleccionados() {
-  const checkboxes = document.querySelectorAll('.check-mant:checked');
-  if (checkboxes.length === 0) {
-    alert(currentLang === 'es' ? 'Selecciona al menos un mantenimiento para generar el informe.' : 'Select at least one maintenance record to generate the report.');
+// ============ MODO DE INFORME ============
+function toggleModoInforme() {
+  const modo = document.getElementById('i_modo').value;
+  document.getElementById('bloque_fechas').style.display = modo === 'fechas' ? 'grid' : 'none';
+  document.getElementById('bloque_seleccion').style.display = modo === 'seleccion' ? 'block' : 'none';
+  if (modo === 'seleccion') renderTablaSeleccion();
+}
+
+function renderTablaSeleccion() {
+  const vehiculoId = document.getElementById('i_vehiculo').value;
+  const tbody = document.querySelector('#tabla_seleccion tbody');
+  tbody.innerHTML = '';
+  
+  if (!vehiculoId) return;
+  
+  const lista = state.mantenimientos.filter(m => m.vehiculoId === vehiculoId).sort((a,b) => a.fecha.localeCompare(b.fecha));
+  if (lista.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888; padding:20px;">No hay mantenimientos registrados para este vehículo.</td></tr>`;
     return;
   }
-
-  const idsSeleccionados = Array.from(checkboxes).map(cb => cb.value);
-  let lista = state.mantenimientos.filter(m => idsSeleccionados.includes(m.id));
   
-  // Sacamos los datos del vehículo del primer mantenimiento seleccionado
-  const vehiculoId = lista[0].vehiculoId;
-  const v = state.vehiculos.find(x => x.id === vehiculoId);
-  if (!v) return;
+  lista.forEach(m => {
+    const total = m.mano + m.piezas;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td style="text-align:center;"><input type="checkbox" class="check-mant" value="${m.id}"></td>
+      <td>${m.fecha.split('-').reverse().join('/')}</td>
+      <td>${m.km || ''}</td>
+      <td>${esc(m.tipo)}</td>
+      <td>${(m.manoObra || []).map(o => o.concepto).join(', ')}</td>
+      <td>${fmt(total)}</td>`;
+    tbody.appendChild(tr);
+  });
+}
 
-  // Forzamos a que el PDF sea el "Detallado"
-  const tipoInforme = 'detallado';
+// ============ GENERAR PDF ============
+function generarPDF() {
+  const { jsPDF } = window.jspdf;
+  const modo = document.getElementById('i_modo').value;
+  const tipoInforme = document.getElementById('i_tipo_informe').value;
   const t = translations[currentLang]; 
-  const numFactura = ''; 
-  const tallerEmisor = ''; 
-  const ivaPorcentaje = 21; 
-  const desde = ''; 
-  const hasta = '';
+  
+  const vehiculoId = document.getElementById('i_vehiculo').value;
+  if (!vehiculoId) { mostrarMsg('msg_informe', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err'); return; }
+
+  let lista = [];
+  let desde = '', hasta = '';
+
+  if (modo === 'seleccion') {
+    const checkboxes = document.querySelectorAll('.check-mant:checked');
+    if (checkboxes.length === 0) {
+      mostrarMsg('msg_informe', 'Selecciona al menos un mantenimiento.', 'err'); return;
+    }
+    const ids = Array.from(checkboxes).map(cb => cb.value);
+    lista = state.mantenimientos.filter(m => ids.includes(m.id));
+  } else {
+    desde = document.getElementById('i_desde').value;
+    hasta = document.getElementById('i_hasta').value;
+    lista = state.mantenimientos.filter(m => m.vehiculoId === vehiculoId);
+    if (desde) lista = lista.filter(m => m.fecha >= desde);
+    if (hasta) lista = lista.filter(m => m.fecha <= hasta);
+  }
+
+  lista.sort((a,b) => a.fecha.localeCompare(b.fecha));
+  if (lista.length === 0) { mostrarMsg('msg_informe', currentLang === 'es' ? 'No hay mantenimientos.' : 'No records.', 'err'); return; }
+
+  const v = state.vehiculos.find(x => x.id === vehiculoId);
+  const numFactura = document.getElementById('i_factura').value.trim();
+  const tallerEmisor = document.getElementById('i_taller').value.trim();
+  const ivaPorcentaje = parseFloat(document.getElementById('i_iva').value) || 0;
 
   const doc = new jsPDF('p', 'mm', 'a4');
   const pageW = doc.internal.pageSize.getWidth();
@@ -610,132 +654,11 @@ function generarPDFSeleccionados() {
   doc.rect(0, 0, pageW, 20, 'F'); 
   doc.setTextColor(255,255,255);
   doc.setFontSize(16); doc.setFont(undefined, 'bold');
-  doc.text(t.pdf_informe, 15, 13);
   
-  doc.setTextColor(0,0,0);
-  doc.setFontSize(10); doc.setFont(undefined, 'normal');
-  y = 30;
-
-  doc.setFont(undefined, 'bold'); doc.text(t.pdf_vehiculo, 15, y); doc.setFont(undefined, 'normal');
-  doc.text(`${v.marca} ${v.modelo}`, 45, y); y += 6;
-  doc.setFont(undefined, 'bold'); doc.text(t.pdf_matricula, 15, y); doc.setFont(undefined, 'normal');
-  doc.text(v.matricula, 45, y); y += 6;
-  doc.setFont(undefined, 'bold'); doc.text(t.pdf_bastidor, 15, y); doc.setFont(undefined, 'normal');
-  doc.text(v.bastidor || '—', 45, y); y += 6;
-  doc.setFont(undefined, 'bold'); doc.text(t.pdf_fecha_inf, 15, y); doc.setFont(undefined, 'normal');
-  doc.text(new Date().toLocaleDateString(currentLang === 'es' ? 'es-ES' : 'en-GB'), 45, y); y += 10;
-
-  // Tablas de factura (igual que en el PDF detallado)
-  let totalGlobalMano = 0;
-  let totalGlobalPiezas = 0;
-
-  lista.sort((a,b) => a.fecha.localeCompare(b.fecha)).forEach((m) => {
-    if (y > 230) { doc.addPage(); y = 20; }
-
-    doc.setFillColor(240, 242, 245); 
-    doc.rect(15, y - 5, pageW - 30, 8, 'F');
-    doc.setFontSize(10); doc.setFont(undefined, 'bold'); doc.setTextColor(15, 23, 42);
-    doc.text(`${t.fecha}: ${m.fecha.split('-').reverse().join('/')}`, 18, y);
-    if (m.km) doc.text(`${t.km}: ${m.km}`, 80, y);
-    if (m.taller) doc.text(`${t.pdf_taller_txt} ${m.taller}`, pageW - 18, y, {align:'right'});
-    y += 8;
-
-    let bodyMano = (m.manoObra || []).map(o => [ o.concepto, fmt(o.precio) ]);
-    if (bodyMano.length > 0) {
-      doc.autoTable({
-        startY: y, head: [[t.pdf_mano_obra, t.pdf_importe]], body: bodyMano, theme: 'grid',
-        headStyles: { fillColor: [225, 29, 72], textColor: 255, fontSize: 9 }, 
-        bodyStyles: { fontSize: 9 },
-        columnStyles: { 0: { cellWidth: 140 }, 1: { cellWidth: 25, halign: 'right' } },
-        margin: { left: 15, right: 15 }
-      });
-      y = doc.lastAutoTable.finalY + 5;
-    }
-
-    let bodyRepuestos = (m.repuestos || []).map(r => [ r.cant, r.ref || '-', r.desc, fmt(r.precio), fmt(r.cant * r.precio) ]);
-    if (bodyRepuestos.length > 0) {
-      doc.autoTable({
-        startY: y, head: [[t.cant, t.referencia, t.pdf_desc, t.pdf_precio_ud, t.total]], body: bodyRepuestos, theme: 'grid',
-        headStyles: { fillColor: [225, 29, 72], textColor: 255, fontSize: 9 }, 
-        bodyStyles: { fontSize: 9 },
-        columnStyles: { 0: { cellWidth: 15, halign: 'center' }, 1: { cellWidth: 30 }, 2: { cellWidth: 75 }, 3: { cellWidth: 20, halign: 'right' }, 4: { cellWidth: 25, halign: 'right' } },
-        margin: { left: 15, right: 15 }
-      });
-      y = doc.lastAutoTable.finalY + 5;
-    }
-
-    const subMano = (m.manoObra || []).reduce((s, o) => s + o.precio, 0);
-    const subPiezas = (m.repuestos || []).reduce((s, r) => s + (r.cant * r.precio), 0);
-    const subTotal = subMano + subPiezas;
-    totalGlobalMano += subMano;
-    totalGlobalPiezas += subPiezas;
-
-    doc.setFontSize(10); doc.setFont(undefined, 'bold'); doc.setTextColor(225, 29, 72);
-    doc.text(`${t.total}: ${fmt(subTotal)}`, pageW - 15, y + 3, {align:'right'});
-    doc.setTextColor(0,0,0); doc.setFont(undefined, 'normal');
-    y += 15; 
-  });
-
-  if (y > 250) { doc.addPage(); y = 20; }
-  const baseGlobal = totalGlobalMano + totalGlobalPiezas;
-  const iva = baseGlobal * (ivaPorcentaje / 100);
-  const totalFinal = baseGlobal + iva;
-
-  doc.setFontSize(10); doc.setFont(undefined, 'normal');
-  doc.text(t.pdf_base, 130, y); doc.text(fmt(baseGlobal), pageW - 15, y, {align:'right'}); y += 6;
-  doc.text(`${t.pdf_iva} (${ivaPorcentaje}%):`, 130, y); doc.text(fmt(iva), pageW - 15, y, {align:'right'}); y += 6;
-  doc.setFont(undefined, 'bold'); doc.setTextColor(225, 29, 72); 
-  doc.text(t.pdf_total, 130, y); doc.text(fmt(totalFinal), pageW - 15, y, {align:'right'});
-
-  const nombre = `Factura_Seleccion_${v.matricula}.pdf`;
-  doc.save(nombre);
-  mostrarMsg('msg_mantenimiento', currentLang === 'es' ? 'PDF de selección generado.' : 'Selection PDF generated.', 'ok');
-}
-
-// ============ GENERAR PDF GENERAL ============
-function generarPDF() {
-  const { jsPDF } = window.jspdf;
-  const tipoInforme = document.getElementById('i_tipo_informe').value;
-  const t = translations[currentLang]; 
-  
-  const vehiculoId = document.getElementById('i_vehiculo').value;
-  const desde = document.getElementById('i_desde').value;
-  const hasta = document.getElementById('i_hasta').value;
-  const numFactura = document.getElementById('i_factura').value.trim();
-  const tallerEmisor = document.getElementById('i_taller').value.trim();
-  const ivaPorcentaje = parseFloat(document.getElementById('i_iva').value) || 0;
-
-  if (!vehiculoId) { mostrarMsg('msg_informe', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err'); return; }
-
-  const v = state.vehiculos.find(x => x.id === vehiculoId);
-  
-  let lista = state.mantenimientos.filter(m => m.vehiculoId === vehiculoId);
-  if (desde) lista = lista.filter(m => m.fecha >= desde);
-  if (hasta) lista = lista.filter(m => m.fecha <= hasta);
-  lista.sort((a,b) => a.fecha.localeCompare(b.fecha));
-
-  if (lista.length === 0) { mostrarMsg('msg_informe', currentLang === 'es' ? 'No hay mantenimientos en ese rango.' : 'No maintenance records in that range.', 'err'); return; }
-
-  const doc = new jsPDF('p', 'mm', 'a4');
-  const pageW = doc.internal.pageSize.getWidth();
-  const pageH = doc.internal.pageSize.getHeight();
-  let y = 15;
-
-  const logoImg = document.querySelector('.logo-img');
-  if (logoImg) {
-    try {
-      doc.saveGraphicsState();
-      doc.setGState(new doc.GState({opacity: 0.05})); 
-      doc.addImage(logoImg, 'PNG', (pageW - 150) / 2, (pageH - 150) / 2, 150, 150);
-      doc.restoreGraphicsState();
-    } catch(e) { console.log(e); }
-  }
-
-  doc.setFillColor(15, 23, 42); 
-  doc.rect(0, 0, pageW, 20, 'F'); 
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(16); doc.setFont(undefined, 'bold');
-  doc.text(t.pdf_informe, 15, 13);
+  // Título centrado
+  const titulo = t.pdf_informe;
+  const tituloAncho = doc.getTextWidth(titulo);
+  doc.text(titulo, (pageW - tituloAncho) / 2, 13);
   
   if (numFactura && tipoInforme === 'detallado') { 
     doc.setFontSize(10); doc.text('Nº: ' + numFactura, pageW - 15, 13, {align:'right'}); 
@@ -755,9 +678,10 @@ function generarPDF() {
   doc.setFont(undefined, 'bold'); doc.text(t.pdf_fecha_inf, 15, y); doc.setFont(undefined, 'normal');
   doc.text(new Date().toLocaleDateString(currentLang === 'es' ? 'es-ES' : 'en-GB'), 45, y); y += 6;
   doc.setFont(undefined, 'bold'); doc.text(t.pdf_periodo, 15, y); doc.setFont(undefined, 'normal');
-  const per = (desde ? desde.split('-').reverse().join('/') : (currentLang === 'es' ? 'inicio' : 'start')) + ' — ' + (hasta ? hasta.split('-').reverse().join('/') : (currentLang === 'es' ? 'hoy' : 'today'));
+  const per = modo === 'seleccion' ? 'Selección manual' : (desde ? desde.split('-').reverse().join('/') : 'inicio') + ' — ' + (hasta ? hasta.split('-').reverse().join('/') : 'hoy');
   doc.text(per, 45, y); y += 10;
 
+  // Tablas
   if (tipoInforme === 'historico') {
     let bodyHistorial = [];
     lista.forEach(m => {
