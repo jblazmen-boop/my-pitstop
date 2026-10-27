@@ -492,6 +492,10 @@ function renderAll() {
   renderVehiculos();
   renderMantenimientos();
   renderSelects();
+  // Si estamos en la pestaña de informe y hay un vehículo seleccionado, actualizamos la tabla
+  if (document.getElementById('bloque_seleccion').style.display === 'block' && document.getElementById('i_vehiculo').value) {
+    renderTablaSeleccion();
+  }
 }
 
 function renderVehiculos() {
@@ -562,6 +566,7 @@ function renderSelects() {
 }
 
 document.getElementById('f_vehiculo').addEventListener('change', renderMantenimientos);
+document.getElementById('i_vehiculo').addEventListener('change', renderTablaSeleccion);
 
 // ============ CHECKBOX SELECT ALL ============
 function toggleAllChecks(source) {
@@ -599,7 +604,10 @@ function renderTablaSeleccion() {
   
   lista.forEach(m => {
     const total = m.mano + m.piezas;
+    
+    // CORRECCIÓN AQUÍ: Traducimos el tipo para la tabla de selección
     const tipoTexto = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
+    
     const tr = document.createElement('tr');
     tr.innerHTML = `<td style="text-align:center;"><input type="checkbox" class="check-mant" value="${m.id}"></td>
       <td>${m.fecha.split('-').reverse().join('/')}</td>
@@ -693,7 +701,6 @@ function generarPDF() {
     if (tipoInforme === 'historico') {
       let bodyHistorial = [];
       lista.forEach(m => {
-        // AQUI ESTA LA MAGIA: Traducimos el tipo en el PDF
         const tipoTraducido = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
         
         let textoTipoYServicio = tipoTraducido + "\n";
@@ -726,17 +733,15 @@ function generarPDF() {
       lista.forEach((m) => {
         if (y > 230) { doc.addPage(); y = 20; }
 
-        // AQUI ESTA LA MAGIA: Traducimos el tipo en la factura detallada
         const tipoTraducido = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
 
         doc.setFillColor(240, 242, 245); 
-        doc.rect(15, y - 5, pageW - 30, 12, 'F'); // Un poco más alto para que quepa el tipo
+        doc.rect(15, y - 5, pageW - 30, 12, 'F'); 
         doc.setFontSize(10); doc.setFont(undefined, 'bold'); doc.setTextColor(15, 23, 42);
         doc.text(`${t.fecha}: ${m.fecha.split('-').reverse().join('/')}`, 18, y);
         if (m.km) doc.text(`${t.km}: ${m.km}`, 70, y);
         if (m.taller) doc.text(`${t.pdf_taller_txt} ${m.taller}`, pageW - 18, y, {align:'right'});
         
-        // Añadimos el Tipo de Mantenimiento traducido debajo de la fecha
         doc.setFontSize(9); doc.setFont(undefined, 'normal'); doc.setTextColor(100, 100, 100);
         doc.text(`${t.tipo}: ${tipoTraducido}`, 18, y + 5);
         
@@ -818,7 +823,7 @@ function importarJSON(e) {
       const data = JSON.parse(ev.target.result);
       if (!data.vehiculos || !data.mantenimientos) throw new Error('Formato inválido');
       if (!confirm(currentLang === 'es' ? 'Esto reemplazará todos los datos actuales. ¿Continuar?' : 'This will replace all current data. Continue?')) return;
-      state = data; cargar(); guardar(); renderAll(); // Recargamos para migrar los tipos
+      state = data; cargar(); guardar(); renderAll(); 
       mostrarMsg('msg_backup', currentLang === 'es' ? 'Datos importados correctamente.' : 'Data imported successfully.', 'ok');
     } catch(err) {
       mostrarMsg('msg_backup', (currentLang === 'es' ? 'Error al importar: ' : 'Import error: ') + err.message, 'err');
