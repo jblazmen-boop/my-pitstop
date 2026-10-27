@@ -4,6 +4,7 @@ let repuestosTemporales = [];
 let manoObraTemporal = [];
 let editandoMantenimientoId = null;
 let currentLang = 'es'; 
+let miGraficoInstancia = null; 
 
 const STORAGE_KEY = 'mi_app_mantenimiento_coches'; 
 
@@ -20,21 +21,22 @@ const translations = {
     filtrar: "Filtrar por vehículo", todos: "Todos", operaciones: "Operaciones", mano: "Mano", piezas: "Piezas",
     gen_informe: "Generar informe / factura en PDF", tipo_informe: "Tipo de Informe", detallado: "Factura Detallada (con precios)",
     historico: "Histórico Técnico (sin precios)", fecha_desde: "Fecha desde", fecha_hasta: "Fecha hasta",
-    iva: "IVA (%)", 
-    btn_gen_pdf: "Generar PDF", copia_seguridad: "Copia de seguridad", copia_texto: "Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.",
+    iva: "IVA (%)", btn_gen_pdf: "Generar PDF", btn_share_pdf: "Compartir PDF",
+    copia_seguridad: "Copia de seguridad", copia_texto: "Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.",
     exportar: "⬇ Exportar copia (JSON)", importar: "⬆ Importar copia", borrar: "🗑 Borrar todos los datos",
     derechos: "Todos los derechos reservados.", selecciona: "— Selecciona —", no_foto: "— No usar foto —",
     ej_operacion: "Ej: Sustituir correa", ej_referencia: "Ej: MANN-W712", seleccionar_archivo: "Seleccionar archivo",
-    
     ph_matricula: "1234ABC", ph_marca: "Seat", ph_modelo: "León", ph_bastidor: "WVWZZZ...", ph_taller: "Taller Pepe", ph_descripcion: "Filtro de aceite",
-
     pdf_informe: "INFORME DE MANTENIMIENTO / FACTURA", pdf_factura: "INFORME DE MANTENIMIENTO / FACTURA",
     pdf_vehiculo: "Vehículo:", pdf_matricula: "Matrícula:", pdf_bastidor: "Nº Bastidor:", pdf_fecha_inf: "Fecha informe:",
     pdf_periodo: "Periodo:", pdf_mano_obra: "Desglose de Mano de Obra", pdf_concepto: "Concepto", pdf_importe: "Importe",
     pdf_repuestos: "Desglose de Repuestos", pdf_desc: "Descripción", pdf_precio_ud: "Precio Ud.", pdf_base: "Base imponible:",
     pdf_iva: "IVA", pdf_total: "TOTAL FACTURA:", pdf_servicios: "Servicio / Mano de Obra", pdf_materiales: "Materiales / Repuestos",
     pdf_taller_txt: "Taller:", modo_generacion: "Modo de generación", por_fechas: "Por rango de fechas", 
-    por_seleccion: "Seleccionando mantenimientos", selecciona_mant: "Selecciona los mantenimientos para incluir en la factura"
+    por_seleccion: "Seleccionando mantenimientos", selecciona_mant: "Selecciona los mantenimientos para incluir en la factura",
+    estadisticas: "Estadísticas de Gasto", recordatorios: "Recordatorios y Avisos", recordatorios_texto: "Aquí puedes ver las fechas importantes de tus vehículos (ITV, Seguro, etc.)",
+    fecha_itv: "Fecha de la próxima ITV", guardar: "Guardar Fecha", estado: "Estado", itv_ok: "En regla", itv_warn: "Próxima", itv_danger: "Caducada", sin_fecha: "Sin fecha",
+    meses: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"]
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -48,21 +50,22 @@ const translations = {
     filtrar: "Filter by vehicle", todos: "All", operaciones: "Operations", mano: "Labor", piezas: "Parts",
     gen_informe: "Generate report / invoice PDF", tipo_informe: "Report Type", detallado: "Detailed Invoice (with prices)",
     historico: "Technical History (no prices)", fecha_desde: "Date from", fecha_hasta: "Date to",
-    iva: "VAT (%)", 
-    btn_gen_pdf: "Generate PDF", copia_seguridad: "Backup", copia_texto: "Data is stored in this browser. If you clear your history or change devices, it will be lost. Export a backup regularly.",
+    iva: "VAT (%)", btn_gen_pdf: "Generate PDF", btn_share_pdf: "Share PDF",
+    copia_seguridad: "Backup", copia_texto: "Data is stored in this browser. If you clear your history or change devices, it will be lost. Export a backup regularly.",
     exportar: "⬇ Export backup (JSON)", importar: "⬆ Import backup", borrar: "🗑 Delete all data",
     derechos: "All rights reserved.", selecciona: "— Select —", no_foto: "— No photo —",
     ej_operacion: "Ex: Replace belt", ej_referencia: "Ex: MANN-W712", seleccionar_archivo: "Select file",
-    
     ph_matricula: "1234ABC", ph_marca: "Seat", ph_modelo: "Leon", ph_bastidor: "WVWZZZ...", ph_taller: "Workshop Joe", ph_descripcion: "Oil filter",
-
     pdf_informe: "MAINTENANCE REPORT / INVOICE", pdf_factura: "MAINTENANCE REPORT / INVOICE",
     pdf_vehiculo: "Vehicle:", pdf_matricula: "Plate:", pdf_bastidor: "VIN:", pdf_fecha_inf: "Report date:",
     pdf_periodo: "Period:", pdf_mano_obra: "Labor Breakdown", pdf_concepto: "Concept", pdf_importe: "Amount",
     pdf_repuestos: "Parts Breakdown", pdf_desc: "Description", pdf_precio_ud: "Unit Price", pdf_base: "Subtotal:",
     pdf_iva: "VAT", pdf_total: "TOTAL INVOICE:", pdf_servicios: "Service / Labor", pdf_materiales: "Materials / Parts",
     pdf_taller_txt: "Workshop:", modo_generacion: "Generation mode", por_fechas: "By date range", 
-    por_seleccion: "Selecting records", selecciona_mant: "Select maintenance records to include in the invoice"
+    por_seleccion: "Selecting records", selecciona_mant: "Select maintenance records to include in the invoice",
+    estadisticas: "Expense Statistics", recordatorios: "Reminders & Alerts", recordatorios_texto: "Here you can see important dates for your vehicles (MOT, Insurance, etc.)",
+    fecha_itv: "Next MOT Date", guardar: "Save Date", estado: "Status", itv_ok: "Valid", itv_warn: "Due soon", itv_danger: "Expired", sin_fecha: "No date",
+    meses: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
   }
 };
 
@@ -123,10 +126,13 @@ function translatePage() {
   
   document.documentElement.lang = currentLang;
   renderAll(); 
+  renderGrafico(); // Actualizar gráfico al cambiar idioma
+  cargarRecordatorios(); // Actualizar tabla de recordatorios
 }
 
 function setLanguage(lang) {
   currentLang = lang;
+  localStorage.setItem('pitstop_idioma', lang); 
   document.getElementById('lang-es').classList.remove('active');
   document.getElementById('lang-en').classList.remove('active');
   document.getElementById('lang-' + lang).classList.add('active');
@@ -141,6 +147,8 @@ function cargar() {
       if (!state.catalogoFotos) state.catalogoFotos = [];
       if (!state.vehiculos) state.vehiculos = [];
       if (!state.mantenimientos) state.mantenimientos = [];
+
+      state.vehiculos.forEach(v => { if (!v.proxItv) v.proxItv = ''; });
 
       state.mantenimientos.forEach(m => {
         if (m.tipo && !m.tipo.startsWith('type_')) {
@@ -179,6 +187,10 @@ document.querySelectorAll('.tab').forEach(t => {
     document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
     t.classList.add('active');
     document.getElementById(t.dataset.tab).classList.add('active');
+    
+    // Al entrar en la pestaña de gráfico o recordatorios, actualizamos
+    if (t.dataset.tab === 'grafico') renderGrafico();
+    if (t.dataset.tab === 'recordatorios') cargarRecordatorios();
   };
 });
 
@@ -193,7 +205,7 @@ function addVehiculo() {
     mostrarMsg('msg_vehiculo', currentLang === 'es' ? 'Ya existe un vehículo con esa matrícula.' : 'A vehicle with that plate already exists.', 'err'); return;
   }
   
-  state.vehiculos.push({ id: uid(), matricula: mat, marca, modelo, bastidor });
+  state.vehiculos.push({ id: uid(), matricula: mat, marca, modelo, bastidor, proxItv: '' });
   guardar();
   document.getElementById('v_matricula').value = '';
   document.getElementById('v_marca').value = '';
@@ -201,6 +213,7 @@ function addVehiculo() {
   document.getElementById('v_bastidor').value = '';
   mostrarMsg('msg_vehiculo', currentLang === 'es' ? 'Vehículo añadido.' : 'Vehicle added.', 'ok');
   renderAll();
+  cargarRecordatorios();
 }
 
 function editarVehiculo(id) {
@@ -213,14 +226,14 @@ function editarVehiculo(id) {
   v.marca = marca;
   v.modelo = modelo;
   v.bastidor = bastidor.toUpperCase();
-  guardar(); renderAll();
+  guardar(); renderAll(); cargarRecordatorios();
 }
 
 function eliminarVehiculo(id) {
   if (!confirm(currentLang === 'es' ? '¿Eliminar vehículo y todos sus mantenimientos?' : 'Delete vehicle and all its maintenance records?')) return;
   state.vehiculos = state.vehiculos.filter(v => v.id !== id);
   state.mantenimientos = state.mantenimientos.filter(m => m.vehiculoId !== id);
-  guardar(); renderAll();
+  guardar(); renderAll(); cargarRecordatorios();
 }
 
 function addManoObra() {
@@ -544,12 +557,16 @@ function renderMantenimientos() {
 
 function renderSelects() {
   const opts = state.vehiculos.map(v => `<option value="${v.id}">${esc(v.matricula)} — ${esc(v.marca)} ${esc(v.modelo)}</option>`).join('');
-  ['m_vehiculo','i_vehiculo'].forEach(id => {
+  
+  ['m_vehiculo','i_vehiculo','g_vehiculo','rec_vehiculo'].forEach(id => {
     const sel = document.getElementById(id);
+    if (!sel) return;
     const prev = sel.value;
     sel.innerHTML = `<option value="" data-i18n="selecciona">${translations[currentLang].selecciona}</option>` + opts;
+    if (id === 'g_vehiculo') sel.innerHTML = `<option value="" data-i18n="todos">${translations[currentLang].todos}</option>` + opts;
     if (prev) sel.value = prev;
   });
+  
   const filtro = document.getElementById('f_vehiculo');
   const prevF = filtro.value;
   filtro.innerHTML = `<option value="" data-i18n="todos">${translations[currentLang].todos}</option>` + opts;
@@ -572,6 +589,126 @@ function mostrarMsg(id, texto, tipo) {
   setTimeout(() => { el.innerHTML = ''; }, 4000);
 }
 
+// ============ NUEVO: GRÁFICO DE GASTOS ============
+function renderGrafico() {
+  if (typeof Chart === 'undefined') return; // Si no ha cargado la librería, no hace nada
+
+  const vehiculoId = document.getElementById('g_vehiculo').value;
+  let lista = state.mantenimientos;
+  if (vehiculoId) lista = lista.filter(m => m.vehiculoId === vehiculoId);
+
+  const gastosPorAnio = {};
+  lista.forEach(m => {
+    if (!m.fecha) return;
+    const anio = m.fecha.split('-')[0];
+    if (!gastosPorAnio[anio]) gastosPorAnio[anio] = { mano: 0, piezas: 0 };
+    gastosPorAnio[anio].mano += m.mano;
+    gastosPorAnio[anio].piezas += m.piezas;
+  });
+
+  const anios = Object.keys(gastosPorAnio).sort();
+  const dataMano = anios.map(a => gastosPorAnio[a].mano);
+  const dataPiezas = anios.map(a => gastosPorAnio[a].piezas);
+
+  const ctx = document.getElementById('miGrafico').getContext('2d');
+  
+  if (miGraficoInstancia) miGraficoInstancia.destroy();
+
+  miGraficoInstancia = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: anios,
+      datasets: [
+        {
+          label: translations[currentLang].mano_obra,
+          data: dataMano,
+          backgroundColor: '#e11d48',
+          borderColor: '#be123c',
+          borderWidth: 1
+        },
+        {
+          label: translations[currentLang].repuestos,
+          data: dataPiezas,
+          backgroundColor: '#38bdf8',
+          borderColor: '#0ea5e9',
+          borderWidth: 1
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#e2e8f0' } }
+      },
+      scales: {
+        x: { stacked: true, ticks: { color: '#9ca3af' }, grid: { color: '#374151' } },
+        y: { stacked: true, ticks: { color: '#9ca3af' }, grid: { color: '#374151' } }
+      }
+    }
+  });
+}
+
+// ============ NUEVO: RECORDATORIOS ITV ============
+function cargarRecordatorios() {
+  const sel = document.getElementById('rec_vehiculo');
+  if (!sel) return;
+  const vehiculoId = sel.value;
+  const itvInput = document.getElementById('rec_itv');
+  const tbody = document.getElementById('tabla_recordatorios_body');
+  tbody.innerHTML = '';
+
+  if (vehiculoId) {
+    const v = state.vehiculos.find(x => x.id === vehiculoId);
+    if (v && v.proxItv) itvInput.value = v.proxItv;
+    else itvInput.value = '';
+  }
+
+  state.vehiculos.forEach(v => {
+    let estadoTxt = translations[currentLang].sin_fecha;
+    let claseColor = '#9ca3af'; // Gris
+
+    if (v.proxItv) {
+      const fechaItv = new Date(v.proxItv);
+      const hoy = new Date();
+      const diffDias = Math.ceil((fechaItv - hoy) / (1000 * 60 * 60 * 24));
+      const fechaMostrar = v.proxItv.split('-').reverse().join('/');
+
+      if (diffDias < 0) {
+        estadoTxt = `${translations[currentLang].itv_danger} (${fechaMostrar})`;
+        claseColor = '#ef4444'; // Rojo
+      } else if (diffDias <= 30) {
+        estadoTxt = `${translations[currentLang].itv_warn} (${fechaMostrar})`;
+        claseColor = '#f59e0b'; // Naranja
+      } else {
+        estadoTxt = `${translations[currentLang].itv_ok} (${fechaMostrar})`;
+        claseColor = '#10b981'; // Verde
+      }
+    }
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${esc(v.matricula)}</td>
+      <td>${v.proxItv || '—'}</td>
+      <td style="color: ${claseColor}; font-weight: bold;">${estadoTxt}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function guardarRecordatorio() {
+  const vehiculoId = document.getElementById('rec_vehiculo').value;
+  const fecha = document.getElementById('rec_itv').value;
+  
+  if (!vehiculoId) { mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err'); return; }
+  
+  const v = state.vehiculos.find(x => x.id === vehiculoId);
+  if (v) {
+    v.proxItv = fecha;
+    guardar();
+    cargarRecordatorios();
+    mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Fecha guardada.' : 'Date saved.', 'ok');
+  }
+}
+
+// ============ MODO DE INFORME ============
 function toggleModoInforme() {
   const modo = document.getElementById('i_modo').value;
   document.getElementById('bloque_fechas').style.display = modo === 'fechas' ? 'grid' : 'none';
@@ -607,8 +744,8 @@ function renderTablaSeleccion() {
   });
 }
 
-// ============ GENERAR PDF ============
-function generarPDF() {
+// ============ GENERAR PDF (CON COMPARTIR) ============
+function generarPDF(compartir = false) {
   try {
     const { jsPDF } = window.jspdf;
     const modo = document.getElementById('i_modo').value;
@@ -780,8 +917,31 @@ function generarPDF() {
     }
 
     const nombre = tipoInforme === 'historico' ? `Historico_${v.matricula}.pdf` : `Factura_${v.matricula}.pdf`;
+    
+    // COMPARTIR POR WHATSAPP / SISTEMA
+    if (compartir && navigator.share && navigator.canShare) {
+      const pdfBlob = doc.output('blob');
+      const file = new File([pdfBlob], nombre, { type: 'application/pdf' });
+      
+      if (navigator.canShare({ files: [file] })) {
+        navigator.share({
+          files: [file],
+          title: nombre,
+          text: currentLang === 'es' ? 'Aquí tienes el informe de mantenimiento.' : 'Here is the maintenance report.'
+        }).then(() => {
+          mostrarMsg('msg_informe', currentLang === 'es' ? 'PDF compartido.' : 'PDF shared.', 'ok');
+        }).catch((err) => {
+          console.log("Error al compartir:", err);
+          // Si cancela, no hacemos nada.
+        });
+        return;
+      }
+    }
+    
+    // Si no se puede compartir (o es ordenador), se descarga normal
     doc.save(nombre);
-    mostrarMsg('msg_informe', currentLang === 'es' ? 'PDF generado y abierto.' : 'PDF generated and opened.', 'ok');
+    mostrarMsg('msg_informe', currentLang === 'es' ? 'PDF generado y descargado.' : 'PDF generated and downloaded.', 'ok');
+
   } catch (error) {
     console.error(error);
     mostrarMsg('msg_informe', currentLang === 'es' ? 'Error al generar el PDF. Revisa la consola.' : 'Error generating PDF. Check console.', 'err');
@@ -824,59 +984,54 @@ function borrarTodo() {
 }
 
 // ============ PROTECCIÓN DE DATOS Y AVISOS ============
-
-// 1. Pedir al navegador que no borre los datos si se queda sin espacio
 async function solicitarPersistencia() {
   if (navigator.storage && navigator.storage.persist) {
     const isPersisted = await navigator.storage.persisted();
     if (!isPersisted) {
       const granted = await navigator.storage.persist();
-      if (granted) {
-        console.log("El navegador ha aceptado proteger los datos.");
-      } else {
-        console.log("El navegador NO protegerá los datos. Se recomienda hacer copias manuales.");
-      }
+      if (granted) console.log("El navegador protegerá los datos.");
     }
   }
 }
 
-// 2. Recordatorio de copia de seguridad (cada 7 días)
 function comprobarRecordatorioBackup() {
   const ultimoAviso = localStorage.getItem('pitstop_ultimo_aviso_backup');
   const ahora = new Date().getTime();
-  
-  // Si nunca ha avisado, o han pasado más de 7 días
   if (!ultimoAviso || (ahora - parseInt(ultimoAviso)) > 604800000) {
-    
     if (state.mantenimientos.length > 0 || state.vehiculos.length > 0) {
       const mensaje = currentLang === 'es' 
-        ? "⚠️ RECORDATORIO: Tienes datos guardados. Si borras la caché del navegador o cambias de dispositivo, los perderás.\n\nTe recomendamos ir a la pestaña 'Copia de seguridad' y exportar tus datos (JSON).\n\n¿Quieres ir ahora a la pestaña de copia de seguridad?"
-        : "⚠️ REMINDER: You have saved data. If you clear your browser cache or change devices, you will lose it.\n\nWe recommend going to the 'Backup' tab and exporting your data (JSON).\n\nDo you want to go to the backup tab now?";
+        ? "⚠️ RECORDATORIO: Tienes datos guardados. Si borras la caché, los perderás.\n\nTe recomendamos exportar una copia (JSON) en la pestaña 'Copia de seguridad'.\n\n¿Quieres ir ahora?"
+        : "⚠️ REMINDER: You have saved data. If you clear cache, you will lose it.\n\nWe recommend exporting a backup (JSON) in the 'Backup' tab.\n\nDo you want to go now?";
       
       const irABackup = confirm(mensaje);
-      
       if (irABackup) {
         document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
         document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
         document.querySelector('.tab[data-tab="backup"]').classList.add('active');
         document.getElementById('backup').classList.add('active');
       }
-      
       localStorage.setItem('pitstop_ultimo_aviso_backup', ahora.toString());
     }
   }
 }
 
 // ============ INIT ============
+const idiomaGuardado = localStorage.getItem('pitstop_idioma');
+if (idiomaGuardado && (idiomaGuardado === 'es' || idiomaGuardado === 'en')) {
+  currentLang = idiomaGuardado;
+  document.getElementById('lang-es').classList.remove('active');
+  document.getElementById('lang-en').classList.remove('active');
+  document.getElementById('lang-' + currentLang).classList.add('active');
+}
+
 cargar();
 document.getElementById('m_fecha').value = new Date().toISOString().slice(0,10);
 renderManoObraTemporal();
 renderRepuestosTemporales();
+translatePage(); 
 renderAll();
 
-// Iniciar protección y avisos
 solicitarPersistencia();
-// Esperar un segundo y medio para que la app cargue bien antes de lanzar el aviso
 setTimeout(comprobarRecordatorioBackup, 1500); 
 
 document.getElementById('r_foto').addEventListener('change', function() {
