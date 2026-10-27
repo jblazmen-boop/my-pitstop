@@ -557,7 +557,7 @@ function mostrarMsg(id, texto, tipo) {
   setTimeout(() => { el.innerHTML = ''; }, 4000);
 }
 
-// ============ GENERAR PDF ============
+// ============ GENERAR PDF TUNEADO ============
 function generarPDF() {
   const { jsPDF } = window.jspdf;
   const tipoInforme = document.getElementById('i_tipo_informe').value;
@@ -585,22 +585,29 @@ function generarPDF() {
   const pageW = doc.internal.pageSize.getWidth();
   let y = 15;
 
-  // ================= CABECERA =================
-  doc.setFillColor(26, 58, 92);
-  doc.rect(0, 0, pageW, 22, 'F');
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(15); doc.setFont(undefined, 'bold');
+  // ================= CABECERA TUNEADA =================
+  doc.setFillColor(15, 23, 42); // Gris muy oscuro (igual que la app)
+  doc.rect(0, 0, pageW, 28, 'F');
   
-  const titulo = tipoInforme === 'historico' ? t.pdf_informe : t.pdf_factura;
-  doc.text(titulo, 15, 14);
+  // Añadimos el logo a la cabecera
+  const logoImg = document.querySelector('.logo-img');
+  if (logoImg) {
+    try {
+      doc.addImage(logoImg, 'PNG', 15, 4, 20, 20);
+    } catch(e) { console.log("Error al cargar el logo en el PDF", e); }
+  }
+
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(16); doc.setFont(undefined, 'bold');
+  doc.text(tipoInforme === 'historico' ? t.pdf_informe : t.pdf_factura, 40, 16);
   
   if (numFactura && tipoInforme === 'detallado') { 
-    doc.setFontSize(10); doc.text('Nº: ' + numFactura, pageW - 15, 14, {align:'right'}); 
+    doc.setFontSize(10); doc.text('Nº: ' + numFactura, pageW - 15, 16, {align:'right'}); 
   }
 
   doc.setTextColor(0,0,0);
   doc.setFontSize(10); doc.setFont(undefined, 'normal');
-  y = 32;
+  y = 38;
 
   if (taller && tipoInforme === 'detallado') { doc.text(taller, 15, y); y += 5; }
   
@@ -622,10 +629,12 @@ function generarPDF() {
     
     lista.forEach(m => {
       let textoTipoYServicio = m.tipo;
+      
+      // Añadimos la mano de obra y el taller
       if (m.manoObra && m.manoObra.length > 0) {
         textoTipoYServicio += "\n" + m.manoObra.map(o => `• ${o.concepto}`).join("\n");
       }
-
+      
       let textoRepuestos = "—";
       if (m.repuestos && m.repuestos.length > 0) {
         textoRepuestos = m.repuestos.map(r => {
@@ -634,6 +643,7 @@ function generarPDF() {
         }).join("\n");
       }
 
+      // Si hay taller, lo metemos debajo de los repuestos
       if (m.taller) {
          if (textoRepuestos !== "—") textoRepuestos += "\n\n";
          else textoRepuestos = "";
@@ -653,8 +663,9 @@ function generarPDF() {
       head: [[t.fecha, t.km, t.pdf_servicios, t.pdf_materiales]],
       body: bodyHistorial,
       theme: 'striped',
-      headStyles: { fillColor: [26, 58, 92], textColor: 255, fontSize: 10, fontStyle: 'bold' },
+      headStyles: { fillColor: [225, 29, 72], textColor: 255, fontSize: 10, fontStyle: 'bold' }, // Rojo Boxes
       bodyStyles: { fontSize: 9, valign: 'top', cellPadding: 4 },
+      alternateRowStyles: { fillColor: [248, 249, 250] }, // Gris muy clarito para las filas pares
       columnStyles: { 0: { cellWidth: 25 }, 1: { cellWidth: 20 }, 2: { cellWidth: 65 }, 3: { cellWidth: 70 } },
       margin: { left: 15, right: 15 }
     });
@@ -665,7 +676,11 @@ function generarPDF() {
     lista.forEach(m => {
       if (m.manoObra && m.manoObra.length > 0) {
         m.manoObra.forEach(o => {
-          bodyMano.push([ m.fecha.split('-').reverse().join('/'), m.km || '', o.concepto, fmt(o.precio) ]);
+          // Añadimos el taller en una línea nueva debajo del concepto
+          let conceptoTaller = o.concepto;
+          if (m.taller) conceptoTaller += `\n(${t.pdf_taller_txt} ${m.taller})`;
+          
+          bodyMano.push([ m.fecha.split('-').reverse().join('/'), m.km || '', conceptoTaller, fmt(o.precio) ]);
         });
       }
     });
@@ -679,8 +694,9 @@ function generarPDF() {
         head: [[t.fecha, t.km, t.pdf_concepto, t.pdf_importe]],
         body: bodyMano,
         theme: 'grid',
-        headStyles: { fillColor: [40, 70, 100], textColor: 255, fontSize: 9 },
+        headStyles: { fillColor: [225, 29, 72], textColor: 255, fontSize: 9 }, // Rojo Boxes
         bodyStyles: { fontSize: 9 },
+        alternateRowStyles: { fillColor: [248, 249, 250] },
         columnStyles: { 0: { cellWidth: 25 }, 1: { cellWidth: 20 }, 2: { cellWidth: 115 }, 3: { cellWidth: 25, halign: 'right' } },
         margin: { left: 15, right: 15 }
       });
@@ -705,14 +721,16 @@ function generarPDF() {
         head: [[t.fecha, t.cant, t.referencia, t.pdf_desc, t.pdf_precio_ud, t.total]],
         body: bodyRepuestos,
         theme: 'grid',
-        headStyles: { fillColor: [40, 70, 100], textColor: 255, fontSize: 9 },
+        headStyles: { fillColor: [225, 29, 72], textColor: 255, fontSize: 9 }, // Rojo Boxes
         bodyStyles: { fontSize: 9 },
+        alternateRowStyles: { fillColor: [248, 249, 250] },
         columnStyles: { 0: { cellWidth: 25 }, 1: { cellWidth: 15, halign: 'center' }, 2: { cellWidth: 30 }, 3: { cellWidth: 60 }, 4: { cellWidth: 25, halign: 'right' }, 5: { cellWidth: 25, halign: 'right' } },
         margin: { left: 15, right: 15 }
       });
       y = doc.lastAutoTable.finalY + 10;
     }
 
+    // Totales
     const totalMano = lista.reduce((s,m) => s + (Number(m.mano)||0), 0);
     const totalPiezas = lista.reduce((s,m) => s + (Number(m.piezas)||0), 0);
     const base = totalMano + totalPiezas;
@@ -720,9 +738,10 @@ function generarPDF() {
     const total = base + iva;
 
     doc.setFontSize(10); doc.setFont(undefined, 'normal');
+    doc.setTextColor(0,0,0);
     doc.text(t.pdf_base, 130, y); doc.text(fmt(base), pageW - 15, y, {align:'right'}); y += 6;
     doc.text(`${t.pdf_iva} (${ivaPorcentaje}%):`, 130, y); doc.text(fmt(iva), pageW - 15, y, {align:'right'}); y += 6;
-    doc.setFont(undefined, 'bold');
+    doc.setFont(undefined, 'bold'); doc.setTextColor(225, 29, 72); // Total en rojo
     doc.text(t.pdf_total, 130, y); doc.text(fmt(total), pageW - 15, y, {align:'right'});
   }
 
