@@ -168,7 +168,7 @@ h2 { margin-top: 0; font-size: 20px; color: #ffffff !important; }
   grid-template-columns: 1.2fr 1fr 1fr 1fr; 
   gap: 15px; 
   margin-bottom: 20px; 
-  align-items: end; /* Fuerza a que los inputs se alineen abajo */
+  align-items: end; 
 }
 @media (max-width: 768px) {
   .grid-avisos { grid-template-columns: 1fr; }
