@@ -62,9 +62,11 @@ header {
   height: 100%;
   object-fit: cover;
   
-  /* AJUSTE FINO PARA CENTRAR EL DIBUJO Y OCULTAR BORDES GRISES */
-  object-position: 55% 45%; 
-  transform: scale(1.3); 
+  /* AJUSTE FINO: Mueve un poco a la izquierda y arriba para centrar la llave y el texto */
+  object-position: 45% 45%; 
+  
+  /* Zoom suave para ocultar los bordes grises sin cortar el dibujo */
+  transform: scale(1.1); 
 }
 
 /* --- TÍTULO TIPO FIRMA --- */
