@@ -557,7 +557,7 @@ function mostrarMsg(id, texto, tipo) {
   setTimeout(() => { el.innerHTML = ''; }, 4000);
 }
 
-// ============ GENERAR PDF TUNEADO ============
+// ============ GENERAR PDF TUNEADO (FACTURAS INDIVIDUALES) ============
 function generarPDF() {
   const { jsPDF } = window.jspdf;
   const tipoInforme = document.getElementById('i_tipo_informe').value;
@@ -567,7 +567,7 @@ function generarPDF() {
   const desde = document.getElementById('i_desde').value;
   const hasta = document.getElementById('i_hasta').value;
   const numFactura = document.getElementById('i_factura').value.trim();
-  const taller = document.getElementById('i_taller').value.trim();
+  const tallerEmisor = document.getElementById('i_taller').value.trim();
   const ivaPorcentaje = parseFloat(document.getElementById('i_iva').value) || 0;
 
   if (!vehiculoId) { mostrarMsg('msg_informe', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err'); return; }
@@ -585,16 +585,13 @@ function generarPDF() {
   const pageW = doc.internal.pageSize.getWidth();
   let y = 15;
 
-  // ================= CABECERA TUNEADA =================
-  doc.setFillColor(15, 23, 42); // Gris muy oscuro (igual que la app)
+  // ================= CABECERA GENERAL =================
+  doc.setFillColor(15, 23, 42); // Gris muy oscuro
   doc.rect(0, 0, pageW, 28, 'F');
   
-  // Añadimos el logo a la cabecera
   const logoImg = document.querySelector('.logo-img');
   if (logoImg) {
-    try {
-      doc.addImage(logoImg, 'PNG', 15, 4, 20, 20);
-    } catch(e) { console.log("Error al cargar el logo en el PDF", e); }
+    try { doc.addImage(logoImg, 'PNG', 15, 4, 20, 20); } catch(e) { console.log(e); }
   }
 
   doc.setTextColor(255,255,255);
@@ -609,8 +606,7 @@ function generarPDF() {
   doc.setFontSize(10); doc.setFont(undefined, 'normal');
   y = 38;
 
-  if (taller && tipoInforme === 'detallado') { doc.text(taller, 15, y); y += 5; }
-  
+  if (tallerEmisor && tipoInforme === 'detallado') { doc.text(tallerEmisor, 15, y); y += 5; }
   doc.setFont(undefined, 'bold'); doc.text(t.pdf_vehiculo, 15, y); doc.setFont(undefined, 'normal');
   doc.text(`${v.marca} ${v.modelo}`, 45, y); y += 6;
   doc.setFont(undefined, 'bold'); doc.text(t.pdf_matricula, 15, y); doc.setFont(undefined, 'normal');
@@ -623,31 +619,23 @@ function generarPDF() {
   const per = (desde ? desde.split('-').reverse().join('/') : (currentLang === 'es' ? 'inicio' : 'start')) + ' — ' + (hasta ? hasta.split('-').reverse().join('/') : (currentLang === 'es' ? 'hoy' : 'today'));
   doc.text(per, 45, y); y += 10;
 
+  // ================= 1. INFORME HISTÓRICO =================
   if (tipoInforme === 'historico') {
-    // ================= INFORME HISTÓRICO =================
     let bodyHistorial = [];
     
     lista.forEach(m => {
-      let textoTipoYServicio = m.tipo;
+      // Columna 1: Servicio / Tipo / Taller
+      let textoTipoYServicio = m.tipo + "\n";
+      textoTipoYServicio += "• " + (m.manoObra || []).map(o => o.concepto).join("\n• ");
+      if (m.taller) textoTipoYServicio += `\n\n(${t.pdf_taller_txt} ${m.taller})`;
       
-      // Añadimos la mano de obra y el taller
-      if (m.manoObra && m.manoObra.length > 0) {
-        textoTipoYServicio += "\n" + m.manoObra.map(o => `• ${o.concepto}`).join("\n");
-      }
-      
+      // Columna 2: Repuestos
       let textoRepuestos = "—";
       if (m.repuestos && m.repuestos.length > 0) {
         textoRepuestos = m.repuestos.map(r => {
            const refStr = r.ref ? `- ${r.ref}:` : '-';
            return `• ${refStr} ${r.desc}`;
         }).join("\n");
-      }
-
-      // Si hay taller, lo metemos debajo de los repuestos
-      if (m.taller) {
-         if (textoRepuestos !== "—") textoRepuestos += "\n\n";
-         else textoRepuestos = "";
-         textoRepuestos += `${t.pdf_taller_txt} ${m.taller}`;
       }
 
       bodyHistorial.push([
@@ -663,89 +651,91 @@ function generarPDF() {
       head: [[t.fecha, t.km, t.pdf_servicios, t.pdf_materiales]],
       body: bodyHistorial,
       theme: 'striped',
-      headStyles: { fillColor: [225, 29, 72], textColor: 255, fontSize: 10, fontStyle: 'bold' }, // Rojo Boxes
+      headStyles: { fillColor: [225, 29, 72], textColor: 255, fontSize: 10, fontStyle: 'bold' }, 
       bodyStyles: { fontSize: 9, valign: 'top', cellPadding: 4 },
-      alternateRowStyles: { fillColor: [248, 249, 250] }, // Gris muy clarito para las filas pares
+      alternateRowStyles: { fillColor: [248, 249, 250] }, 
       columnStyles: { 0: { cellWidth: 25 }, 1: { cellWidth: 20 }, 2: { cellWidth: 65 }, 3: { cellWidth: 70 } },
       margin: { left: 15, right: 15 }
     });
 
+  // ================= 2. INFORME DETALLADO (Facturas Individuales) =================
   } else {
-    // ================= INFORME DETALLADO =================
-    let bodyMano = [];
-    lista.forEach(m => {
-      if (m.manoObra && m.manoObra.length > 0) {
-        m.manoObra.forEach(o => {
-          // Añadimos el taller en una línea nueva debajo del concepto
-          let conceptoTaller = o.concepto;
-          if (m.taller) conceptoTaller += `\n(${t.pdf_taller_txt} ${m.taller})`;
-          
-          bodyMano.push([ m.fecha.split('-').reverse().join('/'), m.km || '', conceptoTaller, fmt(o.precio) ]);
+    let totalGlobalMano = 0;
+    let totalGlobalPiezas = 0;
+
+    // Recorremos cada mantenimiento como un bloque de factura independiente
+    lista.forEach((m, index) => {
+      if (y > 230) { doc.addPage(); y = 20; }
+
+      // --- Cabecera del bloque (Fecha y Taller) ---
+      doc.setFillColor(240, 242, 245); // Gris clarito
+      doc.rect(15, y - 5, pageW - 30, 8, 'F');
+      doc.setFontSize(10); doc.setFont(undefined, 'bold'); doc.setTextColor(15, 23, 42);
+      doc.text(`${t.fecha}: ${m.fecha.split('-').reverse().join('/')}`, 18, y);
+      if (m.km) doc.text(`${t.km}: ${m.km}`, 80, y);
+      if (m.taller) doc.text(`${t.pdf_taller_txt} ${m.taller}`, pageW - 18, y, {align:'right'});
+      y += 8;
+
+      // --- Tabla de Mano de Obra ---
+      let bodyMano = (m.manoObra || []).map(o => [ o.concepto, fmt(o.precio) ]);
+      if (bodyMano.length > 0) {
+        doc.autoTable({
+          startY: y,
+          head: [[t.pdf_mano_obra, t.pdf_importe]],
+          body: bodyMano,
+          theme: 'grid',
+          headStyles: { fillColor: [225, 29, 72], textColor: 255, fontSize: 9 }, 
+          bodyStyles: { fontSize: 9 },
+          columnStyles: { 0: { cellWidth: 140 }, 1: { cellWidth: 25, halign: 'right' } },
+          margin: { left: 15, right: 15 }
         });
+        y = doc.lastAutoTable.finalY + 5;
       }
+
+      // --- Tabla de Repuestos ---
+      let bodyRepuestos = (m.repuestos || []).map(r => [ r.cant, r.ref || '-', r.desc, fmt(r.precio), fmt(r.cant * r.precio) ]);
+      if (bodyRepuestos.length > 0) {
+        doc.autoTable({
+          startY: y,
+          head: [[t.cant, t.referencia, t.pdf_desc, t.pdf_precio_ud, t.total]],
+          body: bodyRepuestos,
+          theme: 'grid',
+          headStyles: { fillColor: [225, 29, 72], textColor: 255, fontSize: 9 }, 
+          bodyStyles: { fontSize: 9 },
+          columnStyles: { 0: { cellWidth: 15, halign: 'center' }, 1: { cellWidth: 30 }, 2: { cellWidth: 75 }, 3: { cellWidth: 20, halign: 'right' }, 4: { cellWidth: 25, halign: 'right' } },
+          margin: { left: 15, right: 15 }
+        });
+        y = doc.lastAutoTable.finalY + 5;
+      }
+
+      // --- Total del bloque individual ---
+      const subMano = (m.manoObra || []).reduce((s, o) => s + o.precio, 0);
+      const subPiezas = (m.repuestos || []).reduce((s, r) => s + (r.cant * r.precio), 0);
+      const subTotal = subMano + subPiezas;
+      totalGlobalMano += subMano;
+      totalGlobalPiezas += subPiezas;
+
+      doc.setFontSize(10); doc.setFont(undefined, 'bold'); doc.setTextColor(225, 29, 72);
+      doc.text(`${t.total}: ${fmt(subTotal)}`, pageW - 15, y + 3, {align:'right'});
+      doc.setTextColor(0,0,0); doc.setFont(undefined, 'normal');
+      y += 15; // Espacio antes del siguiente bloque
     });
 
-    if (bodyMano.length > 0) {
-      doc.setFontSize(11); doc.setFont(undefined, 'bold');
-      doc.text(t.pdf_mano_obra, 15, y);
-      y += 4;
-      doc.autoTable({
-        startY: y,
-        head: [[t.fecha, t.km, t.pdf_concepto, t.pdf_importe]],
-        body: bodyMano,
-        theme: 'grid',
-        headStyles: { fillColor: [225, 29, 72], textColor: 255, fontSize: 9 }, // Rojo Boxes
-        bodyStyles: { fontSize: 9 },
-        alternateRowStyles: { fillColor: [248, 249, 250] },
-        columnStyles: { 0: { cellWidth: 25 }, 1: { cellWidth: 20 }, 2: { cellWidth: 115 }, 3: { cellWidth: 25, halign: 'right' } },
-        margin: { left: 15, right: 15 }
-      });
-      y = doc.lastAutoTable.finalY + 10;
-    }
-
-    let bodyRepuestos = [];
-    lista.forEach(m => {
-      if (m.repuestos && m.repuestos.length > 0) {
-        m.repuestos.forEach(r => {
-          bodyRepuestos.push([ m.fecha.split('-').reverse().join('/'), r.cant, r.ref || '-', r.desc, fmt(r.precio), fmt(r.cant * r.precio) ]);
-        });
-      }
-    });
-
-    if (bodyRepuestos.length > 0) {
-      doc.setFontSize(11); doc.setFont(undefined, 'bold');
-      doc.text(t.pdf_repuestos, 15, y);
-      y += 4;
-      doc.autoTable({
-        startY: y,
-        head: [[t.fecha, t.cant, t.referencia, t.pdf_desc, t.pdf_precio_ud, t.total]],
-        body: bodyRepuestos,
-        theme: 'grid',
-        headStyles: { fillColor: [225, 29, 72], textColor: 255, fontSize: 9 }, // Rojo Boxes
-        bodyStyles: { fontSize: 9 },
-        alternateRowStyles: { fillColor: [248, 249, 250] },
-        columnStyles: { 0: { cellWidth: 25 }, 1: { cellWidth: 15, halign: 'center' }, 2: { cellWidth: 30 }, 3: { cellWidth: 60 }, 4: { cellWidth: 25, halign: 'right' }, 5: { cellWidth: 25, halign: 'right' } },
-        margin: { left: 15, right: 15 }
-      });
-      y = doc.lastAutoTable.finalY + 10;
-    }
-
-    // Totales
-    const totalMano = lista.reduce((s,m) => s + (Number(m.mano)||0), 0);
-    const totalPiezas = lista.reduce((s,m) => s + (Number(m.piezas)||0), 0);
-    const base = totalMano + totalPiezas;
-    const iva = base * (ivaPorcentaje / 100);
-    const total = base + iva;
+    // --- Totales Globales (Al final del documento) ---
+    if (y > 250) { doc.addPage(); y = 20; }
+    
+    const baseGlobal = totalGlobalMano + totalGlobalPiezas;
+    const iva = baseGlobal * (ivaPorcentaje / 100);
+    const totalFinal = baseGlobal + iva;
 
     doc.setFontSize(10); doc.setFont(undefined, 'normal');
-    doc.setTextColor(0,0,0);
-    doc.text(t.pdf_base, 130, y); doc.text(fmt(base), pageW - 15, y, {align:'right'}); y += 6;
+    doc.text(t.pdf_base, 130, y); doc.text(fmt(baseGlobal), pageW - 15, y, {align:'right'}); y += 6;
     doc.text(`${t.pdf_iva} (${ivaPorcentaje}%):`, 130, y); doc.text(fmt(iva), pageW - 15, y, {align:'right'}); y += 6;
-    doc.setFont(undefined, 'bold'); doc.setTextColor(225, 29, 72); // Total en rojo
-    doc.text(t.pdf_total, 130, y); doc.text(fmt(total), pageW - 15, y, {align:'right'});
+    doc.setFont(undefined, 'bold'); doc.setTextColor(225, 29, 72); 
+    doc.text(t.pdf_total, 130, y); doc.text(fmt(totalFinal), pageW - 15, y, {align:'right'});
   }
 
-  const nombre = tipoInforme === 'historico' ? `Historico_${v.matricula}.pdf` : `Factura_${v.matricula}.pdf`;
+  const nombre = tipoInforme === 'historico' ? `Historico_${v.matricula}.pdf` : `Facturas_${v.matricula}.pdf`;
   doc.save(nombre);
   mostrarMsg('msg_informe', currentLang === 'es' ? 'PDF generado y abierto.' : 'PDF generated and opened.', 'ok');
 }
