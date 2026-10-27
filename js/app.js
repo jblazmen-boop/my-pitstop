@@ -26,7 +26,6 @@ const translations = {
     derechos: "Todos los derechos reservados.", selecciona: "— Selecciona —", no_foto: "— No usar foto —",
     ej_operacion: "Ej: Sustituir correa", ej_referencia: "Ej: MANN-W712", seleccionar_archivo: "Seleccionar archivo",
     
-    // PLACEHOLDERS
     ph_matricula: "1234ABC", ph_marca: "Seat", ph_modelo: "León", ph_bastidor: "WVWZZZ...", ph_taller: "Taller Pepe", ph_descripcion: "Filtro de aceite",
 
     pdf_informe: "INFORME DE MANTENIMIENTO / FACTURA", pdf_factura: "INFORME DE MANTENIMIENTO / FACTURA",
@@ -55,7 +54,6 @@ const translations = {
     derechos: "All rights reserved.", selecciona: "— Select —", no_foto: "— No photo —",
     ej_operacion: "Ex: Replace belt", ej_referencia: "Ex: MANN-W712", seleccionar_archivo: "Select file",
     
-    // PLACEHOLDERS
     ph_matricula: "1234ABC", ph_marca: "Seat", ph_modelo: "Leon", ph_bastidor: "WVWZZZ...", ph_taller: "Workshop Joe", ph_descripcion: "Oil filter",
 
     pdf_informe: "MAINTENANCE REPORT / INVOICE", pdf_factura: "MAINTENANCE REPORT / INVOICE",
@@ -68,7 +66,6 @@ const translations = {
   }
 };
 
-// Diccionario exclusivo para los tipos de mantenimiento
 const tiposMantenimiento = {
   "type_1": { es: "Revisión / Mantenimiento", en: "Service / Maintenance" },
   "type_2": { es: "Motor", en: "Engine" },
@@ -108,7 +105,6 @@ function translatePage() {
     }
   });
 
-  // Actualizar optgroups y options del select de tipo
   for (const [key, texts] of Object.entries(tiposMantenimiento)) {
     const num = key.split('_')[1];
     const groupEl = document.getElementById('group-' + num);
@@ -147,12 +143,10 @@ function cargar() {
       if (!state.mantenimientos) state.mantenimientos = [];
 
       state.mantenimientos.forEach(m => {
-        // Migración: Si guardó el texto literal antes, lo pasamos a la clave (ej: type_1)
         if (m.tipo && !m.tipo.startsWith('type_')) {
             const foundKey = Object.keys(tiposMantenimiento).find(k => tiposMantenimiento[k].es === m.tipo || tiposMantenimiento[k].en === m.tipo);
             if (foundKey) m.tipo = foundKey;
         }
-
         if (!m.manoObra) {
           m.manoObra = [];
           if (m.concepto && m.mano > 0) {
@@ -375,7 +369,7 @@ function guardarMantenimiento() {
   const vehiculoId = document.getElementById('m_vehiculo').value;
   const fecha = document.getElementById('m_fecha').value;
   const km = document.getElementById('m_km').value;
-  const tipo = document.getElementById('m_tipo').value; // Ahora guarda "type_1", etc.
+  const tipo = document.getElementById('m_tipo').value; 
   const taller = document.getElementById('m_taller').value.trim();
   const notas = document.getElementById('m_notas').value.trim();
   
@@ -418,7 +412,7 @@ function editarMantenimiento(id) {
   document.getElementById('m_vehiculo').value = m.vehiculoId;
   document.getElementById('m_fecha').value = m.fecha;
   document.getElementById('m_km').value = m.km || '';
-  document.getElementById('m_tipo').value = m.tipo; // Selecciona el value (ej: type_1)
+  document.getElementById('m_tipo').value = m.tipo; 
   document.getElementById('m_taller').value = m.taller || '';
   document.getElementById('m_notas').value = m.notas || '';
   
@@ -448,7 +442,7 @@ function cancelarEdicion() {
   document.getElementById('m_taller').value = '';
   document.getElementById('m_notas').value = '';
   document.getElementById('m_vehiculo').value = ''; 
-  document.getElementById('m_tipo').value = 'type_1'; // Por defecto
+  document.getElementById('m_tipo').value = 'type_1'; 
 
   document.getElementById('btn-guardar').textContent = translations[currentLang].guardar_mant;
   document.getElementById('btn-cancelar').style.display = 'none';
@@ -492,7 +486,6 @@ function renderAll() {
   renderVehiculos();
   renderMantenimientos();
   renderSelects();
-  // Si estamos en la pestaña de informe y hay un vehículo seleccionado, actualizamos la tabla
   if (document.getElementById('bloque_seleccion').style.display === 'block' && document.getElementById('i_vehiculo').value) {
     renderTablaSeleccion();
   }
@@ -568,20 +561,17 @@ function renderSelects() {
 document.getElementById('f_vehiculo').addEventListener('change', renderMantenimientos);
 document.getElementById('i_vehiculo').addEventListener('change', renderTablaSeleccion);
 
-// ============ CHECKBOX SELECT ALL ============
 function toggleAllChecks(source) {
   const checkboxes = document.querySelectorAll('.check-mant');
   checkboxes.forEach(cb => cb.checked = source.checked);
 }
 
-// ============ MENSAJES ============
 function mostrarMsg(id, texto, tipo) {
   const el = document.getElementById(id);
   el.innerHTML = `<div class="msg ${tipo}">${esc(texto)}</div>`;
   setTimeout(() => { el.innerHTML = ''; }, 4000);
 }
 
-// ============ MODO DE INFORME ============
 function toggleModoInforme() {
   const modo = document.getElementById('i_modo').value;
   document.getElementById('bloque_fechas').style.display = modo === 'fechas' ? 'grid' : 'none';
@@ -604,8 +594,6 @@ function renderTablaSeleccion() {
   
   lista.forEach(m => {
     const total = m.mano + m.piezas;
-    
-    // CORRECCIÓN AQUÍ: Traducimos el tipo para la tabla de selección
     const tipoTexto = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
     
     const tr = document.createElement('tr');
@@ -659,7 +647,6 @@ function generarPDF() {
     const pageH = doc.internal.pageSize.getHeight();
     let y = 15;
 
-    // Marca de agua (Logo)
     const logoImg = document.querySelector('.logo-img');
     if (logoImg && logoImg.src) {
       try {
@@ -670,13 +657,11 @@ function generarPDF() {
       } catch(e) { console.log("Error al añadir logo al PDF", e); }
     }
 
-    // Cabecera
     doc.setFillColor(15, 23, 42); 
     doc.rect(0, 0, pageW, 20, 'F'); 
     doc.setTextColor(255,255,255);
     doc.setFontSize(16); doc.setFont(undefined, 'bold');
     
-    // Título dinámico centrado
     const titulo = tipoInforme === 'detallado' ? t.pdf_factura : t.pdf_informe;
     const tituloAncho = doc.getTextWidth(titulo);
     doc.text(titulo, (pageW - tituloAncho) / 2, 13);
@@ -697,7 +682,6 @@ function generarPDF() {
     const per = modo === 'seleccion' ? (currentLang === 'es' ? 'Selección manual' : 'Manual selection') : (desde ? desde.split('-').reverse().join('/') : 'inicio') + ' — ' + (hasta ? hasta.split('-').reverse().join('/') : 'hoy');
     doc.text(per, 45, y); y += 10;
 
-    // Tablas
     if (tipoInforme === 'historico') {
       let bodyHistorial = [];
       lista.forEach(m => {
@@ -839,12 +823,61 @@ function borrarTodo() {
   mostrarMsg('msg_backup', currentLang === 'es' ? 'Todos los datos borrados.' : 'All data deleted.', 'ok');
 }
 
+// ============ PROTECCIÓN DE DATOS Y AVISOS ============
+
+// 1. Pedir al navegador que no borre los datos si se queda sin espacio
+async function solicitarPersistencia() {
+  if (navigator.storage && navigator.storage.persist) {
+    const isPersisted = await navigator.storage.persisted();
+    if (!isPersisted) {
+      const granted = await navigator.storage.persist();
+      if (granted) {
+        console.log("El navegador ha aceptado proteger los datos.");
+      } else {
+        console.log("El navegador NO protegerá los datos. Se recomienda hacer copias manuales.");
+      }
+    }
+  }
+}
+
+// 2. Recordatorio de copia de seguridad (cada 7 días)
+function comprobarRecordatorioBackup() {
+  const ultimoAviso = localStorage.getItem('pitstop_ultimo_aviso_backup');
+  const ahora = new Date().getTime();
+  
+  // Si nunca ha avisado, o han pasado más de 7 días
+  if (!ultimoAviso || (ahora - parseInt(ultimoAviso)) > 604800000) {
+    
+    if (state.mantenimientos.length > 0 || state.vehiculos.length > 0) {
+      const mensaje = currentLang === 'es' 
+        ? "⚠️ RECORDATORIO: Tienes datos guardados. Si borras la caché del navegador o cambias de dispositivo, los perderás.\n\nTe recomendamos ir a la pestaña 'Copia de seguridad' y exportar tus datos (JSON).\n\n¿Quieres ir ahora a la pestaña de copia de seguridad?"
+        : "⚠️ REMINDER: You have saved data. If you clear your browser cache or change devices, you will lose it.\n\nWe recommend going to the 'Backup' tab and exporting your data (JSON).\n\nDo you want to go to the backup tab now?";
+      
+      const irABackup = confirm(mensaje);
+      
+      if (irABackup) {
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+        document.querySelector('.tab[data-tab="backup"]').classList.add('active');
+        document.getElementById('backup').classList.add('active');
+      }
+      
+      localStorage.setItem('pitstop_ultimo_aviso_backup', ahora.toString());
+    }
+  }
+}
+
 // ============ INIT ============
 cargar();
 document.getElementById('m_fecha').value = new Date().toISOString().slice(0,10);
 renderManoObraTemporal();
 renderRepuestosTemporales();
 renderAll();
+
+// Iniciar protección y avisos
+solicitarPersistencia();
+// Esperar un segundo y medio para que la app cargue bien antes de lanzar el aviso
+setTimeout(comprobarRecordatorioBackup, 1500); 
 
 document.getElementById('r_foto').addEventListener('change', function() {
   const fileLabel = document.getElementById('file-btn-label');
