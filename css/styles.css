@@ -248,6 +248,13 @@ h2 {
 }
 .file-btn:hover { background: #4b5563 !important; border-color: #e11d48 !important; }
 
+/* Checkboxes de la tabla */
+input[type="checkbox"] {
+  transform: scale(1.3);
+  cursor: pointer;
+  accent-color: #e11d48;
+}
+
 /* --- AJUSTE ESPECÍFICO PARA MÓVILES --- */
 @media (max-width: 768px) {
   body::before {
