@@ -162,6 +162,18 @@ header h1 {
 h2 { margin-top: 0; font-size: 20px; color: #ffffff !important; }
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
 
+/* NUEVO: Grid específico para los avisos (alineación perfecta) */
+.grid-avisos { 
+  display: grid; 
+  grid-template-columns: 1.2fr 1fr 1fr 1fr; 
+  gap: 15px; 
+  margin-bottom: 20px; 
+  align-items: end; /* Fuerza a que los inputs se alineen abajo */
+}
+@media (max-width: 768px) {
+  .grid-avisos { grid-template-columns: 1fr; }
+}
+
 /* --- INPUTS Y ETIQUETAS --- */
 label { display: block; font-size: 12px; color: #9ca3af !important; margin-bottom: 6px; font-weight: 700; }
 input, select, textarea { 
@@ -282,9 +294,6 @@ input[type="checkbox"] {
   table th, table td { padding: 8px 4px; font-size: 11px; }
   header h1 { font-size: 45px; }
   .author { font-size: 20px; }
-  
-  /* Ajuste para que los inputs de avisos se apilen en móvil */
-  #recordatorios .grid { grid-template-columns: 1fr; }
 }
 
 /* --- ROTACIÓN EN MÓVILES --- */

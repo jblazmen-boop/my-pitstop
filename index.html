@@ -155,12 +155,13 @@
     </table>
   </div>
 
-  <!-- RECORDATORIOS (Con Km y Fecha) -->
+  <!-- RECORDATORIOS -->
   <div id="recordatorios" class="panel">
     <h2 data-i18n="recordatorios">Avisos y Recordatorios</h2>
     <p style="color: #9ca3af; margin-bottom: 20px;" data-i18n="recordatorios_texto">Aquí puedes ver y gestionar las fechas de tus próximos mantenimientos e ITV.</p>
     
-    <div class="grid" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+    <!-- Clase grid-avisos para forzar la alineación perfecta -->
+    <div class="grid-avisos">
       <div>
         <label data-i18n="vehiculo">Vehículo</label>
         <select id="rec_vehiculo" onchange="cargarRecordatorios()">
@@ -168,15 +169,15 @@
         </select>
       </div>
       <div>
-        <label data-i18n="km_prox_mant">Km del próximo mantenimiento</label>
+        <label data-i18n="km_prox_mant">Km Próx. Mantenimiento</label>
         <input type="number" id="rec_km_mant" placeholder="Ej: 100000">
       </div>
       <div>
-        <label data-i18n="fecha_prox_mant">Fecha del próximo mantenimiento</label>
+        <label data-i18n="fecha_prox_mant">Fecha Próx. Mantenimiento</label>
         <input type="date" id="rec_mant">
       </div>
       <div>
-        <label data-i18n="fecha_prox_itv">Fecha de la próxima ITV</label>
+        <label data-i18n="fecha_prox_itv">Fecha Próx. ITV</label>
         <input type="date" id="rec_itv">
       </div>
     </div>
@@ -191,7 +192,7 @@
       <thead>
         <tr>
           <th data-i18n="vehiculo">Vehículo</th>
-          <th data-i18n="prox_mant">Próximo Mantenimiento</th>
+          <th data-i18n="prox_mant">Próximo Mantenimiento (Km / Fecha)</th>
           <th data-i18n="prox_itv">Próxima ITV</th>
         </tr>
       </thead>
