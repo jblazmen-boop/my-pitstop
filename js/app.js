@@ -26,16 +26,16 @@ const translations = {
     derechos: "Todos los derechos reservados.", selecciona: "— Selecciona —", no_foto: "— No usar foto —",
     ej_operacion: "Ej: Sustituir correa", ej_referencia: "Ej: MANN-W712", seleccionar_archivo: "Seleccionar archivo",
     
-    // TÍTULO UNIFICADO SEGÚN TU PETICIÓN
-    pdf_informe: "INFORME DE MANTENIMIENTO / FACTURA", 
-    pdf_factura: "INFORME DE MANTENIMIENTO / FACTURA",
-    
+    // PLACEHOLDERS
+    ph_matricula: "1234ABC", ph_marca: "Seat", ph_modelo: "León", ph_bastidor: "WVWZZZ...", ph_taller: "Taller Pepe", ph_descripcion: "Filtro de aceite",
+
+    pdf_informe: "INFORME DE MANTENIMIENTO / FACTURA", pdf_factura: "INFORME DE MANTENIMIENTO / FACTURA",
     pdf_vehiculo: "Vehículo:", pdf_matricula: "Matrícula:", pdf_bastidor: "Nº Bastidor:", pdf_fecha_inf: "Fecha informe:",
     pdf_periodo: "Periodo:", pdf_mano_obra: "Desglose de Mano de Obra", pdf_concepto: "Concepto", pdf_importe: "Importe",
     pdf_repuestos: "Desglose de Repuestos", pdf_desc: "Descripción", pdf_precio_ud: "Precio Ud.", pdf_base: "Base imponible:",
     pdf_iva: "IVA", pdf_total: "TOTAL FACTURA:", pdf_servicios: "Servicio / Mano de Obra", pdf_materiales: "Materiales / Repuestos",
-    pdf_ope_realizadas: "Operaciones Realizadas", pdf_taller_txt: "Taller:",
-    modo_generacion: "Modo de generación", por_fechas: "Por rango de fechas", por_seleccion: "Seleccionando mantenimientos", selecciona_mant: "Selecciona los mantenimientos para incluir en la factura"
+    pdf_taller_txt: "Taller:", modo_generacion: "Modo de generación", por_fechas: "Por rango de fechas", 
+    por_seleccion: "Seleccionando mantenimientos", selecciona_mant: "Selecciona los mantenimientos para incluir en la factura"
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -55,17 +55,31 @@ const translations = {
     derechos: "All rights reserved.", selecciona: "— Select —", no_foto: "— No photo —",
     ej_operacion: "Ex: Replace belt", ej_referencia: "Ex: MANN-W712", seleccionar_archivo: "Select file",
     
-    // TÍTULO UNIFICADO EN INGLÉS
-    pdf_informe: "MAINTENANCE REPORT / INVOICE",
-    pdf_factura: "MAINTENANCE REPORT / INVOICE",
-    
+    // PLACEHOLDERS
+    ph_matricula: "1234ABC", ph_marca: "Seat", ph_modelo: "Leon", ph_bastidor: "WVWZZZ...", ph_taller: "Workshop Joe", ph_descripcion: "Oil filter",
+
+    pdf_informe: "MAINTENANCE REPORT / INVOICE", pdf_factura: "MAINTENANCE REPORT / INVOICE",
     pdf_vehiculo: "Vehicle:", pdf_matricula: "Plate:", pdf_bastidor: "VIN:", pdf_fecha_inf: "Report date:",
     pdf_periodo: "Period:", pdf_mano_obra: "Labor Breakdown", pdf_concepto: "Concept", pdf_importe: "Amount",
     pdf_repuestos: "Parts Breakdown", pdf_desc: "Description", pdf_precio_ud: "Unit Price", pdf_base: "Subtotal:",
     pdf_iva: "VAT", pdf_total: "TOTAL INVOICE:", pdf_servicios: "Service / Labor", pdf_materiales: "Materials / Parts",
-    pdf_ope_realizadas: "Operations Performed", pdf_taller_txt: "Workshop:",
-    modo_generacion: "Generation mode", por_fechas: "By date range", por_seleccion: "Selecting records", selecciona_mant: "Select maintenance records to include in the invoice"
+    pdf_taller_txt: "Workshop:", modo_generacion: "Generation mode", por_fechas: "By date range", 
+    por_seleccion: "Selecting records", selecciona_mant: "Select maintenance records to include in the invoice"
   }
+};
+
+// Diccionario exclusivo para los tipos de mantenimiento
+const tiposMantenimiento = {
+  "type_1": { es: "Revisión / Mantenimiento", en: "Service / Maintenance" },
+  "type_2": { es: "Motor", en: "Engine" },
+  "type_3": { es: "Transmisión", en: "Transmission" },
+  "type_4": { es: "Suspensión, Dirección y Frenos", en: "Suspension, Steering & Brakes" },
+  "type_5": { es: "Electricidad / Electrónica", en: "Electrical / Electronics" },
+  "type_6": { es: "Climatización", en: "Air Conditioning" },
+  "type_7": { es: "Escape", en: "Exhaust" },
+  "type_8": { es: "Interior, Habitáculo y Seguridad", en: "Interior, Cabin & Safety" },
+  "type_9": { es: "Chasis y Carrocería", en: "Chassis & Bodywork" },
+  "type_10": { es: "Otro", en: "Other" }
 };
 
 function translatePage() {
@@ -94,43 +108,13 @@ function translatePage() {
     }
   });
 
-  const groupTexts = {
-    "group-1": { es: "Revisión / Mantenimiento", en: "Service / Maintenance" },
-    "group-2": { es: "Motor", en: "Engine" },
-    "group-3": { es: "Transmisión", en: "Transmission" },
-    "group-4": { es: "Suspensión, Dirección y Frenos", en: "Suspension, Steering & Brakes" },
-    "group-5": { es: "Electricidad / Electrónica", en: "Electrical / Electronics" },
-    "group-6": { es: "Climatización", en: "Air Conditioning" },
-    "group-7": { es: "Escape", en: "Exhaust" },
-    "group-8": { es: "Interior, Habitáculo y Seguridad", en: "Interior, Cabin & Safety" },
-    "group-9": { es: "Chasis y Carrocería", en: "Chassis & Bodywork" },
-    "group-10": { es: "Otro", en: "Other" }
-  };
-
-  const optionTexts = {
-    "opt-1": { es: "Revisión / Mantenimiento", en: "Service / Maintenance" },
-    "opt-2": { es: "Motor", en: "Engine" },
-    "opt-3": { es: "Transmisión", en: "Transmission" },
-    "opt-4": { es: "Suspensión, Dirección y Frenos", en: "Suspension, Steering & Brakes" },
-    "opt-5": { es: "Electricidad / Electrónica", en: "Electrical / Electronics" },
-    "opt-6": { es: "Climatización", en: "Air Conditioning" },
-    "opt-7": { es: "Escape", en: "Exhaust" },
-    "opt-8": { es: "Interior, Habitáculo y Seguridad", en: "Interior, Cabin & Safety" },
-    "opt-9": { es: "Chasis y Carrocería", en: "Chassis & Bodywork" },
-    "opt-10": { es: "Otro", en: "Other" }
-  };
-
-  for (const [id, texts] of Object.entries(groupTexts)) {
-    const el = document.getElementById(id);
-    if (el) el.label = texts[currentLang];
-  }
-
-  for (const [id, texts] of Object.entries(optionTexts)) {
-    const el = document.getElementById(id);
-    if (el) {
-      el.textContent = texts[currentLang];
-      el.value = texts[currentLang];
-    }
+  // Actualizar optgroups y options del select de tipo
+  for (const [key, texts] of Object.entries(tiposMantenimiento)) {
+    const num = key.split('_')[1];
+    const groupEl = document.getElementById('group-' + num);
+    const optEl = document.getElementById('opt-' + num);
+    if (groupEl) groupEl.label = texts[currentLang];
+    if (optEl) optEl.textContent = texts[currentLang];
   }
 
   if(editandoMantenimientoId) {
@@ -142,6 +126,7 @@ function translatePage() {
   }
   
   document.documentElement.lang = currentLang;
+  renderAll(); 
 }
 
 function setLanguage(lang) {
@@ -162,6 +147,12 @@ function cargar() {
       if (!state.mantenimientos) state.mantenimientos = [];
 
       state.mantenimientos.forEach(m => {
+        // Migración: Si guardó el texto literal antes, lo pasamos a la clave (ej: type_1)
+        if (m.tipo && !m.tipo.startsWith('type_')) {
+            const foundKey = Object.keys(tiposMantenimiento).find(k => tiposMantenimiento[k].es === m.tipo || tiposMantenimiento[k].en === m.tipo);
+            if (foundKey) m.tipo = foundKey;
+        }
+
         if (!m.manoObra) {
           m.manoObra = [];
           if (m.concepto && m.mano > 0) {
@@ -384,7 +375,7 @@ function guardarMantenimiento() {
   const vehiculoId = document.getElementById('m_vehiculo').value;
   const fecha = document.getElementById('m_fecha').value;
   const km = document.getElementById('m_km').value;
-  const tipo = document.getElementById('m_tipo').value;
+  const tipo = document.getElementById('m_tipo').value; // Ahora guarda "type_1", etc.
   const taller = document.getElementById('m_taller').value.trim();
   const notas = document.getElementById('m_notas').value.trim();
   
@@ -427,7 +418,7 @@ function editarMantenimiento(id) {
   document.getElementById('m_vehiculo').value = m.vehiculoId;
   document.getElementById('m_fecha').value = m.fecha;
   document.getElementById('m_km').value = m.km || '';
-  document.getElementById('m_tipo').value = m.tipo;
+  document.getElementById('m_tipo').value = m.tipo; // Selecciona el value (ej: type_1)
   document.getElementById('m_taller').value = m.taller || '';
   document.getElementById('m_notas').value = m.notas || '';
   
@@ -457,10 +448,7 @@ function cancelarEdicion() {
   document.getElementById('m_taller').value = '';
   document.getElementById('m_notas').value = '';
   document.getElementById('m_vehiculo').value = ''; 
-  
-  const selTipo = document.getElementById('m_tipo');
-  if (currentLang === 'es') selTipo.value = "Revisión / Mantenimiento";
-  else selTipo.value = "Service / Maintenance";
+  document.getElementById('m_tipo').value = 'type_1'; // Por defecto
 
   document.getElementById('btn-guardar').textContent = translations[currentLang].guardar_mant;
   document.getElementById('btn-cancelar').style.display = 'none';
@@ -479,7 +467,12 @@ function eliminarMantenimiento(id) {
 function verDesglose(id) {
   const m = state.mantenimientos.find(x => x.id === id);
   if (!m) return;
+  
+  const tipoTexto = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
+  
   let texto = (currentLang === 'es' ? "DESGLOSE DEL MANTENIMIENTO:" : "MAINTENANCE BREAKDOWN:") + "\n\n";
+  texto += (currentLang === 'es' ? "Tipo: " : "Type: ") + tipoTexto + "\n\n";
+  
   if (m.manoObra && m.manoObra.length > 0) {
     texto += (currentLang === 'es' ? "MANO DE OBRA:\n" : "LABOR:\n");
     m.manoObra.forEach(o => { texto += `- ${o.concepto}: ${fmt(o.precio)}\n`; });
@@ -534,9 +527,12 @@ function renderMantenimientos() {
     const v = state.vehiculos.find(x => x.id === m.vehiculoId);
     const fechaMostrar = m.fecha ? m.fecha.split('-').reverse().join('/') : '';
     let numOps = (m.manoObra ? m.manoObra.length : 0) + (m.repuestos ? m.repuestos.length : 0);
+    
+    const tipoTexto = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
+
     const tr = document.createElement('tr');
     tr.innerHTML = `<td>${fechaMostrar}</td><td>${esc(v ? v.matricula : '—')}</td>
-      <td>${m.km||''}</td><td>${esc(m.tipo)}</td>
+      <td>${m.km||''}</td><td>${esc(tipoTexto)}</td>
       <td><button class="secondary" style="padding:4px 8px; font-size:11px;" onclick="verDesglose('${m.id}')">${currentLang === 'es' ? 'Ver' : 'View'} (${numOps})</button></td>
       <td>${fmt(m.mano)}</td><td>${fmt(m.piezas)}</td><td>${fmt(m.mano+m.piezas)}</td>
       <td style="display:flex; flex-direction:column; gap:4px;">
@@ -603,11 +599,12 @@ function renderTablaSeleccion() {
   
   lista.forEach(m => {
     const total = m.mano + m.piezas;
+    const tipoTexto = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
     const tr = document.createElement('tr');
     tr.innerHTML = `<td style="text-align:center;"><input type="checkbox" class="check-mant" value="${m.id}"></td>
       <td>${m.fecha.split('-').reverse().join('/')}</td>
       <td>${m.km || ''}</td>
-      <td>${esc(m.tipo)}</td>
+      <td>${esc(tipoTexto)}</td>
       <td>${(m.manoObra || []).map(o => o.concepto).join(', ')}</td>
       <td>${fmt(total)}</td>`;
     tbody.appendChild(tr);
@@ -654,21 +651,6 @@ function generarPDF() {
     const pageH = doc.internal.pageSize.getHeight();
     let y = 15;
 
-    // Diccionario para traducir los tipos de mantenimiento si el PDF está en inglés
-    const tiposTraducidos = {
-      "Revisión / Mantenimiento": "Service / Maintenance",
-      "Motor": "Engine",
-      "Transmisión": "Transmission",
-      "Suspensión, Dirección y Frenos": "Suspension, Steering & Brakes",
-      "Electricidad / Electrónica": "Electrical / Electronics",
-      "Climatización": "Air Conditioning",
-      "Escape": "Exhaust",
-      "Interior, Habitáculo y Seguridad": "Interior, Cabin & Safety",
-      "Chasis y Carrocería": "Chassis & Bodywork",
-      "Otro": "Other"
-    };
-    const getTipoTraducido = (tipo) => (currentLang === 'en' && tiposTraducidos[tipo]) ? tiposTraducidos[tipo] : tipo;
-
     // Marca de agua (Logo)
     const logoImg = document.querySelector('.logo-img');
     if (logoImg && logoImg.src) {
@@ -711,7 +693,10 @@ function generarPDF() {
     if (tipoInforme === 'historico') {
       let bodyHistorial = [];
       lista.forEach(m => {
-        let textoTipoYServicio = getTipoTraducido(m.tipo) + "\n"; // Usamos el tipo traducido
+        // AQUI ESTA LA MAGIA: Traducimos el tipo en el PDF
+        const tipoTraducido = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
+        
+        let textoTipoYServicio = tipoTraducido + "\n";
         textoTipoYServicio += "• " + (m.manoObra || []).map(o => o.concepto).join("\n• ");
         if (m.taller) textoTipoYServicio += `\n\n(${t.pdf_taller_txt} ${m.taller})`;
         
@@ -741,17 +726,21 @@ function generarPDF() {
       lista.forEach((m) => {
         if (y > 230) { doc.addPage(); y = 20; }
 
+        // AQUI ESTA LA MAGIA: Traducimos el tipo en la factura detallada
+        const tipoTraducido = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
+
         doc.setFillColor(240, 242, 245); 
-        doc.rect(15, y - 5, pageW - 30, 8, 'F');
+        doc.rect(15, y - 5, pageW - 30, 12, 'F'); // Un poco más alto para que quepa el tipo
         doc.setFontSize(10); doc.setFont(undefined, 'bold'); doc.setTextColor(15, 23, 42);
         doc.text(`${t.fecha}: ${m.fecha.split('-').reverse().join('/')}`, 18, y);
-        if (m.km) doc.text(`${t.km}: ${m.km}`, 80, y);
+        if (m.km) doc.text(`${t.km}: ${m.km}`, 70, y);
         if (m.taller) doc.text(`${t.pdf_taller_txt} ${m.taller}`, pageW - 18, y, {align:'right'});
         
         // Añadimos el Tipo de Mantenimiento traducido debajo de la fecha
         doc.setFontSize(9); doc.setFont(undefined, 'normal'); doc.setTextColor(100, 100, 100);
-        doc.text(`${t.tipo}: ${getTipoTraducido(m.tipo)}`, 18, y + 4);
-        y += 9; // Ajustamos un poco el margen
+        doc.text(`${t.tipo}: ${tipoTraducido}`, 18, y + 5);
+        
+        y += 12; 
 
         let bodyMano = (m.manoObra || []).map(o => [ o.concepto, fmt(o.precio) ]);
         if (bodyMano.length > 0) {
@@ -829,7 +818,7 @@ function importarJSON(e) {
       const data = JSON.parse(ev.target.result);
       if (!data.vehiculos || !data.mantenimientos) throw new Error('Formato inválido');
       if (!confirm(currentLang === 'es' ? 'Esto reemplazará todos los datos actuales. ¿Continuar?' : 'This will replace all current data. Continue?')) return;
-      state = data; guardar(); renderAll();
+      state = data; cargar(); guardar(); renderAll(); // Recargamos para migrar los tipos
       mostrarMsg('msg_backup', currentLang === 'es' ? 'Datos importados correctamente.' : 'Data imported successfully.', 'ok');
     } catch(err) {
       mostrarMsg('msg_backup', (currentLang === 'es' ? 'Error al importar: ' : 'Import error: ') + err.message, 'err');
