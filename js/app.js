@@ -617,6 +617,9 @@ function renderGrafico() {
   const gastosPorAnio = {};
   lista.forEach(m => {
     if (!m.fecha) return;
+    // AQUI FILTRAMOS: Si el taller es 'ITV' o el concepto es la revisión ITV, lo ignoramos para el gráfico
+    if (m.taller === 'ITV' || (m.manoObra && m.manoObra.some(o => o.concepto.includes('ITV')))) return;
+
     const anio = m.fecha.split('-')[0];
     if (!gastosPorAnio[anio]) gastosPorAnio[anio] = { mano: 0, piezas: 0 };
     gastosPorAnio[anio].mano += m.mano;
@@ -733,7 +736,7 @@ function cargarRecordatorios() {
     const tr = document.createElement('tr');
     tr.innerHTML = `<td>${esc(v.matricula)}</td>
       <td>${kmMantFormat}${formatDate(v.proxMant)}</td>
-      <td>${formatDate(v.proxItv)}</td>`; // <-- Aquí ya solo sale la fecha de ITV
+      <td>${formatDate(v.proxItv)}</td>`;
     tbody.appendChild(tr);
   });
 }
@@ -770,8 +773,8 @@ function guardarRecordatorio() {
         state.mantenimientos.push({
           id: uid(),
           vehiculoId: vehiculoId,
-          fecha: itvPasada,
-          km: Number(itvKmPasada) || 0,
+          fecha: itvPasada, // <-- GUARDAMOS LA FECHA REAL PASADA
+          km: Number(itvKmPasada) || 0, // <-- GUARDAMOS LOS KMS REALES
           tipo: 'type_10', 
           mano: 0,
           piezas: 0,
