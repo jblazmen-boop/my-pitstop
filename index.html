@@ -40,7 +40,7 @@
 </header>
 
 <div class="container">
-  <!-- PESTAÑAS EN EL ORDEN QUE PEDISTE -->
+  <!-- PESTAÑAS -->
   <div class="tabs">
     <button class="tab active" data-tab="vehiculos" title="Vehículos" data-i18n-title="vehiculos_titulo"><img src="icono-coche.png" class="tab-icon" alt="Vehículos"></button>
     <button class="tab" data-tab="mantenimientos" title="Mantenimientos" data-i18n-title="historial"><img src="icono-llave.png" class="tab-icon" alt="Mantenimientos"></button>
@@ -160,7 +160,6 @@
     <h2 data-i18n="recordatorios">Avisos y Recordatorios</h2>
     <p style="color: #9ca3af; margin-bottom: 20px;" data-i18n="recordatorios_texto">Aquí puedes ver y gestionar las fechas de tus próximos mantenimientos e ITV.</p>
     
-    <!-- Clase grid-avisos para forzar la alineación perfecta -->
     <div class="grid-avisos">
       <div>
         <label data-i18n="vehiculo">Vehículo</label>
@@ -180,6 +179,17 @@
         <label data-i18n="fecha_prox_itv">Fecha Próx. ITV</label>
         <input type="date" id="rec_itv">
       </div>
+    </div>
+
+    <div class="grid-avisos" style="grid-template-columns: 1.2fr 1fr 1fr 1fr;">
+      <!-- Dejamos un hueco vacío para alinear -->
+      <div></div>
+      <div>
+        <label data-i18n="km_itv">Km de la ITV</label>
+        <input type="number" id="rec_km_itv" placeholder="Ej: 105000">
+      </div>
+      <div></div>
+      <div></div>
     </div>
     
     <div style="margin-top: 15px;">
