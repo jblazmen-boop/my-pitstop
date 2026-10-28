@@ -22,6 +22,7 @@ const translations = {
     gen_informe: "Generar informe / factura en PDF", tipo_informe: "Tipo de Informe", detallado: "Factura Detallada (con precios)",
     historico: "Histórico Técnico (sin precios)", fecha_desde: "Fecha desde", fecha_hasta: "Fecha hasta",
     iva: "IVA (%)", btn_gen_pdf: "Generar PDF", btn_share_pdf: "Compartir PDF", btn_email_pdf: "Enviar por Correo",
+    btn_share_chart: "Compartir Gráfico", btn_email_chart: "Enviar Gráfico por Correo",
     copia_seguridad: "Copia de seguridad", copia_texto: "Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.",
     exportar: "⬇ Exportar copia (JSON)", importar: "⬆ Importar copia", borrar: "🗑 Borrar todos los datos",
     derechos: "Todos los derechos reservados.", selecciona: "— Selecciona —", no_foto: "— No usar foto —",
@@ -46,7 +47,10 @@ const translations = {
     modo_grafico: "Ver por:", anios: "Años", meses: "Meses", anio_grafico: "Año:", gasto_total: "Gasto Total", gasto_total_mix: "Gasto Total (Mecánica + Fijos)",
     aviso_horizontal: "Para una mejor experiencia, gira tu dispositivo a horizontal.",
     gastos_fijos: "Gastos Fijos (Seguro e ITV)", gastos_fijos_texto: "Añade aquí el coste de tu seguro y de la tasa de la ITV para que se sumen al total de gastos del vehículo.",
-    coste_seguro: "Coste Seguro (Anual)", coste_itv: "Coste Tasa ITV (Aprox)", resumen_fijos: "Resumen Fijos"
+    coste_seguro: "Coste Seguro (Anual)", coste_itv: "Coste Tasa ITV (Aprox)", resumen_fijos: "Resumen Fijos",
+    pdf_titulo_grafico: "RESUMEN DE GASTOS", pdf_gasto_fijo: "Gasto Fijo (Seguro+ITV):", 
+    email_asunto_grafico: "Resumen de Gastos My PitStop", email_cuerpo_grafico: "Adjunto el resumen de gastos generado con My PitStop. Por favor, no olvides adjuntar el PDF descargado.",
+    email_asunto_informe: "Informe de Mantenimiento My PitStop", email_cuerpo_informe: "Adjunto el informe de mantenimiento generado con My PitStop. Por favor, no olvides adjuntar el PDF descargado."
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -61,6 +65,7 @@ const translations = {
     gen_informe: "Generate report / invoice PDF", tipo_informe: "Report Type", detallado: "Detailed Invoice (with prices)",
     historico: "Technical History (no prices)", fecha_desde: "Date from", fecha_hasta: "Date to",
     iva: "VAT (%)", btn_gen_pdf: "Generate PDF", btn_share_pdf: "Share PDF", btn_email_pdf: "Send by Email",
+    btn_share_chart: "Share Chart", btn_email_chart: "Email Chart",
     copia_seguridad: "Backup", copia_texto: "Data is stored in this browser. If you clear your history or change devices, it will be lost. Export a backup regularly.",
     exportar: "⬇ Export backup (JSON)", importar: "⬆ Import backup", borrar: "🗑 Delete all data",
     derechos: "All rights reserved.", selecciona: "— Select —", no_foto: "— No photo —",
@@ -85,7 +90,10 @@ const translations = {
     modo_grafico: "View by:", anios: "Years", meses: "Months", anio_grafico: "Year:", gasto_total: "Total Expense", gasto_total_mix: "Total Expense (Mechanics + Fixed)",
     aviso_horizontal: "For a better experience, rotate your device to landscape.",
     gastos_fijos: "Fixed Costs (Insurance & MOT)", gastos_fijos_texto: "Add the cost of your insurance and MOT fee here so they add up to the vehicle's total expenses.",
-    coste_seguro: "Insurance Cost (Annual)", coste_itv: "MOT Fee (Approx)", resumen_fijos: "Fixed Summary"
+    coste_seguro: "Insurance Cost (Annual)", coste_itv: "MOT Fee (Approx)", resumen_fijos: "Fixed Summary",
+    pdf_titulo_grafico: "EXPENSE SUMMARY", pdf_gasto_fijo: "Fixed Cost (Insurance+MOT):",
+    email_asunto_grafico: "My PitStop Expense Summary", email_cuerpo_grafico: "Attached is the expense summary generated with My PitStop. Please do not forget to attach the downloaded PDF.",
+    email_asunto_informe: "My PitStop Maintenance Report", email_cuerpo_informe: "Attached is the maintenance report generated with My PitStop. Please do not forget to attach the downloaded PDF."
   }
 };
 
@@ -708,7 +716,6 @@ function renderGrafico() {
 
     etiquetas = Object.keys(gastosPorAnio).sort();
     
-    // Añadir los gastos fijos al año en curso
     const anioActual = new Date().getFullYear().toString();
     if (!etiquetas.includes(anioActual) && (vehiculoId || state.vehiculos.some(v => v.costeSeguro || v.costeItv))) {
         etiquetas.push(anioActual);
@@ -719,7 +726,6 @@ function renderGrafico() {
     dataMano = etiquetas.map(a => gastosPorAnio[a].mano);
     dataPiezas = etiquetas.map(a => gastosPorAnio[a].piezas);
     
-    // Sumar los fijos al año actual
     if (vehiculoId) {
         const v = state.vehiculos.find(x => x.id === vehiculoId);
         if (v) {
@@ -756,7 +762,6 @@ function renderGrafico() {
       }
     });
 
-    // En el modo meses, sumamos los gastos fijos al mes de Enero
     if (anioSeleccionado == new Date().getFullYear().toString()) {
         if (vehiculoId) {
             const v = state.vehiculos.find(x => x.id === vehiculoId);
@@ -1169,18 +1174,18 @@ function generarPDF(accion = false) {
 
     const nombre = tipoInforme === 'historico' ? `Historico_${v.matricula}.pdf` : `Factura_${v.matricula}.pdf`;
     
-    if (accion && navigator.share && navigator.canShare) {
+    if (accion === 'email') {
+        doc.save(nombre);
+        enviarPorCorreo(t.email_asunto_informe, t.email_cuerpo_informe);
+        mostrarMsg('msg_informe', currentLang === 'es' ? 'PDF descargado. Se ha abierto tu gestor de correo.' : 'PDF downloaded. Your email client has been opened.', 'ok');
+        return;
+    } else if (accion && navigator.share && navigator.canShare) {
       const pdfBlob = doc.output('blob');
       const file = new File([pdfBlob], nombre, { type: 'application/pdf' });
       
       if (navigator.canShare({ files: [file] })) {
         let tituloShare = nombre;
         let textoShare = currentLang === 'es' ? 'Aquí tienes el informe de mantenimiento.' : 'Here is the maintenance report.';
-
-        if (accion === 'email') {
-            tituloShare = currentLang === 'es' ? 'Informe My PitStop' : 'My PitStop Report';
-            textoShare = currentLang === 'es' ? 'Adjunto el informe de mantenimiento generado con My PitStop.' : 'Attached is the maintenance report generated with My PitStop.';
-        }
 
         navigator.share({
           files: [file],
@@ -1190,6 +1195,7 @@ function generarPDF(accion = false) {
           mostrarMsg('msg_informe', currentLang === 'es' ? 'Compartido con éxito.' : 'Shared successfully.', 'ok');
         }).catch((err) => {
           console.log("Error al compartir:", err);
+          doc.save(nombre);
         });
         return;
       }
@@ -1202,6 +1208,121 @@ function generarPDF(accion = false) {
     console.error(error);
     mostrarMsg('msg_informe', currentLang === 'es' ? 'Error al generar el PDF. Revisa la consola.' : 'Error generating PDF. Check console.', 'err');
   }
+}
+
+// ============ NUEVA FUNCIÓN: EXPORTAR GRÁFICO ============
+function exportarGraficoPDF(accion) {
+  try {
+    const { jsPDF } = window.jspdf;
+    const t = translations[currentLang];
+    
+    const canvas = document.getElementById('miGrafico');
+    if (!canvas) return;
+    
+    // Obtener la imagen del gráfico
+    const imgData = canvas.toDataURL('image/png', 1.0);
+    
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageW = doc.internal.pageSize.getWidth();
+    let y = 15;
+
+    // Logo
+    const logoImg = document.querySelector('.logo-img');
+    if (logoImg && logoImg.src) {
+      try {
+        doc.saveGraphicsState();
+        doc.setGState(new doc.GState({opacity: 0.05})); 
+        doc.addImage(logoImg.src, 'PNG', (pageW - 150) / 2, 50, 150, 150);
+        doc.restoreGraphicsState();
+      } catch(e) {}
+    }
+
+    // Cabecera
+    doc.setFillColor(15, 23, 42); 
+    doc.rect(0, 0, pageW, 20, 'F'); 
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(16); doc.setFont(undefined, 'bold');
+    const titulo = t.pdf_titulo_grafico;
+    doc.text(titulo, (pageW - doc.getTextWidth(titulo)) / 2, 13);
+
+    doc.setTextColor(0,0,0);
+    doc.setFontSize(10); doc.setFont(undefined, 'normal');
+    y = 30;
+
+    // Datos del vehículo
+    const vehiculoId = document.getElementById('g_vehiculo').value;
+    let nombreVehiculo = t.todos;
+    if (vehiculoId) {
+        const v = state.vehiculos.find(x => x.id === vehiculoId);
+        if (v) nombreVehiculo = `${v.marca} ${v.modelo} (${v.matricula})`;
+    }
+
+    doc.setFont(undefined, 'bold'); doc.text(t.vehiculo, 15, y); doc.setFont(undefined, 'normal');
+    doc.text(nombreVehiculo, 45, y); y += 8;
+
+    // Total y Fijos
+    const totalTexto = document.getElementById('texto_gasto_total').textContent;
+    doc.setFontSize(14); doc.setFont(undefined, 'bold'); doc.setTextColor(225, 29, 72);
+    doc.text(`${t.gasto_total}: ${totalTexto}`, 15, y); 
+    doc.setTextColor(0,0,0); doc.setFontSize(10); doc.setFont(undefined, 'normal');
+    y += 8;
+
+    if (vehiculoId) {
+        const v = state.vehiculos.find(x => x.id === vehiculoId);
+        if (v && (v.costeSeguro || v.costeItv)) {
+            const fijos = (parseFloat(v.costeSeguro)||0) + (parseFloat(v.costeItv)||0);
+            doc.text(`${t.pdf_gasto_fijo} ${fmt(fijos)}`, 15, y);
+            y += 8;
+        }
+    }
+
+    // Insertar gráfico
+    const imgProps = doc.getImageProperties(imgData);
+    const pdfWidth = pageW - 30;
+    const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+    
+    y += 5;
+    doc.addImage(imgData, 'PNG', 15, y, pdfWidth, pdfHeight);
+
+    const nombre = `Estadisticas_${vehiculoId ? 'Vehiculo' : 'Todos'}.pdf`;
+
+    if (accion === 'email') {
+        doc.save(nombre);
+        enviarPorCorreo(t.email_asunto_grafico, t.email_cuerpo_grafico);
+        mostrarMsg('msg_grafico', currentLang === 'es' ? 'PDF descargado. Se ha abierto tu gestor de correo.' : 'PDF downloaded. Your email client has been opened.', 'ok');
+        return;
+    } else if (accion && navigator.share && navigator.canShare) {
+      const pdfBlob = doc.output('blob');
+      const file = new File([pdfBlob], nombre, { type: 'application/pdf' });
+      
+      if (navigator.canShare({ files: [file] })) {
+        navigator.share({
+          files: [file],
+          title: nombre,
+          text: currentLang === 'es' ? 'Aquí tienes el resumen de gastos.' : 'Here is the expense summary.'
+        }).then(() => {
+          mostrarMsg('msg_grafico', currentLang === 'es' ? 'Compartido con éxito.' : 'Shared successfully.', 'ok');
+        }).catch((err) => {
+          console.log("Error al compartir:", err);
+          doc.save(nombre);
+        });
+        return;
+      }
+    }
+    
+    doc.save(nombre);
+    mostrarMsg('msg_grafico', currentLang === 'es' ? 'Gráfico exportado.' : 'Chart exported.', 'ok');
+
+  } catch (error) {
+    console.error(error);
+    mostrarMsg('msg_grafico', currentLang === 'es' ? 'Error al generar el PDF.' : 'Error generating PDF.', 'err');
+  }
+}
+
+// ============ AUXILIAR: ENVIAR POR CORREO ============
+function enviarPorCorreo(asunto, cuerpo) {
+    const mailtoLink = `mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+    window.location.href = mailtoLink;
 }
 
 // ============ BACKUP ============
