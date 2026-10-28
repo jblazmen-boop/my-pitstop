@@ -147,8 +147,8 @@ function translatePage() {
   document.documentElement.lang = currentLang;
   renderAll(); 
   renderGrafico(); 
-  cargarRecordatorios(); 
   cargarGastosFijos();
+  cargarRecordatorios(); 
 }
 
 function setLanguage(lang) {
@@ -217,9 +217,11 @@ document.querySelectorAll('.tab').forEach(t => {
     t.classList.add('active');
     document.getElementById(t.dataset.tab).classList.add('active');
     
-    if (t.dataset.tab === 'grafico') renderGrafico();
+    if (t.dataset.tab === 'grafico') {
+        renderGrafico();
+        cargarGastosFijos();
+    }
     if (t.dataset.tab === 'recordatorios') cargarRecordatorios();
-    if (t.dataset.tab === 'gastos_fijos') cargarGastosFijos();
   };
 });
 
@@ -526,14 +528,12 @@ function verDesglose(id) {
 
 // ============ GASTOS FIJOS ============
 function cargarGastosFijos() {
-  const sel = document.getElementById('gf_vehiculo');
+  const sel = document.getElementById('g_vehiculo');
   if (!sel) return;
   const vehiculoId = sel.value;
   
   const seguroInput = document.getElementById('gf_seguro');
   const itvInput = document.getElementById('gf_itv');
-  const tbody = document.getElementById('tabla_gastos_fijos_body');
-  tbody.innerHTML = '';
 
   if (vehiculoId) {
     const v = state.vehiculos.find(x => x.id === vehiculoId);
@@ -541,26 +541,18 @@ function cargarGastosFijos() {
       seguroInput.value = v.costeSeguro || '';
       itvInput.value = v.costeItv || '';
     }
+  } else {
+    seguroInput.value = '';
+    itvInput.value = '';
   }
-
-  state.vehiculos.forEach(v => {
-    const seguro = v.costeSeguro ? fmt(v.costeSeguro) : '—';
-    const itv = v.costeItv ? fmt(v.costeItv) : '—';
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${esc(v.matricula)}</td>
-      <td>${seguro}</td>
-      <td>${itv}</td>`;
-    tbody.appendChild(tr);
-  });
 }
 
 function guardarGastosFijos() {
-  const vehiculoId = document.getElementById('gf_vehiculo').value;
+  const vehiculoId = document.getElementById('g_vehiculo').value;
   const seguro = document.getElementById('gf_seguro').value;
   const itv = document.getElementById('gf_itv').value;
   
-  if (!vehiculoId) { mostrarMsg('msg_gastos_fijos', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err'); return; }
+  if (!vehiculoId) { mostrarMsg('msg_gastos_fijos', currentLang === 'es' ? 'Selecciona un vehículo en el desplegable de arriba.' : 'Select a vehicle in the dropdown above.', 'err'); return; }
   
   const v = state.vehiculos.find(x => x.id === vehiculoId);
   if (v) {
@@ -568,7 +560,6 @@ function guardarGastosFijos() {
     v.costeItv = itv;
     
     guardar();
-    cargarGastosFijos();
     renderGrafico(); 
     mostrarMsg('msg_gastos_fijos', currentLang === 'es' ? 'Gastos guardados.' : 'Costs saved.', 'ok');
   }
@@ -638,7 +629,7 @@ function renderMantenimientos() {
 function renderSelects() {
   const opts = state.vehiculos.map(v => `<option value="${v.id}">${esc(v.matricula)} — ${esc(v.marca)} ${esc(v.modelo)}</option>`).join('');
   
-  ['m_vehiculo','i_vehiculo','g_vehiculo','rec_vehiculo', 'gf_vehiculo'].forEach(id => {
+  ['m_vehiculo','i_vehiculo','g_vehiculo','rec_vehiculo'].forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
     const prev = sel.value;
@@ -681,7 +672,6 @@ function renderGrafico() {
   let lista = state.mantenimientos;
   if (vehiculoId) lista = lista.filter(m => m.vehiculoId === vehiculoId);
 
-  // Recopilar años para el selector (solo si estamos en modo meses)
   const aniosDisponibles = [...new Set(lista.filter(m => m.fecha).map(m => m.fecha.split('-')[0]))].sort();
   
   if (modo === 'meses') {
@@ -736,11 +726,10 @@ function renderGrafico() {
             const fijos = (parseFloat(v.costeSeguro)||0) + (parseFloat(v.costeItv)||0);
             const indexActual = etiquetas.indexOf(anioActual);
             if (indexActual !== -1) {
-                dataMano[indexActual] += fijos; // Los metemos como mano de obra para que se vean
+                dataMano[indexActual] += fijos;
             }
         }
     } else {
-        // Sumar todos los fijos de todos los vehículos al año actual
         let fijosTotales = 0;
         state.vehiculos.forEach(v => fijosTotales += (parseFloat(v.costeSeguro)||0) + (parseFloat(v.costeItv)||0));
         const indexActual = etiquetas.indexOf(anioActual);
@@ -752,7 +741,6 @@ function renderGrafico() {
     gastoTotal = dataMano.reduce((s, v) => s + v, 0) + dataPiezas.reduce((s, v) => s + v, 0);
 
   } else {
-    // Modo Meses
     const anioSeleccionado = selectAnio.value || aniosDisponibles[0] || new Date().getFullYear();
     const gastosPorMes = Array(12).fill(0).map(() => ({ mano: 0, piezas: 0 }));
 

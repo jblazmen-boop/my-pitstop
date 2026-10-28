@@ -44,7 +44,6 @@
   <div class="tabs">
     <button class="tab active" data-tab="vehiculos" title="Vehículos" data-i18n-title="vehiculos_titulo"><img src="icono-coche.png" class="tab-icon" alt="Vehículos"></button>
     <button class="tab" data-tab="mantenimientos" title="Mantenimientos" data-i18n-title="historial"><img src="icono-llave.png" class="tab-icon" alt="Mantenimientos"></button>
-    <button class="tab" data-tab="gastos_fijos" title="Gastos Fijos" data-i18n-title="gastos_fijos"><span style="font-size: 35px; line-height: 1;">💰</span></button>
     <button class="tab" data-tab="informe" title="Generar Informe" data-i18n-title="gen_informe"><img src="icono-libro.png" class="tab-icon" alt="Informes"></button>
     <button class="tab" data-tab="recordatorios" title="Avisos" data-i18n-title="recordatorios"><img src="icono-calendario.PNG" class="tab-icon" alt="Calendario"></button>
     <button class="tab" data-tab="grafico" title="Estadísticas" data-i18n-title="estadisticas"><img src="icono-grafico.PNG" class="tab-icon" alt="Gráfico"></button>
@@ -156,53 +155,6 @@
     </table>
   </div>
 
-  <!-- GASTOS FIJOS -->
-  <div id="gastos_fijos" class="panel">
-    <h2 data-i18n="gastos_fijos">Gastos Fijos (Seguro e ITV)</h2>
-    <p style="color: #9ca3af; margin-bottom: 20px;" data-i18n="gastos_fijos_texto">Añade aquí el coste de tu seguro y de la tasa de la ITV para que se sumen al total de gastos del vehículo.</p>
-    
-    <div class="grid" style="grid-template-columns: 1fr;">
-      <div>
-        <label data-i18n="vehiculo">Vehículo</label>
-        <select id="gf_vehiculo" onchange="cargarGastosFijos()">
-          <option value="" data-i18n="selecciona">— Selecciona —</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="grid-avisos" style="grid-template-columns: 1fr 1fr;">
-      <div>
-        <label data-i18n="coste_seguro">Coste Seguro (Anual)</label>
-        <input type="number" step="0.01" id="gf_seguro" placeholder="Ej: 350.00">
-      </div>
-      <div>
-        <label data-i18n="coste_itv">Coste Tasa ITV (Aprox)</label>
-        <input type="number" step="0.01" id="gf_itv" placeholder="Ej: 45.00">
-      </div>
-    </div>
-    
-    <div style="margin-top: 15px;">
-      <button class="primary" data-i18n="guardar" onclick="guardarGastosFijos()">Guardar Datos</button>
-    </div>
-    
-    <div id="msg_gastos_fijos"></div>
-
-    <!-- TABLA RESUMEN GASTOS FIJOS -->
-    <h3 style="margin-top: 30px; color: #e2e8f0;" data-i18n="resumen_fijos">Resumen Fijos</h3>
-    <table style="margin-top: 10px;">
-      <thead>
-        <tr>
-          <th data-i18n="vehiculo">Vehículo</th>
-          <th data-i18n="coste_seguro">Seguro Anual</th>
-          <th data-i18n="coste_itv">Tasa ITV</th>
-        </tr>
-      </thead>
-      <tbody id="tabla_gastos_fijos_body">
-        <!-- Aquí se cargarán los avisos -->
-      </tbody>
-    </table>
-  </div>
-
   <!-- RECORDATORIOS -->
   <div id="recordatorios" class="panel">
     <h2 data-i18n="recordatorios">Avisos y Recordatorios</h2>
@@ -279,14 +231,14 @@
     </table>
   </div>
 
-  <!-- GRÁFICO DE GASTOS -->
+  <!-- GRÁFICO DE GASTOS Y GASTOS FIJOS INTEGRADOS -->
   <div id="grafico" class="panel">
     <h2 data-i18n="estadisticas">Estadísticas de Gasto</h2>
     
     <div class="grid">
       <div>
         <label data-i18n="vehiculo">Vehículo</label>
-        <select id="g_vehiculo" onchange="renderGrafico()">
+        <select id="g_vehiculo" onchange="renderGrafico(); cargarGastosFijos();">
           <option value="" data-i18n="todos">Todos</option>
         </select>
       </div>
@@ -307,14 +259,36 @@
 
     <div style="display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap;">
       
-      <!-- Panel del total (Ahora suma mecánica + fijos) -->
-      <div style="flex: 1; min-width: 200px; background: rgba(17, 24, 39, 0.85); padding: 20px; border-radius: 8px; border: 1px solid #374151; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: inset 0 0 20px rgba(225, 29, 72, 0.1);">
-        <h3 style="color: #9ca3af; margin: 0 0 10px 0; font-size: 14px;" data-i18n="gasto_total_mix">Gasto Total (Mecánica + Fijos)</h3>
-        <span id="texto_gasto_total" style="font-size: 36px; font-weight: bold; color: #e11d48; text-shadow: 0 0 10px rgba(225, 29, 72, 0.5);">0.00 €</span>
+      <!-- COLUMNA IZQUIERDA: TOTAL Y GASTOS FIJOS -->
+      <div style="flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 20px;">
+        
+        <!-- Panel del total -->
+        <div style="background: rgba(17, 24, 39, 0.85); padding: 20px; border-radius: 8px; border: 1px solid #374151; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: inset 0 0 20px rgba(225, 29, 72, 0.1);">
+          <h3 style="color: #9ca3af; margin: 0 0 10px 0; font-size: 14px;" data-i18n="gasto_total_mix">Gasto Total (Mecánica + Fijos)</h3>
+          <span id="texto_gasto_total" style="font-size: 36px; font-weight: bold; color: #e11d48; text-shadow: 0 0 10px rgba(225, 29, 72, 0.5);">0.00 €</span>
+        </div>
+
+        <!-- Panel Gastos Fijos (Movido aquí) -->
+        <div style="background: rgba(17, 24, 39, 0.85); padding: 15px; border-radius: 8px; border: 1px solid #374151;">
+          <h3 style="color: #e11d48; font-size: 14px; margin-top: 0; margin-bottom: 15px; text-transform: uppercase;" data-i18n="gastos_fijos">Gastos Fijos (Seguro e ITV)</h3>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div>
+              <label data-i18n="coste_seguro">Coste Seguro (Anual)</label>
+              <input type="number" step="0.01" id="gf_seguro" placeholder="Ej: 350.00">
+            </div>
+            <div>
+              <label data-i18n="coste_itv">Coste Tasa ITV (Aprox)</label>
+              <input type="number" step="0.01" id="gf_itv" placeholder="Ej: 45.00">
+            </div>
+            <button class="secondary" style="width: 100%; margin-top: 5px;" data-i18n="guardar" onclick="guardarGastosFijos()">Guardar Fijos</button>
+            <div id="msg_gastos_fijos"></div>
+          </div>
+        </div>
+
       </div>
       
-      <!-- Gráfico -->
-      <div style="flex: 3; min-width: 300px; background: rgba(17, 24, 39, 0.85); padding: 20px; border-radius: 8px; border: 1px solid #374151; height: 400px;">
+      <!-- COLUMNA DERECHA: GRÁFICO -->
+      <div style="flex: 2; min-width: 300px; background: rgba(17, 24, 39, 0.85); padding: 20px; border-radius: 8px; border: 1px solid #374151; height: 400px;">
         <canvas id="miGrafico"></canvas>
       </div>
 
