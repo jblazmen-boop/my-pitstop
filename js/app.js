@@ -43,8 +43,10 @@ const translations = {
     guardar: "Guardar Datos", estado: "Estado", 
     itv_ok: "En regla", itv_warn: "Próximo", itv_danger: "Caducado", sin_fecha: "Sin fecha",
     itv_nombre: "Revisión ITV", prox_itv: "Próxima ITV",
-    modo_grafico: "Ver por:", anios: "Años", meses: "Meses", anio_grafico: "Año:", gasto_total: "Gasto Total",
-    aviso_horizontal: "Para una mejor experiencia, gira tu dispositivo a horizontal."
+    modo_grafico: "Ver por:", anios: "Años", meses: "Meses", anio_grafico: "Año:", gasto_total: "Gasto Total", gasto_total_mix: "Gasto Total (Mecánica + Fijos)",
+    aviso_horizontal: "Para una mejor experiencia, gira tu dispositivo a horizontal.",
+    gastos_fijos: "Gastos Fijos (Seguro e ITV)", gastos_fijos_texto: "Añade aquí el coste de tu seguro y de la tasa de la ITV para que se sumen al total de gastos del vehículo.",
+    coste_seguro: "Coste Seguro (Anual)", coste_itv: "Coste Tasa ITV (Aprox)", resumen_fijos: "Resumen Fijos"
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -80,8 +82,10 @@ const translations = {
     guardar: "Save Data", estado: "Status", 
     itv_ok: "Valid", itv_warn: "Due soon", itv_danger: "Expired", sin_fecha: "No date",
     itv_nombre: "MOT Inspection", prox_itv: "Next Vehicle Inspection",
-    modo_grafico: "View by:", anios: "Years", meses: "Months", anio_grafico: "Year:", gasto_total: "Total Expense",
-    aviso_horizontal: "For a better experience, rotate your device to landscape."
+    modo_grafico: "View by:", anios: "Years", meses: "Months", anio_grafico: "Year:", gasto_total: "Total Expense", gasto_total_mix: "Total Expense (Mechanics + Fixed)",
+    aviso_horizontal: "For a better experience, rotate your device to landscape.",
+    gastos_fijos: "Fixed Costs (Insurance & MOT)", gastos_fijos_texto: "Add the cost of your insurance and MOT fee here so they add up to the vehicle's total expenses.",
+    coste_seguro: "Insurance Cost (Annual)", coste_itv: "MOT Fee (Approx)", resumen_fijos: "Fixed Summary"
   }
 };
 
@@ -144,6 +148,7 @@ function translatePage() {
   renderAll(); 
   renderGrafico(); 
   cargarRecordatorios(); 
+  cargarGastosFijos();
 }
 
 function setLanguage(lang) {
@@ -170,6 +175,8 @@ function cargar() {
         if (!v.proxItv) v.proxItv = ''; 
         if (!v.ultItvFecha) v.ultItvFecha = '';
         if (!v.ultItvKm) v.ultItvKm = '';
+        if (!v.costeSeguro) v.costeSeguro = '';
+        if (!v.costeItv) v.costeItv = '';
       });
 
       state.mantenimientos.forEach(m => {
@@ -212,6 +219,7 @@ document.querySelectorAll('.tab').forEach(t => {
     
     if (t.dataset.tab === 'grafico') renderGrafico();
     if (t.dataset.tab === 'recordatorios') cargarRecordatorios();
+    if (t.dataset.tab === 'gastos_fijos') cargarGastosFijos();
   };
 });
 
@@ -226,7 +234,7 @@ function addVehiculo() {
     mostrarMsg('msg_vehiculo', currentLang === 'es' ? 'Ya existe un vehículo con esa matrícula.' : 'A vehicle with that plate already exists.', 'err'); return;
   }
   
-  state.vehiculos.push({ id: uid(), matricula: mat, marca, modelo, bastidor, proxMant: '', proxKmMant: '', proxItv: '', ultItvFecha: '', ultItvKm: '' });
+  state.vehiculos.push({ id: uid(), matricula: mat, marca, modelo, bastidor, proxMant: '', proxKmMant: '', proxItv: '', ultItvFecha: '', ultItvKm: '', costeSeguro: '', costeItv: '' });
   guardar();
   document.getElementById('v_matricula').value = '';
   document.getElementById('v_marca').value = '';
@@ -235,6 +243,7 @@ function addVehiculo() {
   mostrarMsg('msg_vehiculo', currentLang === 'es' ? 'Vehículo añadido.' : 'Vehicle added.', 'ok');
   renderAll();
   cargarRecordatorios();
+  cargarGastosFijos();
 }
 
 function editarVehiculo(id) {
@@ -247,14 +256,14 @@ function editarVehiculo(id) {
   v.marca = marca;
   v.modelo = modelo;
   v.bastidor = bastidor.toUpperCase();
-  guardar(); renderAll(); cargarRecordatorios();
+  guardar(); renderAll(); cargarRecordatorios(); cargarGastosFijos();
 }
 
 function eliminarVehiculo(id) {
   if (!confirm(currentLang === 'es' ? '¿Eliminar vehículo y todos sus mantenimientos?' : 'Delete vehicle and all its maintenance records?')) return;
   state.vehiculos = state.vehiculos.filter(v => v.id !== id);
   state.mantenimientos = state.mantenimientos.filter(m => m.vehiculoId !== id);
-  guardar(); renderAll(); cargarRecordatorios();
+  guardar(); renderAll(); cargarRecordatorios(); cargarGastosFijos();
 }
 
 function addManoObra() {
@@ -515,6 +524,56 @@ function verDesglose(id) {
   alert(texto);
 }
 
+// ============ GASTOS FIJOS ============
+function cargarGastosFijos() {
+  const sel = document.getElementById('gf_vehiculo');
+  if (!sel) return;
+  const vehiculoId = sel.value;
+  
+  const seguroInput = document.getElementById('gf_seguro');
+  const itvInput = document.getElementById('gf_itv');
+  const tbody = document.getElementById('tabla_gastos_fijos_body');
+  tbody.innerHTML = '';
+
+  if (vehiculoId) {
+    const v = state.vehiculos.find(x => x.id === vehiculoId);
+    if (v) {
+      seguroInput.value = v.costeSeguro || '';
+      itvInput.value = v.costeItv || '';
+    }
+  }
+
+  state.vehiculos.forEach(v => {
+    const seguro = v.costeSeguro ? fmt(v.costeSeguro) : '—';
+    const itv = v.costeItv ? fmt(v.costeItv) : '—';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${esc(v.matricula)}</td>
+      <td>${seguro}</td>
+      <td>${itv}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function guardarGastosFijos() {
+  const vehiculoId = document.getElementById('gf_vehiculo').value;
+  const seguro = document.getElementById('gf_seguro').value;
+  const itv = document.getElementById('gf_itv').value;
+  
+  if (!vehiculoId) { mostrarMsg('msg_gastos_fijos', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err'); return; }
+  
+  const v = state.vehiculos.find(x => x.id === vehiculoId);
+  if (v) {
+    v.costeSeguro = seguro;
+    v.costeItv = itv;
+    
+    guardar();
+    cargarGastosFijos();
+    renderGrafico(); 
+    mostrarMsg('msg_gastos_fijos', currentLang === 'es' ? 'Gastos guardados.' : 'Costs saved.', 'ok');
+  }
+}
+
 // ============ RENDER ============
 function renderAll() {
   renderVehiculos();
@@ -579,7 +638,7 @@ function renderMantenimientos() {
 function renderSelects() {
   const opts = state.vehiculos.map(v => `<option value="${v.id}">${esc(v.matricula)} — ${esc(v.marca)} ${esc(v.modelo)}</option>`).join('');
   
-  ['m_vehiculo','i_vehiculo','g_vehiculo','rec_vehiculo'].forEach(id => {
+  ['m_vehiculo','i_vehiculo','g_vehiculo','rec_vehiculo', 'gf_vehiculo'].forEach(id => {
     const sel = document.getElementById(id);
     if (!sel) return;
     const prev = sel.value;
@@ -610,7 +669,7 @@ function mostrarMsg(id, texto, tipo) {
   setTimeout(() => { el.innerHTML = ''; }, 4000);
 }
 
-// ============ GRÁFICO ESTILO RACING MEJORADO ============
+// ============ GRÁFICO ESTILO RACING MEJORADO (Suma Fijos) ============
 function renderGrafico() {
   if (typeof Chart === 'undefined') return; 
 
@@ -658,8 +717,37 @@ function renderGrafico() {
     });
 
     etiquetas = Object.keys(gastosPorAnio).sort();
+    
+    // Añadir los gastos fijos al año en curso
+    const anioActual = new Date().getFullYear().toString();
+    if (!etiquetas.includes(anioActual) && (vehiculoId || state.vehiculos.some(v => v.costeSeguro || v.costeItv))) {
+        etiquetas.push(anioActual);
+        etiquetas.sort();
+        gastosPorAnio[anioActual] = { mano: 0, piezas: 0 };
+    }
+
     dataMano = etiquetas.map(a => gastosPorAnio[a].mano);
     dataPiezas = etiquetas.map(a => gastosPorAnio[a].piezas);
+    
+    // Sumar los fijos al año actual
+    if (vehiculoId) {
+        const v = state.vehiculos.find(x => x.id === vehiculoId);
+        if (v) {
+            const fijos = (parseFloat(v.costeSeguro)||0) + (parseFloat(v.costeItv)||0);
+            const indexActual = etiquetas.indexOf(anioActual);
+            if (indexActual !== -1) {
+                dataMano[indexActual] += fijos; // Los metemos como mano de obra para que se vean
+            }
+        }
+    } else {
+        // Sumar todos los fijos de todos los vehículos al año actual
+        let fijosTotales = 0;
+        state.vehiculos.forEach(v => fijosTotales += (parseFloat(v.costeSeguro)||0) + (parseFloat(v.costeItv)||0));
+        const indexActual = etiquetas.indexOf(anioActual);
+        if (indexActual !== -1) {
+            dataMano[indexActual] += fijosTotales;
+        }
+    }
     
     gastoTotal = dataMano.reduce((s, v) => s + v, 0) + dataPiezas.reduce((s, v) => s + v, 0);
 
@@ -679,6 +767,18 @@ function renderGrafico() {
         gastosPorMes[mesIndex].piezas += m.piezas;
       }
     });
+
+    // En el modo meses, sumamos los gastos fijos al mes de Enero
+    if (anioSeleccionado == new Date().getFullYear().toString()) {
+        if (vehiculoId) {
+            const v = state.vehiculos.find(x => x.id === vehiculoId);
+            if (v) gastosPorMes[0].mano += (parseFloat(v.costeSeguro)||0) + (parseFloat(v.costeItv)||0);
+        } else {
+            let fijosTotales = 0;
+            state.vehiculos.forEach(v => fijosTotales += (parseFloat(v.costeSeguro)||0) + (parseFloat(v.costeItv)||0));
+            gastosPorMes[0].mano += fijosTotales;
+        }
+    }
 
     etiquetas = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
     if (currentLang === 'en') etiquetas = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -707,7 +807,7 @@ function renderGrafico() {
       labels: etiquetas,
       datasets: [
         {
-          label: translations[currentLang].mano_obra,
+          label: translations[currentLang].mano_obra + ' + Fijos',
           data: dataMano,
           borderColor: '#e11d48', 
           backgroundColor: gradientMano,
@@ -1081,7 +1181,6 @@ function generarPDF(accion = false) {
 
     const nombre = tipoInforme === 'historico' ? `Historico_${v.matricula}.pdf` : `Factura_${v.matricula}.pdf`;
     
-    // LÓGICA DE ENVÍO (WhatsApp / Correo / Descarga)
     if (accion && navigator.share && navigator.canShare) {
       const pdfBlob = doc.output('blob');
       const file = new File([pdfBlob], nombre, { type: 'application/pdf' });
@@ -1108,7 +1207,6 @@ function generarPDF(accion = false) {
       }
     }
     
-    // Si no es compatible o es descarga normal
     doc.save(nombre);
     mostrarMsg('msg_informe', currentLang === 'es' ? 'PDF generado y descargado.' : 'PDF generated and downloaded.', 'ok');
 
@@ -1188,7 +1286,6 @@ function comprobarRecordatorioBackup() {
 // ============ AVISO DE GIRO EN MÓVIL ============
 function mostrarAvisoGiro() {
   if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
-    // Solo mostramos el aviso si es móvil y está en vertical
     if (!sessionStorage.getItem('aviso_giro_mostrado')) {
       mostrarMsg('msg_mantenimiento', translations[currentLang].aviso_horizontal, 'ok');
       sessionStorage.setItem('aviso_giro_mostrado', 'true');

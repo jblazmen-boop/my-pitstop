@@ -140,6 +140,19 @@ header h1 {
   transform: translateY(-2px);
 }
 
+/* Estilo extra para el emoji del icono de gastos */
+.tab span { 
+  transition: all 0.3s ease;
+}
+.tab:hover span { 
+  transform: translateY(-5px); 
+  text-shadow: 0 0 15px rgba(225, 29, 72, 0.8); 
+}
+.tab.active span { 
+  transform: translateY(-2px);
+  text-shadow: 0 0 20px rgba(225, 29, 72, 1); 
+}
+
 .panel { 
   display: none; 
   background: rgba(31, 41, 55, 0.9) !important; 
@@ -270,7 +283,7 @@ input[type="checkbox"] {
   .title-block { align-items: center; }
   .lang-switch { width: auto; justify-content: center; margin-top: 10px; }
   .tabs { gap: 10px; margin-bottom: 20px; }
-  .tab-icon { height: 60px; width: 60px; }
+  .tab-icon, .tab span { height: 60px; width: 60px; font-size: 30px !important; display: flex; align-items: center; justify-content: center; }
   .container { padding: 0 10px; margin-top: 10px; }
   .panel { padding: 15px; border-left-width: 4px; }
   h2 { font-size: 16px; }
