@@ -729,13 +729,11 @@ function cargarRecordatorios() {
     };
 
     const kmMantFormat = v.proxKmMant ? `<span style="color: #38bdf8; font-weight: bold;">${v.proxKmMant} Kms</span><br>` : '';
-    // AQUI: Mostramos los Kms de la ultima ITV pasada, no los futuros.
-    const kmItvFormat = v.ultItvKm ? `<span style="color: #38bdf8; font-weight: bold;">${v.ultItvKm} Kms</span><br>` : '';
 
     const tr = document.createElement('tr');
     tr.innerHTML = `<td>${esc(v.matricula)}</td>
       <td>${kmMantFormat}${formatDate(v.proxMant)}</td>
-      <td>${kmItvFormat}${formatDate(v.proxItv)}</td>`;
+      <td>${formatDate(v.proxItv)}</td>`; // <-- Aquí ya solo sale la fecha de ITV
     tbody.appendChild(tr);
   });
 }
@@ -760,7 +758,6 @@ function guardarRecordatorio() {
     v.ultItvFecha = itvPasada;
     v.ultItvKm = itvKmPasada;
 
-    // LÓGICA PARA REGISTRAR LA ITV PASADA EN EL HISTORIAL
     if (itvPasada) {
       const itvExistente = state.mantenimientos.find(m => 
         m.vehiculoId === vehiculoId && 
