@@ -42,7 +42,7 @@ const translations = {
     fecha_pasada_itv: "Fecha Pasada ITV", km_itv_pasada: "Kms de esa ITV",
     guardar: "Guardar Datos", estado: "Estado", 
     itv_ok: "En regla", itv_warn: "Próximo", itv_danger: "Caducado", sin_fecha: "Sin fecha",
-    itv_nombre: "Revisión ITV (Registrada)"
+    itv_nombre: "Revisión ITV (Registrada)", prox_itv: "Próxima ITV"
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -77,7 +77,7 @@ const translations = {
     fecha_pasada_itv: "Last Insp. Date", km_itv_pasada: "Miles at Last Insp.",
     guardar: "Save Data", estado: "Status", 
     itv_ok: "Valid", itv_warn: "Due soon", itv_danger: "Expired", sin_fecha: "No date",
-    itv_nombre: "MOT Inspection (Recorded)"
+    itv_nombre: "MOT Inspection (Recorded)", prox_itv: "Next Vehicle Inspection"
   }
 };
 
@@ -617,7 +617,7 @@ function renderGrafico() {
   const gastosPorAnio = {};
   lista.forEach(m => {
     if (!m.fecha) return;
-    // Ignoramos las ITVs en la gráfica
+    // AQUI FILTRAMOS: Si el taller es 'ITV' o el concepto es la revisión ITV, lo ignoramos para el gráfico
     if (m.taller === 'ITV' || (m.manoObra && m.manoObra.some(o => o.concepto.includes('ITV')))) return;
 
     const anio = m.fecha.split('-')[0];
