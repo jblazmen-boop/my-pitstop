@@ -158,34 +158,48 @@
   <!-- RECORDATORIOS -->
   <div id="recordatorios" class="panel">
     <h2 data-i18n="recordatorios">Avisos y Recordatorios</h2>
-    <p style="color: #9ca3af; margin-bottom: 20px;" data-i18n="recordatorios_texto">Aquí puedes gestionar los Kms y fechas de tus próximos mantenimientos e ITV.</p>
     
-    <div class="grid-avisos">
+    <div class="grid" style="grid-template-columns: 1fr;">
       <div>
         <label data-i18n="vehiculo">Vehículo</label>
         <select id="rec_vehiculo" onchange="cargarRecordatorios()">
           <option value="" data-i18n="selecciona">— Selecciona —</option>
         </select>
       </div>
-      <div></div> <!-- Hueco -->
     </div>
 
-    <div class="grid-avisos">
-      <div>
-        <label data-i18n="fecha_prox_mant">Fecha Próx. Mantenimiento</label>
-        <input type="date" id="rec_mant">
+    <!-- BLOQUE MANTENIMIENTO -->
+    <div style="background: rgba(17, 24, 39, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #374151; margin-bottom: 20px;">
+      <h3 style="color: #e11d48; font-size: 16px; margin-top: 0; margin-bottom: 15px;" data-i18n="prox_mant">Próximo Mantenimiento</h3>
+      <div class="grid-avisos">
+        <div>
+          <label data-i18n="fecha_prox_mant">Fecha Próx. Mantenimiento</label>
+          <input type="date" id="rec_mant">
+        </div>
+        <div>
+          <label data-i18n="km_prox_mant">Kms Próx. Mantenimiento</label>
+          <input type="number" id="rec_km_mant" placeholder="Ej: 100000">
+        </div>
       </div>
-      <div>
-        <label data-i18n="km_prox_mant">Kms Próx. Mantenimiento</label>
-        <input type="number" id="rec_km_mant" placeholder="Ej: 100000">
-      </div>
-      <div>
-        <label data-i18n="fecha_prox_itv">Fecha Próx. ITV</label>
-        <input type="date" id="rec_itv">
-      </div>
-      <div>
-        <label data-i18n="km_itv">Kms de la ITV</label>
-        <input type="number" id="rec_km_itv" placeholder="Ej: 105000">
+    </div>
+
+    <!-- BLOQUE ITV -->
+    <div style="background: rgba(17, 24, 39, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #374151; margin-bottom: 20px;">
+      <h3 style="color: #e11d48; font-size: 16px; margin-top: 0; margin-bottom: 15px;" data-i18n="itv">ITV</h3>
+      <div class="grid-avisos">
+        <div>
+          <label data-i18n="fecha_prox_itv">Fecha Próx. ITV</label>
+          <input type="date" id="rec_itv">
+        </div>
+        <div></div> <!-- Hueco -->
+        <div>
+          <label data-i18n="fecha_pasada_itv">Fecha Pasada ITV</label>
+          <input type="date" id="rec_itv_pasada">
+        </div>
+        <div>
+          <label data-i18n="km_itv_pasada">Kms de esa ITV</label>
+          <input type="number" id="rec_km_itv_pasada" placeholder="Ej: 105000">
+        </div>
       </div>
     </div>
     
@@ -195,7 +209,9 @@
     
     <div id="msg_recordatorios"></div>
 
-    <table style="margin-top: 20px;">
+    <!-- TABLA RESUMEN (Ahora más limpia) -->
+    <h3 style="margin-top: 30px; color: #e2e8f0;" data-i18n="resumen_avisos">Resumen de Avisos</h3>
+    <table style="margin-top: 10px;">
       <thead>
         <tr>
           <th data-i18n="vehiculo">Vehículo</th>

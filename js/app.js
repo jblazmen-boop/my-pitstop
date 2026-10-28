@@ -34,12 +34,13 @@ const translations = {
     pdf_iva: "IVA", pdf_total: "TOTAL FACTURA:", pdf_servicios: "Servicio / Mano de Obra", pdf_materiales: "Materiales / Repuestos",
     pdf_taller_txt: "Taller:", modo_generacion: "Modo de generación", por_fechas: "Por rango de fechas", 
     por_seleccion: "Seleccionando mantenimientos", selecciona_mant: "Selecciona los mantenimientos para incluir en la factura",
-    estadisticas: "Estadísticas de Gasto", recordatorios: "Avisos y Recordatorios", recordatorios_texto: "Aquí puedes gestionar los Kms y fechas de tus próximos mantenimientos e ITV.",
-    fecha_prox_mant: "Fecha Próx. Mantenimiento", km_prox_mant: "Kms Próx. Mantenimiento", km_itv: "Kms de la ITV",
-    fecha_prox_itv: "Fecha Próx. ITV", prox_mant: "Próximo Mantenimiento", prox_itv: "Próxima ITV",
+    estadisticas: "Estadísticas de Gasto", recordatorios: "Avisos y Recordatorios", 
+    prox_mant: "Próximo Mantenimiento", itv: "ITV", resumen_avisos: "Resumen de Avisos",
+    fecha_prox_mant: "Fecha Próx. Mantenimiento", km_prox_mant: "Kms Próx. Mantenimiento", 
+    fecha_prox_itv: "Fecha Próx. ITV", fecha_pasada_itv: "Fecha Pasada ITV", km_itv_pasada: "Kms de esa ITV",
     guardar: "Guardar Datos", estado: "Estado", 
     itv_ok: "En regla", itv_warn: "Próximo", itv_danger: "Caducado", sin_fecha: "Sin fecha",
-    itv_nombre: "Revisión ITV (Automática)"
+    itv_nombre: "Revisión ITV (Registrada)"
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -66,12 +67,13 @@ const translations = {
     pdf_iva: "VAT", pdf_total: "TOTAL INVOICE:", pdf_servicios: "Service / Labor", pdf_materiales: "Materials / Parts",
     pdf_taller_txt: "Workshop:", modo_generacion: "Generation mode", por_fechas: "By date range", 
     por_seleccion: "Selecting records", selecciona_mant: "Select maintenance records to include in the invoice",
-    estadisticas: "Expense Statistics", recordatorios: "Reminders & Alerts", recordatorios_texto: "Here you can manage the Miles and dates of your next maintenance and vehicle inspections.",
-    fecha_prox_mant: "Next Maint. Date", km_prox_mant: "Next Maint. Miles", km_itv: "MOT Miles",
-    fecha_prox_itv: "Next Insp. Date", prox_mant: "Next Maintenance", prox_itv: "Next Inspection",
+    estadisticas: "Expense Statistics", recordatorios: "Reminders & Alerts", 
+    prox_mant: "Next Maintenance", itv: "Vehicle Inspection", resumen_avisos: "Alerts Summary",
+    fecha_prox_mant: "Next Maint. Date", km_prox_mant: "Next Maint. Miles", 
+    fecha_prox_itv: "Next Insp. Date", fecha_pasada_itv: "Last Insp. Date", km_itv_pasada: "Miles at Last Insp.",
     guardar: "Save Data", estado: "Status", 
     itv_ok: "Valid", itv_warn: "Due soon", itv_danger: "Expired", sin_fecha: "No date",
-    itv_nombre: "MOT Inspection (Auto)"
+    itv_nombre: "MOT Inspection (Recorded)"
   }
 };
 
@@ -158,7 +160,8 @@ function cargar() {
         if (!v.proxMant) v.proxMant = ''; 
         if (!v.proxKmMant) v.proxKmMant = ''; 
         if (!v.proxItv) v.proxItv = ''; 
-        if (!v.proxKmItv) v.proxKmItv = ''; 
+        if (!v.ultItvFecha) v.ultItvFecha = '';
+        if (!v.ultItvKm) v.ultItvKm = '';
       });
 
       state.mantenimientos.forEach(m => {
@@ -215,7 +218,7 @@ function addVehiculo() {
     mostrarMsg('msg_vehiculo', currentLang === 'es' ? 'Ya existe un vehículo con esa matrícula.' : 'A vehicle with that plate already exists.', 'err'); return;
   }
   
-  state.vehiculos.push({ id: uid(), matricula: mat, marca, modelo, bastidor, proxMant: '', proxKmMant: '', proxItv: '', proxKmItv: '' });
+  state.vehiculos.push({ id: uid(), matricula: mat, marca, modelo, bastidor, proxMant: '', proxKmMant: '', proxItv: '', ultItvFecha: '', ultItvKm: '' });
   guardar();
   document.getElementById('v_matricula').value = '';
   document.getElementById('v_marca').value = '';
@@ -599,7 +602,7 @@ function mostrarMsg(id, texto, tipo) {
   setTimeout(() => { el.innerHTML = ''; }, 4000);
 }
 
-// ============ NUEVO: GRÁFICO ESTILO RACING ============
+// ============ GRÁFICO ESTILO RACING ============
 function renderGrafico() {
   if (typeof Chart === 'undefined') return; 
 
@@ -679,25 +682,29 @@ function renderGrafico() {
   });
 }
 
-// ============ RECORDATORIOS (Km, Fecha e ITV Automática) ============
+// ============ RECORDATORIOS Y AVISOS ============
 function cargarRecordatorios() {
   const sel = document.getElementById('rec_vehiculo');
   if (!sel) return;
   const vehiculoId = sel.value;
-  const kmInput = document.getElementById('rec_km_mant');
+  
   const mantInput = document.getElementById('rec_mant');
+  const kmMantInput = document.getElementById('rec_km_mant');
   const itvInput = document.getElementById('rec_itv');
-  const kmItvInput = document.getElementById('rec_km_itv');
+  const itvPasadaInput = document.getElementById('rec_itv_pasada');
+  const kmItvPasadaInput = document.getElementById('rec_km_itv_pasada');
+  
   const tbody = document.getElementById('tabla_recordatorios_body');
   tbody.innerHTML = '';
 
   if (vehiculoId) {
     const v = state.vehiculos.find(x => x.id === vehiculoId);
     if (v) {
-      kmInput.value = v.proxKmMant || '';
       mantInput.value = v.proxMant || '';
+      kmMantInput.value = v.proxKmMant || '';
       itvInput.value = v.proxItv || '';
-      kmItvInput.value = v.proxKmItv || '';
+      itvPasadaInput.value = v.ultItvFecha || '';
+      kmItvPasadaInput.value = v.ultItvKm || '';
     }
   }
 
@@ -717,12 +724,12 @@ function cargarRecordatorios() {
       return `<span style="color: ${color}; font-weight: bold;">${fechaMostrar}</span>`;
     };
 
-    const kmFormat = v.proxKmMant ? `<span style="color: #38bdf8; font-weight: bold;">${v.proxKmMant} Kms</span>` : '—';
+    const kmMantFormat = v.proxKmMant ? `<span style="color: #38bdf8; font-weight: bold;">${v.proxKmMant} Kms</span><br>` : '';
     const kmItvFormat = v.proxKmItv ? `<span style="color: #38bdf8; font-weight: bold;">${v.proxKmItv} Kms</span><br>` : '';
 
     const tr = document.createElement('tr');
     tr.innerHTML = `<td>${esc(v.matricula)}</td>
-      <td>${kmFormat}<br>${formatDate(v.proxMant)}</td>
+      <td>${kmMantFormat}${formatDate(v.proxMant)}</td>
       <td>${kmItvFormat}${formatDate(v.proxItv)}</td>`;
     tbody.appendChild(tr);
   });
@@ -730,52 +737,59 @@ function cargarRecordatorios() {
 
 function guardarRecordatorio() {
   const vehiculoId = document.getElementById('rec_vehiculo').value;
-  const km = document.getElementById('rec_km_mant').value;
-  const mant = document.getElementById('rec_mant').value;
-  const itv = document.getElementById('rec_itv').value;
-  const kmItv = document.getElementById('rec_km_itv').value;
+  
+  const mantFecha = document.getElementById('rec_mant').value;
+  const mantKm = document.getElementById('rec_km_mant').value;
+  
+  const itvProx = document.getElementById('rec_itv').value;
+  const itvPasada = document.getElementById('rec_itv_pasada').value;
+  const itvKmPasada = document.getElementById('rec_km_itv_pasada').value;
   
   if (!vehiculoId) { mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err'); return; }
   
   const v = state.vehiculos.find(x => x.id === vehiculoId);
   if (v) {
-    v.proxKmMant = km;
-    v.proxMant = mant;
-    v.proxItv = itv;
-    v.proxKmItv = kmItv;
+    v.proxMant = mantFecha;
+    v.proxKmMant = mantKm;
+    v.proxItv = itvProx;
+    v.ultItvFecha = itvPasada;
+    v.ultItvKm = itvKmPasada;
 
-    // LÓGICA PARA REGISTRAR LA ITV EN EL HISTORIAL
-    if (itv) {
-      // Buscar si ya existe un registro de ITV para este vehículo con esta misma fecha
+    // LÓGICA PARA REGISTRAR LA ITV PASADA EN EL HISTORIAL
+    if (itvPasada) {
+      // Buscar si ya existe un registro de ITV con esta fecha
       const itvExistente = state.mantenimientos.find(m => 
         m.vehiculoId === vehiculoId && 
-        m.tipo === 'type_10' && // Usamos Otro/ITV
-        m.fecha === itv &&
+        m.tipo === 'type_10' && 
+        m.fecha === itvPasada &&
         m.taller === 'ITV'
       );
 
       if (!itvExistente) {
-        // Creamos un registro automático para el historial
         state.mantenimientos.push({
           id: uid(),
           vehiculoId: vehiculoId,
-          fecha: itv,
-          km: Number(kmItv) || 0,
-          tipo: 'type_10', // Otro
+          fecha: itvPasada,
+          km: Number(itvKmPasada) || 0,
+          tipo: 'type_10', 
           mano: 0,
           piezas: 0,
           taller: 'ITV',
-          notas: currentLang === 'es' ? 'Registro automático de ITV' : 'Automatic MOT record',
+          notas: currentLang === 'es' ? 'Registro de ITV pasada' : 'MOT past record',
           manoObra: [{ concepto: translations[currentLang].itv_nombre, precio: 0 }],
           repuestos: []
         });
+        mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Datos guardados e ITV añadida al historial.' : 'Data saved and MOT added to history.', 'ok');
+      } else {
+        mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Datos guardados (La ITV ya estaba en el historial).' : 'Data saved (MOT was already in history).', 'ok');
       }
+    } else {
+      mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Datos guardados.' : 'Data saved.', 'ok');
     }
 
     guardar();
     cargarRecordatorios();
-    renderAll(); // Actualizamos el historial
-    mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Datos guardados y añadidos al historial.' : 'Data saved and added to history.', 'ok');
+    renderAll();
   }
 }
 
