@@ -761,7 +761,9 @@ function guardarRecordatorio() {
     v.ultItvFecha = itvPasada;
     v.ultItvKm = itvKmPasada;
 
+    // LÓGICA PARA REGISTRAR LA ITV PASADA EN EL HISTORIAL
     if (itvPasada) {
+      // Buscar si ya existe un registro de ITV con esta misma fecha
       const itvExistente = state.mantenimientos.find(m => 
         m.vehiculoId === vehiculoId && 
         m.tipo === 'type_10' && 
