@@ -37,7 +37,9 @@ const translations = {
     estadisticas: "Estadísticas de Gasto", recordatorios: "Avisos y Recordatorios", 
     prox_mant: "Próximo Mantenimiento", itv: "ITV", resumen_avisos: "Resumen de Avisos",
     fecha_prox_mant: "Fecha Próx. Mantenimiento", km_prox_mant: "Kms Próx. Mantenimiento", 
-    fecha_prox_itv: "Fecha Próx. ITV", fecha_pasada_itv: "Fecha Pasada ITV", km_itv_pasada: "Kms de esa ITV",
+    fecha_prox_itv: "Fecha Próx. ITV", 
+    registro_itv_pasada: "Al rellenar estos campos, se añadirá un registro al historial del coche:",
+    fecha_pasada_itv: "Fecha Pasada ITV", km_itv_pasada: "Kms de esa ITV",
     guardar: "Guardar Datos", estado: "Estado", 
     itv_ok: "En regla", itv_warn: "Próximo", itv_danger: "Caducado", sin_fecha: "Sin fecha",
     itv_nombre: "Revisión ITV (Registrada)"
@@ -70,7 +72,9 @@ const translations = {
     estadisticas: "Expense Statistics", recordatorios: "Reminders & Alerts", 
     prox_mant: "Next Maintenance", itv: "Vehicle Inspection", resumen_avisos: "Alerts Summary",
     fecha_prox_mant: "Next Maint. Date", km_prox_mant: "Next Maint. Miles", 
-    fecha_prox_itv: "Next Insp. Date", fecha_pasada_itv: "Last Insp. Date", km_itv_pasada: "Miles at Last Insp.",
+    fecha_prox_itv: "Next Insp. Date", 
+    registro_itv_pasada: "By filling these fields, a record will be added to the car's history:",
+    fecha_pasada_itv: "Last Insp. Date", km_itv_pasada: "Miles at Last Insp.",
     guardar: "Save Data", estado: "Status", 
     itv_ok: "Valid", itv_warn: "Due soon", itv_danger: "Expired", sin_fecha: "No date",
     itv_nombre: "MOT Inspection (Recorded)"
@@ -725,7 +729,8 @@ function cargarRecordatorios() {
     };
 
     const kmMantFormat = v.proxKmMant ? `<span style="color: #38bdf8; font-weight: bold;">${v.proxKmMant} Kms</span><br>` : '';
-    const kmItvFormat = v.proxKmItv ? `<span style="color: #38bdf8; font-weight: bold;">${v.proxKmItv} Kms</span><br>` : '';
+    // AQUI: Mostramos los Kms de la ultima ITV pasada, no los futuros.
+    const kmItvFormat = v.ultItvKm ? `<span style="color: #38bdf8; font-weight: bold;">${v.ultItvKm} Kms</span><br>` : '';
 
     const tr = document.createElement('tr');
     tr.innerHTML = `<td>${esc(v.matricula)}</td>
@@ -757,7 +762,6 @@ function guardarRecordatorio() {
 
     // LÓGICA PARA REGISTRAR LA ITV PASADA EN EL HISTORIAL
     if (itvPasada) {
-      // Buscar si ya existe un registro de ITV con esta fecha
       const itvExistente = state.mantenimientos.find(m => 
         m.vehiculoId === vehiculoId && 
         m.tipo === 'type_10' && 
