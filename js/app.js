@@ -42,7 +42,7 @@ const translations = {
     fecha_pasada_itv: "Fecha Pasada ITV", km_itv_pasada: "Kms de esa ITV",
     guardar: "Guardar Datos", estado: "Estado", 
     itv_ok: "En regla", itv_warn: "Próximo", itv_danger: "Caducado", sin_fecha: "Sin fecha",
-    itv_nombre: "Revisión ITV (Registrada)", prox_itv: "Próxima ITV"
+    itv_nombre: "Revisión ITV", prox_itv: "Próxima ITV"
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -77,7 +77,7 @@ const translations = {
     fecha_pasada_itv: "Last Insp. Date", km_itv_pasada: "Miles at Last Insp.",
     guardar: "Save Data", estado: "Status", 
     itv_ok: "Valid", itv_warn: "Due soon", itv_danger: "Expired", sin_fecha: "No date",
-    itv_nombre: "MOT Inspection (Recorded)", prox_itv: "Next Vehicle Inspection"
+    itv_nombre: "MOT Inspection", prox_itv: "Next Vehicle Inspection"
   }
 };
 
@@ -914,12 +914,15 @@ function generarPDF(compartir = false) {
       lista.forEach(m => {
         // TRADUCCIÓN EXACTA PARA LA ITV EN EL PDF
         let tipoTraducido = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
+        let manoObraTexto = (m.manoObra || []).map(o => o.concepto).join("\n• ");
+        
         if (m.taller === 'ITV') {
             tipoTraducido = currentLang === 'es' ? 'ITV' : 'Vehicle Inspection';
+            manoObraTexto = translations[currentLang].itv_nombre; // Forzamos el texto traducido
         }
         
         let textoTipoYServicio = tipoTraducido + "\n";
-        textoTipoYServicio += "• " + (m.manoObra || []).map(o => o.concepto).join("\n• ");
+        textoTipoYServicio += "• " + manoObraTexto;
         if (m.taller) textoTipoYServicio += `\n\n(${t.pdf_taller_txt} ${m.taller})`;
         
         let textoRepuestos = "—";
@@ -949,8 +952,11 @@ function generarPDF(compartir = false) {
         if (y > 230) { doc.addPage(); y = 20; }
 
         let tipoTraducido = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
+        let manoObraTexto = (m.manoObra || []).map(o => o.concepto).join("\n• ");
+
         if (m.taller === 'ITV') {
             tipoTraducido = currentLang === 'es' ? 'ITV' : 'Vehicle Inspection';
+            manoObraTexto = translations[currentLang].itv_nombre; // Forzamos el texto traducido
         }
 
         doc.setFillColor(240, 242, 245); 
@@ -965,7 +971,12 @@ function generarPDF(compartir = false) {
         
         y += 12; 
 
-        let bodyMano = (m.manoObra || []).map(o => [ o.concepto, fmt(o.precio) ]);
+        let bodyMano = (m.manoObra || []).map(o => {
+            let concepto = o.concepto;
+            if (m.taller === 'ITV') concepto = translations[currentLang].itv_nombre;
+            return [ concepto, fmt(o.precio) ];
+        });
+        
         if (bodyMano.length > 0) {
           doc.autoTable({
             startY: y, head: [[t.pdf_mano_obra, t.pdf_importe]], body: bodyMano, theme: 'grid',
