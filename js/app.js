@@ -617,7 +617,7 @@ function renderGrafico() {
   const gastosPorAnio = {};
   lista.forEach(m => {
     if (!m.fecha) return;
-    // AQUI FILTRAMOS: Si el taller es 'ITV' o el concepto es la revisión ITV, lo ignoramos para el gráfico
+    // Ignoramos las ITVs en la gráfica
     if (m.taller === 'ITV' || (m.manoObra && m.manoObra.some(o => o.concepto.includes('ITV')))) return;
 
     const anio = m.fecha.split('-')[0];
@@ -761,9 +761,8 @@ function guardarRecordatorio() {
     v.ultItvFecha = itvPasada;
     v.ultItvKm = itvKmPasada;
 
-    // LÓGICA PARA REGISTRAR LA ITV PASADA EN EL HISTORIAL
+    // LÓGICA CORREGIDA: SOLO SE GUARDA EN EL HISTORIAL LA ITV PASADA
     if (itvPasada) {
-      // Buscar si ya existe un registro de ITV con esta misma fecha
       const itvExistente = state.mantenimientos.find(m => 
         m.vehiculoId === vehiculoId && 
         m.tipo === 'type_10' && 
@@ -775,8 +774,8 @@ function guardarRecordatorio() {
         state.mantenimientos.push({
           id: uid(),
           vehiculoId: vehiculoId,
-          fecha: itvPasada, // <-- GUARDAMOS LA FECHA REAL PASADA
-          km: Number(itvKmPasada) || 0, // <-- GUARDAMOS LOS KMS REALES
+          fecha: itvPasada, // <-- SOLO LA FECHA REAL
+          km: Number(itvKmPasada) || 0, 
           tipo: 'type_10', 
           mano: 0,
           piezas: 0,
