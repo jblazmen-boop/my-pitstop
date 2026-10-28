@@ -912,7 +912,11 @@ function generarPDF(compartir = false) {
     if (tipoInforme === 'historico') {
       let bodyHistorial = [];
       lista.forEach(m => {
-        const tipoTraducido = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
+        // TRADUCCIÓN EXACTA PARA LA ITV EN EL PDF
+        let tipoTraducido = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
+        if (m.taller === 'ITV') {
+            tipoTraducido = currentLang === 'es' ? 'ITV' : 'Vehicle Inspection';
+        }
         
         let textoTipoYServicio = tipoTraducido + "\n";
         textoTipoYServicio += "• " + (m.manoObra || []).map(o => o.concepto).join("\n• ");
@@ -944,7 +948,10 @@ function generarPDF(compartir = false) {
       lista.forEach((m) => {
         if (y > 230) { doc.addPage(); y = 20; }
 
-        const tipoTraducido = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
+        let tipoTraducido = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
+        if (m.taller === 'ITV') {
+            tipoTraducido = currentLang === 'es' ? 'ITV' : 'Vehicle Inspection';
+        }
 
         doc.setFillColor(240, 242, 245); 
         doc.rect(15, y - 5, pageW - 30, 12, 'F'); 
