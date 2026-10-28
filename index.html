@@ -234,6 +234,8 @@
   <!-- GRÁFICO DE GASTOS -->
   <div id="grafico" class="panel">
     <h2 data-i18n="estadisticas">Estadísticas de Gasto</h2>
+    
+    <!-- NUEVO: Filtros del gráfico -->
     <div class="grid">
       <div>
         <label data-i18n="vehiculo">Vehículo</label>
@@ -241,9 +243,35 @@
           <option value="" data-i18n="todos">Todos</option>
         </select>
       </div>
+      <div>
+        <label data-i18n="modo_grafico">Ver por:</label>
+        <select id="g_modo" onchange="renderGrafico()">
+          <option value="anios" data-i18n="anios">Años</option>
+          <option value="meses" data-i18n="meses">Meses</option>
+        </select>
+      </div>
+      <div id="contenedor_anio_grafico" style="display: none;">
+        <label data-i18n="anio_grafico">Año:</label>
+        <select id="g_anio" onchange="renderGrafico()">
+          <!-- Se rellena desde JS -->
+        </select>
+      </div>
     </div>
-    <div style="background: rgba(17, 24, 39, 0.85); padding: 20px; border-radius: 8px; border: 1px solid #374151; margin-top: 20px; height: 400px;">
-      <canvas id="miGrafico"></canvas>
+
+    <!-- NUEVO: Layout de gráfico + total -->
+    <div style="display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap;">
+      
+      <!-- Panel del total -->
+      <div style="flex: 1; min-width: 200px; background: rgba(17, 24, 39, 0.85); padding: 20px; border-radius: 8px; border: 1px solid #374151; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: inset 0 0 20px rgba(225, 29, 72, 0.1);">
+        <h3 style="color: #9ca3af; margin: 0 0 10px 0; font-size: 14px;" data-i18n="gasto_total">Gasto Total</h3>
+        <span id="texto_gasto_total" style="font-size: 36px; font-weight: bold; color: #e11d48; text-shadow: 0 0 10px rgba(225, 29, 72, 0.5);">0.00 €</span>
+      </div>
+      
+      <!-- Gráfico -->
+      <div style="flex: 3; min-width: 300px; background: rgba(17, 24, 39, 0.85); padding: 20px; border-radius: 8px; border: 1px solid #374151; height: 400px;">
+        <canvas id="miGrafico"></canvas>
+      </div>
+
     </div>
   </div>
 
@@ -287,6 +315,9 @@
       <button class="primary" data-i18n="btn_gen_pdf" onclick="generarPDF(false)">Generar PDF</button>
       <button class="primary" style="background: #25D366 !important; color: #fff !important;" onclick="generarPDF(true)">
         <span data-i18n="btn_share_pdf">Compartir PDF</span> 📲
+      </button>
+      <button class="primary" style="background: #ea4335 !important; color: #fff !important;" onclick="generarPDF('email')">
+        <span data-i18n="btn_email_pdf">Enviar por Correo</span> ✉️
       </button>
     </div>
     <div id="msg_informe"></div>

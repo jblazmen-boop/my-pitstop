@@ -21,7 +21,7 @@ const translations = {
     filtrar: "Filtrar por vehículo", todos: "Todos", operaciones: "Operaciones", mano: "Mano", piezas: "Piezas",
     gen_informe: "Generar informe / factura en PDF", tipo_informe: "Tipo de Informe", detallado: "Factura Detallada (con precios)",
     historico: "Histórico Técnico (sin precios)", fecha_desde: "Fecha desde", fecha_hasta: "Fecha hasta",
-    iva: "IVA (%)", btn_gen_pdf: "Generar PDF", btn_share_pdf: "Compartir PDF",
+    iva: "IVA (%)", btn_gen_pdf: "Generar PDF", btn_share_pdf: "Compartir PDF", btn_email_pdf: "Enviar por Correo",
     copia_seguridad: "Copia de seguridad", copia_texto: "Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.",
     exportar: "⬇ Exportar copia (JSON)", importar: "⬆ Importar copia", borrar: "🗑 Borrar todos los datos",
     derechos: "Todos los derechos reservados.", selecciona: "— Selecciona —", no_foto: "— No usar foto —",
@@ -42,7 +42,9 @@ const translations = {
     fecha_pasada_itv: "Fecha Pasada ITV", km_itv_pasada: "Kms de esa ITV",
     guardar: "Guardar Datos", estado: "Estado", 
     itv_ok: "En regla", itv_warn: "Próximo", itv_danger: "Caducado", sin_fecha: "Sin fecha",
-    itv_nombre: "Revisión ITV", prox_itv: "Próxima ITV"
+    itv_nombre: "Revisión ITV", prox_itv: "Próxima ITV",
+    modo_grafico: "Ver por:", anios: "Años", meses: "Meses", anio_grafico: "Año:", gasto_total: "Gasto Total",
+    aviso_horizontal: "Para una mejor experiencia, gira tu dispositivo a horizontal."
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -56,7 +58,7 @@ const translations = {
     filtrar: "Filter by vehicle", todos: "All", operaciones: "Operations", mano: "Labor", piezas: "Parts",
     gen_informe: "Generate report / invoice PDF", tipo_informe: "Report Type", detallado: "Detailed Invoice (with prices)",
     historico: "Technical History (no prices)", fecha_desde: "Date from", fecha_hasta: "Date to",
-    iva: "VAT (%)", btn_gen_pdf: "Generate PDF", btn_share_pdf: "Share PDF",
+    iva: "VAT (%)", btn_gen_pdf: "Generate PDF", btn_share_pdf: "Share PDF", btn_email_pdf: "Send by Email",
     copia_seguridad: "Backup", copia_texto: "Data is stored in this browser. If you clear your history or change devices, it will be lost. Export a backup regularly.",
     exportar: "⬇ Export backup (JSON)", importar: "⬆ Import backup", borrar: "🗑 Delete all data",
     derechos: "All rights reserved.", selecciona: "— Select —", no_foto: "— No photo —",
@@ -77,7 +79,9 @@ const translations = {
     fecha_pasada_itv: "Last Insp. Date", km_itv_pasada: "Miles at Last Insp.",
     guardar: "Save Data", estado: "Status", 
     itv_ok: "Valid", itv_warn: "Due soon", itv_danger: "Expired", sin_fecha: "No date",
-    itv_nombre: "MOT Inspection", prox_itv: "Next Vehicle Inspection"
+    itv_nombre: "MOT Inspection", prox_itv: "Next Vehicle Inspection",
+    modo_grafico: "View by:", anios: "Years", meses: "Months", anio_grafico: "Year:", gasto_total: "Total Expense",
+    aviso_horizontal: "For a better experience, rotate your device to landscape."
   }
 };
 
@@ -606,32 +610,87 @@ function mostrarMsg(id, texto, tipo) {
   setTimeout(() => { el.innerHTML = ''; }, 4000);
 }
 
-// ============ GRÁFICO ESTILO RACING ============
+// ============ GRÁFICO ESTILO RACING MEJORADO ============
 function renderGrafico() {
   if (typeof Chart === 'undefined') return; 
 
   const vehiculoId = document.getElementById('g_vehiculo').value;
+  const modo = document.getElementById('g_modo').value;
+  const selectAnioContenedor = document.getElementById('contenedor_anio_grafico');
+  const selectAnio = document.getElementById('g_anio');
+
   let lista = state.mantenimientos;
   if (vehiculoId) lista = lista.filter(m => m.vehiculoId === vehiculoId);
 
-  const gastosPorAnio = {};
-  lista.forEach(m => {
-    if (!m.fecha) return;
-    // AQUI FILTRAMOS: Si el taller es 'ITV' o el concepto es la revisión ITV, lo ignoramos para el gráfico
-    if (m.taller === 'ITV' || (m.manoObra && m.manoObra.some(o => o.concepto.includes('ITV')))) return;
+  // Recopilar años para el selector (solo si estamos en modo meses)
+  const aniosDisponibles = [...new Set(lista.filter(m => m.fecha).map(m => m.fecha.split('-')[0]))].sort();
+  
+  if (modo === 'meses') {
+    selectAnioContenedor.style.display = 'block';
+    const prevAnio = selectAnio.value;
+    selectAnio.innerHTML = '';
+    aniosDisponibles.forEach(a => {
+      const opt = document.createElement('option');
+      opt.value = a;
+      opt.textContent = a;
+      selectAnio.appendChild(opt);
+    });
+    if (prevAnio && aniosDisponibles.includes(prevAnio)) selectAnio.value = prevAnio;
+  } else {
+    selectAnioContenedor.style.display = 'none';
+  }
 
-    const anio = m.fecha.split('-')[0];
-    if (!gastosPorAnio[anio]) gastosPorAnio[anio] = { mano: 0, piezas: 0 };
-    gastosPorAnio[anio].mano += m.mano;
-    gastosPorAnio[anio].piezas += m.piezas;
-  });
+  let etiquetas = [];
+  let dataMano = [];
+  let dataPiezas = [];
+  let gastoTotal = 0;
 
-  const anios = Object.keys(gastosPorAnio).sort();
-  const dataMano = anios.map(a => gastosPorAnio[a].mano);
-  const dataPiezas = anios.map(a => gastosPorAnio[a].piezas);
+  if (modo === 'anios') {
+    const gastosPorAnio = {};
+    lista.forEach(m => {
+      if (!m.fecha) return;
+      if (m.taller === 'ITV' || (m.manoObra && m.manoObra.some(o => o.concepto.includes('ITV')))) return;
+
+      const anio = m.fecha.split('-')[0];
+      if (!gastosPorAnio[anio]) gastosPorAnio[anio] = { mano: 0, piezas: 0 };
+      gastosPorAnio[anio].mano += m.mano;
+      gastosPorAnio[anio].piezas += m.piezas;
+    });
+
+    etiquetas = Object.keys(gastosPorAnio).sort();
+    dataMano = etiquetas.map(a => gastosPorAnio[a].mano);
+    dataPiezas = etiquetas.map(a => gastosPorAnio[a].piezas);
+    
+    gastoTotal = dataMano.reduce((s, v) => s + v, 0) + dataPiezas.reduce((s, v) => s + v, 0);
+
+  } else {
+    // Modo Meses
+    const anioSeleccionado = selectAnio.value || aniosDisponibles[0] || new Date().getFullYear();
+    const gastosPorMes = Array(12).fill(0).map(() => ({ mano: 0, piezas: 0 }));
+
+    lista.forEach(m => {
+      if (!m.fecha) return;
+      if (m.taller === 'ITV' || (m.manoObra && m.manoObra.some(o => o.concepto.includes('ITV')))) return;
+      
+      const [anio, mes] = m.fecha.split('-');
+      if (anio === anioSeleccionado) {
+        const mesIndex = parseInt(mes) - 1;
+        gastosPorMes[mesIndex].mano += m.mano;
+        gastosPorMes[mesIndex].piezas += m.piezas;
+      }
+    });
+
+    etiquetas = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+    if (currentLang === 'en') etiquetas = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    dataMano = gastosPorMes.map(m => m.mano);
+    dataPiezas = gastosPorMes.map(m => m.piezas);
+    gastoTotal = dataMano.reduce((s, v) => s + v, 0) + dataPiezas.reduce((s, v) => s + v, 0);
+  }
+
+  document.getElementById('texto_gasto_total').textContent = fmt(gastoTotal);
 
   const ctx = document.getElementById('miGrafico').getContext('2d');
-  
   if (miGraficoInstancia) miGraficoInstancia.destroy();
 
   let gradientMano = ctx.createLinearGradient(0, 0, 0, 400);
@@ -645,7 +704,7 @@ function renderGrafico() {
   miGraficoInstancia = new Chart(ctx, {
     type: 'line',
     data: {
-      labels: anios,
+      labels: etiquetas,
       datasets: [
         {
           label: translations[currentLang].mano_obra,
@@ -761,7 +820,6 @@ function guardarRecordatorio() {
     v.ultItvFecha = itvPasada;
     v.ultItvKm = itvKmPasada;
 
-    // LÓGICA CORREGIDA: SOLO SE GUARDA EN EL HISTORIAL LA ITV PASADA
     if (itvPasada) {
       const itvExistente = state.mantenimientos.find(m => 
         m.vehiculoId === vehiculoId && 
@@ -774,7 +832,7 @@ function guardarRecordatorio() {
         state.mantenimientos.push({
           id: uid(),
           vehiculoId: vehiculoId,
-          fecha: itvPasada, // <-- SOLO LA FECHA REAL
+          fecha: itvPasada, 
           km: Number(itvKmPasada) || 0, 
           tipo: 'type_10', 
           mano: 0,
@@ -834,8 +892,8 @@ function renderTablaSeleccion() {
   });
 }
 
-// ============ GENERAR PDF ============
-function generarPDF(compartir = false) {
+// ============ GENERAR PDF (CON CORREO) ============
+function generarPDF(accion = false) {
   try {
     const { jsPDF } = window.jspdf;
     const modo = document.getElementById('i_modo').value;
@@ -912,13 +970,12 @@ function generarPDF(compartir = false) {
     if (tipoInforme === 'historico') {
       let bodyHistorial = [];
       lista.forEach(m => {
-        // TRADUCCIÓN EXACTA PARA LA ITV EN EL PDF
         let tipoTraducido = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
         let manoObraTexto = (m.manoObra || []).map(o => o.concepto).join("\n• ");
         
         if (m.taller === 'ITV') {
             tipoTraducido = currentLang === 'es' ? 'ITV' : 'Vehicle Inspection';
-            manoObraTexto = translations[currentLang].itv_nombre; // Forzamos el texto traducido
+            manoObraTexto = translations[currentLang].itv_nombre; 
         }
         
         let textoTipoYServicio = tipoTraducido + "\n";
@@ -952,11 +1009,9 @@ function generarPDF(compartir = false) {
         if (y > 230) { doc.addPage(); y = 20; }
 
         let tipoTraducido = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
-        let manoObraTexto = (m.manoObra || []).map(o => o.concepto).join("\n• ");
-
+        
         if (m.taller === 'ITV') {
             tipoTraducido = currentLang === 'es' ? 'ITV' : 'Vehicle Inspection';
-            manoObraTexto = translations[currentLang].itv_nombre; // Forzamos el texto traducido
         }
 
         doc.setFillColor(240, 242, 245); 
@@ -1026,17 +1081,26 @@ function generarPDF(compartir = false) {
 
     const nombre = tipoInforme === 'historico' ? `Historico_${v.matricula}.pdf` : `Factura_${v.matricula}.pdf`;
     
-    if (compartir && navigator.share && navigator.canShare) {
+    // LÓGICA DE ENVÍO (WhatsApp / Correo / Descarga)
+    if (accion && navigator.share && navigator.canShare) {
       const pdfBlob = doc.output('blob');
       const file = new File([pdfBlob], nombre, { type: 'application/pdf' });
       
       if (navigator.canShare({ files: [file] })) {
+        let tituloShare = nombre;
+        let textoShare = currentLang === 'es' ? 'Aquí tienes el informe de mantenimiento.' : 'Here is the maintenance report.';
+
+        if (accion === 'email') {
+            tituloShare = currentLang === 'es' ? 'Informe My PitStop' : 'My PitStop Report';
+            textoShare = currentLang === 'es' ? 'Adjunto el informe de mantenimiento generado con My PitStop.' : 'Attached is the maintenance report generated with My PitStop.';
+        }
+
         navigator.share({
           files: [file],
-          title: nombre,
-          text: currentLang === 'es' ? 'Aquí tienes el informe de mantenimiento.' : 'Here is the maintenance report.'
+          title: tituloShare,
+          text: textoShare
         }).then(() => {
-          mostrarMsg('msg_informe', currentLang === 'es' ? 'PDF compartido.' : 'PDF shared.', 'ok');
+          mostrarMsg('msg_informe', currentLang === 'es' ? 'Compartido con éxito.' : 'Shared successfully.', 'ok');
         }).catch((err) => {
           console.log("Error al compartir:", err);
         });
@@ -1044,6 +1108,7 @@ function generarPDF(compartir = false) {
       }
     }
     
+    // Si no es compatible o es descarga normal
     doc.save(nombre);
     mostrarMsg('msg_informe', currentLang === 'es' ? 'PDF generado y descargado.' : 'PDF generated and downloaded.', 'ok');
 
@@ -1120,6 +1185,17 @@ function comprobarRecordatorioBackup() {
   }
 }
 
+// ============ AVISO DE GIRO EN MÓVIL ============
+function mostrarAvisoGiro() {
+  if (window.innerWidth < 768 && window.innerHeight > window.innerWidth) {
+    // Solo mostramos el aviso si es móvil y está en vertical
+    if (!sessionStorage.getItem('aviso_giro_mostrado')) {
+      mostrarMsg('msg_mantenimiento', translations[currentLang].aviso_horizontal, 'ok');
+      sessionStorage.setItem('aviso_giro_mostrado', 'true');
+    }
+  }
+}
+
 // ============ INIT ============
 const idiomaGuardado = localStorage.getItem('pitstop_idioma');
 if (idiomaGuardado && (idiomaGuardado === 'es' || idiomaGuardado === 'en')) {
@@ -1135,6 +1211,9 @@ renderManoObraTemporal();
 renderRepuestosTemporales();
 translatePage(); 
 renderAll();
+
+// Iniciar aviso de rotación
+setTimeout(mostrarAvisoGiro, 2000);
 
 solicitarPersistencia();
 setTimeout(comprobarRecordatorioBackup, 1500); 
