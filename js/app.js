@@ -1219,14 +1219,12 @@ function exportarGraficoPDF(accion) {
     const canvas = document.getElementById('miGrafico');
     if (!canvas) return;
     
-    // Obtener la imagen del gráfico
     const imgData = canvas.toDataURL('image/png', 1.0);
     
     const doc = new jsPDF('p', 'mm', 'a4');
     const pageW = doc.internal.pageSize.getWidth();
     let y = 15;
 
-    // Logo
     const logoImg = document.querySelector('.logo-img');
     if (logoImg && logoImg.src) {
       try {
@@ -1237,7 +1235,6 @@ function exportarGraficoPDF(accion) {
       } catch(e) {}
     }
 
-    // Cabecera
     doc.setFillColor(15, 23, 42); 
     doc.rect(0, 0, pageW, 20, 'F'); 
     doc.setTextColor(255,255,255);
@@ -1249,7 +1246,6 @@ function exportarGraficoPDF(accion) {
     doc.setFontSize(10); doc.setFont(undefined, 'normal');
     y = 30;
 
-    // Datos del vehículo
     const vehiculoId = document.getElementById('g_vehiculo').value;
     let nombreVehiculo = t.todos;
     if (vehiculoId) {
@@ -1260,7 +1256,6 @@ function exportarGraficoPDF(accion) {
     doc.setFont(undefined, 'bold'); doc.text(t.vehiculo, 15, y); doc.setFont(undefined, 'normal');
     doc.text(nombreVehiculo, 45, y); y += 8;
 
-    // Total y Fijos
     const totalTexto = document.getElementById('texto_gasto_total').textContent;
     doc.setFontSize(14); doc.setFont(undefined, 'bold'); doc.setTextColor(225, 29, 72);
     doc.text(`${t.gasto_total}: ${totalTexto}`, 15, y); 
@@ -1276,7 +1271,6 @@ function exportarGraficoPDF(accion) {
         }
     }
 
-    // Insertar gráfico
     const imgProps = doc.getImageProperties(imgData);
     const pdfWidth = pageW - 30;
     const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;

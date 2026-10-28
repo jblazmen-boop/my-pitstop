@@ -287,14 +287,17 @@
 
       </div>
       
-      <!-- COLUMNA DERECHA: GRÁFICO Y BOTÓN EXPORTAR -->
+      <!-- COLUMNA DERECHA: GRÁFICO Y BOTONES -->
       <div style="flex: 2; min-width: 300px; display: flex; flex-direction: column; gap: 15px;">
         <div style="background: rgba(17, 24, 39, 0.85); padding: 20px; border-radius: 8px; border: 1px solid #374151; height: 400px; position: relative;">
           <canvas id="miGrafico"></canvas>
         </div>
         
-        <!-- BOTÓN EXPORTAR GRÁFICO -->
+        <!-- BOTONES EXPORTAR GRÁFICO -->
         <div class="actions" style="margin-top: 0; justify-content: flex-end;">
+          <button class="primary" onclick="exportarGraficoPDF(false)">
+            Generar PDF
+          </button>
           <button class="primary" style="background: #25D366 !important; color: #fff !important;" onclick="exportarGraficoPDF('whatsapp')">
             <span data-i18n="btn_share_chart">Compartir Gráfico</span> 📲
           </button>
