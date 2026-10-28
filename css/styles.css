@@ -156,7 +156,7 @@ h2 { margin-top: 0; font-size: 20px; color: #ffffff !important; }
 
 .grid-avisos { 
   display: grid; 
-  grid-template-columns: 1.2fr 1fr 1fr 1fr; 
+  grid-template-columns: 1fr 1fr; /* 2 columnas */
   gap: 15px; 
   margin-bottom: 20px; 
   align-items: end; 

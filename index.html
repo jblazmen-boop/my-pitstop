@@ -73,7 +73,7 @@
     <div class="grid">
       <div><label data-i18n="vehiculo">Vehículo</label><select id="m_vehiculo"><option value="" data-i18n="selecciona">— Selecciona —</option></select></div>
       <div><label data-i18n="fecha">Fecha</label><input type="date" id="m_fecha"></div>
-      <div><label data-i18n="km">Km</label><input type="number" id="m_km" placeholder="85000"></div>
+      <div><label data-i18n="km">Kms</label><input type="number" id="m_km" placeholder="85000"></div>
       <div><label data-i18n="tipo">Tipo</label>
         <select id="m_tipo">
           <optgroup label="Revisión / Mantenimiento" id="group-1"><option value="type_1" id="opt-1">Revisión / Mantenimiento</option></optgroup>
@@ -150,7 +150,7 @@
       <div><label data-i18n="filtrar">Filtrar por vehículo</label><select id="f_vehiculo"><option value="" data-i18n="todos">Todos</option></select></div>
     </div>
     <table id="tabla_mantenimientos">
-      <thead><tr><th data-i18n="fecha">Fecha</th><th data-i18n="vehiculo">Vehículo</th><th data-i18n="km">Km</th><th data-i18n="tipo">Tipo</th><th data-i18n="operaciones">Operaciones</th><th data-i18n="mano">Mano</th><th data-i18n="piezas">Piezas</th><th data-i18n="total">Total</th><th data-i18n="acciones">Acciones</th></tr></thead>
+      <thead><tr><th data-i18n="fecha">Fecha</th><th data-i18n="vehiculo">Vehículo</th><th data-i18n="km">Kms</th><th data-i18n="tipo">Tipo</th><th data-i18n="operaciones">Operaciones</th><th data-i18n="mano">Mano</th><th data-i18n="piezas">Piezas</th><th data-i18n="total">Total</th><th data-i18n="acciones">Acciones</th></tr></thead>
       <tbody></tbody>
     </table>
   </div>
@@ -158,7 +158,7 @@
   <!-- RECORDATORIOS -->
   <div id="recordatorios" class="panel">
     <h2 data-i18n="recordatorios">Avisos y Recordatorios</h2>
-    <p style="color: #9ca3af; margin-bottom: 20px;" data-i18n="recordatorios_texto">Aquí puedes ver y gestionar las fechas de tus próximos mantenimientos e ITV.</p>
+    <p style="color: #9ca3af; margin-bottom: 20px;" data-i18n="recordatorios_texto">Aquí puedes gestionar los Kms y fechas de tus próximos mantenimientos e ITV.</p>
     
     <div class="grid-avisos">
       <div>
@@ -167,33 +167,30 @@
           <option value="" data-i18n="selecciona">— Selecciona —</option>
         </select>
       </div>
-      <div>
-        <label data-i18n="km_prox_mant">Km Próx. Mantenimiento</label>
-        <input type="number" id="rec_km_mant" placeholder="Ej: 100000">
-      </div>
+      <div></div> <!-- Hueco -->
+    </div>
+
+    <div class="grid-avisos">
       <div>
         <label data-i18n="fecha_prox_mant">Fecha Próx. Mantenimiento</label>
         <input type="date" id="rec_mant">
       </div>
       <div>
+        <label data-i18n="km_prox_mant">Kms Próx. Mantenimiento</label>
+        <input type="number" id="rec_km_mant" placeholder="Ej: 100000">
+      </div>
+      <div>
         <label data-i18n="fecha_prox_itv">Fecha Próx. ITV</label>
         <input type="date" id="rec_itv">
       </div>
-    </div>
-
-    <div class="grid-avisos" style="grid-template-columns: 1.2fr 1fr 1fr 1fr;">
-      <!-- Dejamos un hueco vacío para alinear -->
-      <div></div>
       <div>
-        <label data-i18n="km_itv">Km de la ITV</label>
+        <label data-i18n="km_itv">Kms de la ITV</label>
         <input type="number" id="rec_km_itv" placeholder="Ej: 105000">
       </div>
-      <div></div>
-      <div></div>
     </div>
     
     <div style="margin-top: 15px;">
-      <button class="primary" data-i18n="guardar" onclick="guardarRecordatorio()">Guardar Fechas</button>
+      <button class="primary" data-i18n="guardar" onclick="guardarRecordatorio()">Guardar Datos</button>
     </div>
     
     <div id="msg_recordatorios"></div>
@@ -202,7 +199,7 @@
       <thead>
         <tr>
           <th data-i18n="vehiculo">Vehículo</th>
-          <th data-i18n="prox_mant">Próximo Mantenimiento (Km / Fecha)</th>
+          <th data-i18n="prox_mant">Próximo Mantenimiento</th>
           <th data-i18n="prox_itv">Próxima ITV</th>
         </tr>
       </thead>
@@ -259,7 +256,7 @@
     <div id="bloque_seleccion" style="display:none; margin-bottom: 20px;">
       <h3 style="font-size: 16px; color: #e11d48; margin-bottom: 10px;" data-i18n="selecciona_mant">Selecciona los mantenimientos para incluir en la factura</h3>
       <table id="tabla_seleccion">
-        <thead><tr><th style="width: 40px; text-align: center;"><input type="checkbox" id="checkAll" onclick="toggleAllChecks(this)"></th><th data-i18n="fecha">Fecha</th><th data-i18n="km">Km</th><th data-i18n="tipo">Tipo</th><th data-i18n="operaciones">Operaciones</th><th data-i18n="total">Total</th></tr></thead>
+        <thead><tr><th style="width: 40px; text-align: center;"><input type="checkbox" id="checkAll" onclick="toggleAllChecks(this)"></th><th data-i18n="fecha">Fecha</th><th data-i18n="km">Kms</th><th data-i18n="tipo">Tipo</th><th data-i18n="operaciones">Operaciones</th><th data-i18n="total">Total</th></tr></thead>
         <tbody></tbody>
       </table>
     </div>
