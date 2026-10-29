@@ -43,8 +43,11 @@
   
   <!-- INICIO DE LA MÁQUINA DE DIAGNOSIS -->
   <div class="maquina-diagnosis">
-    <div class="tornillo-botones">
+    
+    <!-- MARCO SUPERIOR -->
+    <div class="marco-superior">
       <span>⨁</span>
+      <span class="texto-maquina">My PitStop ScanTool</span>
       <span>⨁</span>
     </div>
 
@@ -72,10 +75,12 @@
         </div>
         <button class="primary" data-i18n="add_vehiculo" onclick="addVehiculo()">Añadir vehículo</button>
         <div id="msg_vehiculo"></div>
-        <table id="tabla_vehiculos">
-          <thead><tr><th data-i18n="matricula">Matrícula</th><th data-i18n="marca">Marca</th><th data-i18n="modelo">Modelo</th><th data-i18n="bastidor">Bastidor</th><th data-i18n="acciones">Acciones</th></tr></thead>
-          <tbody></tbody>
-        </table>
+        <div class="tabla-responsive">
+          <table id="tabla_vehiculos">
+            <thead><tr><th data-i18n="matricula">Matrícula</th><th data-i18n="marca">Marca</th><th data-i18n="modelo">Modelo</th><th data-i18n="bastidor">Bastidor</th><th data-i18n="acciones">Acciones</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- MANTENIMIENTOS -->
@@ -110,10 +115,12 @@
             <div><label data-i18n="precio">Precio (€)</label><input type="number" step="0.01" id="o_precio" placeholder="80"></div>
             <div style="display: flex; align-items: flex-end;"><button type="button" class="secondary" data-i18n="add_btn" onclick="addManoObra()" style="width:100%;">+ Añadir</button></div>
           </div>
-          <table id="tabla_mano_obra" style="font-size: 12px; width: 100%; border-collapse: collapse; margin-top: 10px;">
-            <thead><tr style="background:#111827;"><th style="padding:6px; border:1px solid #374151;" data-i18n="operacion">Operación</th><th style="padding:6px; border:1px solid #374151;" data-i18n="precio">Precio</th><th style="padding:6px; border:1px solid #374151;"></th></tr></thead>
-            <tbody></tbody>
-          </table>
+          <div class="tabla-responsive">
+            <table id="tabla_mano_obra" style="font-size: 12px; width: 100%; border-collapse: collapse; margin-top: 10px;">
+              <thead><tr style="background:#111827;"><th style="padding:6px; border:1px solid #374151;" data-i18n="operacion">Operación</th><th style="padding:6px; border:1px solid #374151;" data-i18n="precio">Precio</th><th style="padding:6px; border:1px solid #374151;"></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
           <div style="text-align: right; font-weight: bold; margin-top: 8px;"><span data-i18n="total_mano">Total Mano de Obra:</span> <span id="total_mano">0.00 €</span></div>
         </div>
 
@@ -142,10 +149,12 @@
           
           <button type="button" class="secondary" data-i18n="add_repuesto" onclick="addRepuesto()" style="margin-top:8px;">+ Añadir Repuesto</button>
           
-          <table id="tabla_repuestos" style="font-size: 12px; width: 100%; border-collapse: collapse; margin-top: 10px;">
-            <thead><tr style="background:#111827;"><th style="padding:6px; border:1px solid #374151;" data-i18n="foto">Foto</th><th style="padding:6px; border:1px solid #374151;" data-i18n="cant">Cant</th><th style="padding:6px; border:1px solid #374151;" data-i18n="descripcion">Descripción</th><th style="padding:6px; border:1px solid #374151;" data-i18n="referencia">Ref</th><th style="padding:6px; border:1px solid #374151;" data-i18n="precio">Precio</th><th style="padding:6px; border:1px solid #374151;" data-i18n="total">Total</th><th style="padding:6px; border:1px solid #374151;"></th></tr></thead>
-            <tbody></tbody>
-          </table>
+          <div class="tabla-responsive">
+            <table id="tabla_repuestos" style="font-size: 12px; width: 100%; border-collapse: collapse; margin-top: 10px;">
+              <thead><tr style="background:#111827;"><th style="padding:6px; border:1px solid #374151;" data-i18n="foto">Foto</th><th style="padding:6px; border:1px solid #374151;" data-i18n="cant">Cant</th><th style="padding:6px; border:1px solid #374151;" data-i18n="descripcion">Descripción</th><th style="padding:6px; border:1px solid #374151;" data-i18n="referencia">Ref</th><th style="padding:6px; border:1px solid #374151;" data-i18n="precio">Precio</th><th style="padding:6px; border:1px solid #374151;" data-i18n="total">Total</th><th style="padding:6px; border:1px solid #374151;"></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
           <div style="text-align: right; font-weight: bold; margin-top: 8px;"><span data-i18n="total_repuestos">Total Repuestos:</span> <span id="total_repuestos">0.00 €</span></div>
         </div>
 
@@ -160,10 +169,12 @@
         <div class="grid">
           <div><label data-i18n="filtrar">Filtrar por vehículo</label><select id="f_vehiculo"><option value="" data-i18n="todos">Todos</option></select></div>
         </div>
-        <table id="tabla_mantenimientos">
-          <thead><tr><th data-i18n="fecha">Fecha</th><th data-i18n="vehiculo">Vehículo</th><th data-i18n="km">Kms</th><th data-i18n="tipo">Tipo</th><th data-i18n="operaciones">Operaciones</th><th data-i18n="mano">Mano</th><th data-i18n="piezas">Piezas</th><th data-i18n="total">Total</th><th data-i18n="acciones">Acciones</th></tr></thead>
-          <tbody></tbody>
-        </table>
+        <div class="tabla-responsive">
+          <table id="tabla_mantenimientos">
+            <thead><tr><th data-i18n="fecha">Fecha</th><th data-i18n="vehiculo">Vehículo</th><th data-i18n="km">Kms</th><th data-i18n="tipo">Tipo</th><th data-i18n="operaciones">Operaciones</th><th data-i18n="mano">Mano</th><th data-i18n="piezas">Piezas</th><th data-i18n="total">Total</th><th data-i18n="acciones">Acciones</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
       </div>
 
       <!-- RECORDATORIOS -->
@@ -228,18 +239,20 @@
 
         <!-- TABLA RESUMEN -->
         <h3 style="margin-top: 30px; color: #e2e8f0;" data-i18n="resumen_avisos">Resumen de Avisos</h3>
-        <table style="margin-top: 10px;">
-          <thead>
-            <tr>
-              <th data-i18n="vehiculo">Vehículo</th>
-              <th data-i18n="prox_mant">Próximo Mantenimiento</th>
-              <th data-i18n="prox_itv">Próxima ITV</th>
-            </tr>
-          </thead>
-          <tbody id="tabla_recordatorios_body">
-            <!-- Aquí se cargarán los avisos -->
-          </tbody>
-        </table>
+        <div class="tabla-responsive">
+          <table style="margin-top: 10px;">
+            <thead>
+              <tr>
+                <th data-i18n="vehiculo">Vehículo</th>
+                <th data-i18n="prox_mant">Próximo Mantenimiento</th>
+                <th data-i18n="prox_itv">Próxima ITV</th>
+              </tr>
+            </thead>
+            <tbody id="tabla_recordatorios_body">
+              <!-- Aquí se cargarán los avisos -->
+            </tbody>
+          </table>
+        </div>
       </div>
 
       <!-- GRÁFICO DE GASTOS Y GASTOS FIJOS INTEGRADOS -->
@@ -352,10 +365,12 @@
 
         <div id="bloque_seleccion" style="display:none; margin-bottom: 20px;">
           <h3 style="font-size: 16px; color: #e11d48; margin-bottom: 10px;" data-i18n="selecciona_mant">Selecciona los mantenimientos para incluir en la factura</h3>
-          <table id="tabla_seleccion">
-            <thead><tr><th style="width: 40px; text-align: center;"><input type="checkbox" id="checkAll" onclick="toggleAllChecks(this)"></th><th data-i18n="fecha">Fecha</th><th data-i18n="km">Kms</th><th data-i18n="tipo">Tipo</th><th data-i18n="operaciones">Operaciones</th><th data-i18n="total">Total</th></tr></thead>
-            <tbody></tbody>
-          </table>
+          <div class="tabla-responsive">
+            <table id="tabla_seleccion">
+              <thead><tr><th style="width: 40px; text-align: center;"><input type="checkbox" id="checkAll" onclick="toggleAllChecks(this)"></th><th data-i18n="fecha">Fecha</th><th data-i18n="km">Kms</th><th data-i18n="tipo">Tipo</th><th data-i18n="operaciones">Operaciones</th><th data-i18n="total">Total</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </div>
 
         <div class="actions">
@@ -384,6 +399,12 @@
       </div>
 
     </div> <!-- FIN DE LA PANTALLA LCD -->
+
+    <!-- MARCO INFERIOR -->
+    <div class="marco-inferior">
+      <span class="texto-autor">by J.Blázquez</span>
+    </div>
+
   </div> <!-- FIN DE LA MÁQUINA DE DIAGNOSIS -->
 
 </div>

@@ -146,22 +146,44 @@ header h1 {
   position: relative;
 }
 
-/* Tornillos de la máquina */
-.maquina-diagnosis::before, .maquina-diagnosis::after {
-  content: "⨁";
-  position: absolute;
+/* Marco superior e inferior con textos */
+.marco-superior, .marco-inferior {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   color: #718096;
-  font-size: 26px;
+  font-size: 22px;
   font-weight: bold;
   text-shadow: 1px 1px 2px #000;
+  padding: 0 10px;
 }
-.maquina-diagnosis::before { top: 8px; left: 8px; }
-.maquina-diagnosis::after { top: 8px; right: 8px; }
 
-.tornillo-botones {
-  display: flex; justify-content: space-between; padding: 0 10px; margin-top: -5px; margin-bottom: 15px;
-  color: #718096; font-size: 26px; font-weight: bold;
-  text-shadow: 1px 1px 2px #000;
+.marco-superior {
+  margin-top: -10px;
+  margin-bottom: 15px;
+}
+
+.marco-inferior {
+  margin-top: 15px;
+  margin-bottom: -10px;
+  justify-content: center;
+}
+
+.texto-maquina {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 16px;
+  letter-spacing: 3px;
+  color: #a0aec0;
+  text-transform: uppercase;
+}
+
+.texto-autor {
+  font-family: 'Caveat', cursive !important;
+  font-size: 24px;
+  color: #e11d48;
+  text-shadow: 0 0 5px rgba(225, 29, 72, 0.5);
+  letter-spacing: 1px;
+  transform: rotate(-1deg);
 }
 
 /* Panel de botones (Pestañas) */
@@ -172,7 +194,6 @@ header h1 {
   flex-wrap: wrap; 
   justify-content: center; 
   align-items: center;
-  /* Efecto de ranura metálica */
   background: linear-gradient(180deg, #111827 0%, #1f2937 100%);
   padding: 15px;
   border-radius: 12px;
@@ -296,6 +317,25 @@ header h1 {
   border-radius: 6px;
 }
 
+/* --- TABLAS RESPONSIVAS --- */
+.tabla-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 10px;
+  padding-bottom: 5px;
+}
+.tabla-responsive::-webkit-scrollbar {
+  height: 8px;
+}
+.tabla-responsive::-webkit-scrollbar-thumb {
+  background: #e11d48;
+  border-radius: 4px;
+}
+.tabla-responsive::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
 /* --- PANELES --- */
 .panel { 
   display: none; 
@@ -319,9 +359,6 @@ h2 { margin-top: 0; font-size: 20px; color: #ffffff !important; }
   gap: 15px; 
   margin-bottom: 20px; 
   align-items: end; 
-}
-@media (max-width: 768px) {
-  .grid-avisos { grid-template-columns: 1fr; }
 }
 
 label { display: block; font-size: 12px; color: #9ca3af !important; margin-bottom: 6px; font-weight: 700; }
@@ -356,7 +393,7 @@ button.danger:hover { background: #374151 !important; }
 button.secondary { background: #374151 !important; border: 1px solid #4b5563 !important; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: bold; color: #fff !important; transition: 0.2s; }
 button.secondary:hover { background: #4b5563 !important; }
 
-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 20px; background: rgba(17, 24, 39, 0.85) !important; border-radius: 6px; overflow: hidden; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 20px; background: rgba(17, 24, 39, 0.85) !important; border-radius: 6px; overflow: hidden; white-space: nowrap; }
 th, td { border-bottom: 1px solid #374151 !important; padding: 12px 10px; text-align: left; }
 th { background: rgba(17, 24, 39, 0.95) !important; font-weight: 700; color: #e11d48 !important; text-transform: uppercase; font-size: 12px; letter-spacing: 1px;}
 tr:nth-child(even) { background: rgba(31, 41, 55, 0.7) !important; }
@@ -418,6 +455,9 @@ input[type="checkbox"] {
   accent-color: #e11d48;
 }
 
+/* =========================================
+   OPTIMIZACIÓN PARA MÓVILES
+   ========================================= */
 @media (max-width: 768px) {
   body::before {
     background-size: cover; 
@@ -428,16 +468,27 @@ input[type="checkbox"] {
   .header-content { flex-direction: column; gap: 5px; }
   .title-block { align-items: center; }
   .lang-switch { width: auto; justify-content: center; margin-top: 10px; }
-  .tabs { gap: 10px; margin-bottom: 20px; }
-  .tab-icon, .tab span { height: 60px; width: 60px; font-size: 30px !important; display: flex; align-items: center; justify-content: center; }
-  .container { padding: 0 10px; margin-top: 10px; }
-  .panel { padding: 15px; border-left-width: 4px; }
-  h2 { font-size: 16px; }
-  table th, table td { padding: 8px 4px; font-size: 11px; }
-  header h1 { font-size: 45px; }
-  .author { font-size: 20px; }
-  .maquina-diagnosis { padding: 10px; border-width: 6px; }
-  .pantalla-lcd { padding: 10px; border-width: 4px; }
+  
+  .maquina-diagnosis { padding: 8px; border-width: 4px; border-radius: 12px; }
+  .marco-superior, .marco-inferior { font-size: 16px; padding: 0 5px; }
+  .texto-maquina { font-size: 12px; letter-spacing: 1px; }
+  .texto-autor { font-size: 18px; }
+  .tornillo-botones { display: none; } /* Ocultar los tornillos en móvil para ahorrar espacio */
+
+  .tabs { gap: 8px; padding: 8px; margin-bottom: 15px; border-radius: 8px; }
+  .tab-icon { height: 50px; width: 50px; padding: 3px; border-width: 1px; }
+  
+  .pantalla-lcd { padding: 8px; border-width: 4px; }
+  .panel { padding: 12px; border-left-width: 3px; border-radius: 6px; }
+  h2 { font-size: 16px; margin-bottom: 15px; }
+  
+  .grid, .grid-avisos { grid-template-columns: 1fr; gap: 10px; }
+  
+  input, select, textarea { padding: 8px; font-size: 13px; }
+  button.primary { padding: 10px 16px; font-size: 13px; }
+  button.secondary { padding: 6px 10px; font-size: 12px; }
+  
+  table th, table td { padding: 8px 6px; font-size: 11px; }
 }
 
 @media (orientation: landscape) and (max-height: 500px) {
