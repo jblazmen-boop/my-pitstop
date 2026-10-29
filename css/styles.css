@@ -190,6 +190,7 @@ header h1 {
   transition: all 0.3s ease;
   box-shadow: 0 5px 15px rgba(0,0,0,0.8);
   z-index: 30;
+  text-transform: uppercase !important; /* AÑADIDO: FUERZA MAYÚSCULAS */
 }
 
 /* Mostramos el tooltip al pasar el ratón */
