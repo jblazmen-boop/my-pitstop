@@ -134,7 +134,7 @@ header h1 {
   justify-content: center;
   align-items: center;
   padding: 5px;
-  white-space: nowrap;
+  white-space: nowrap; /* Evita que el texto se parta en varias líneas */
 }
 
 /* Texto superior e inferior con fuente Caveat y efecto grabado */
@@ -148,7 +148,7 @@ header h1 {
 }
 
 /* =========================================
-   NUEVA BOTONERA MODERNA (CORREGIDA)
+   NUEVA BOTONERA MODERNA
    ========================================= */
 .botonera-fisica {
   display: flex;
@@ -158,79 +158,67 @@ header h1 {
   flex: 1;
 }
 
-.d-pad {
+.mando-dpad {
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  width: 120px;
-  height: 120px;
-}
-
-/* Fondo circular oscuro */
-.d-pad::before {
-  content: '';
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%);
-  width: 90px;
-  height: 90px;
-  background: #111827;
+  width: 110px;
+  height: 110px;
+  background: #0f172a;
   border-radius: 50%;
-  box-shadow: inset 0 3px 8px rgba(0,0,0,0.8), 0 4px 10px rgba(0,0,0,0.5);
+  box-shadow: inset 0 4px 10px rgba(0,0,0,0.8), 0 5px 10px rgba(0,0,0,0.4);
 }
 
-/* Botones base de la cruz */
-.btn-dir {
+.mando-flecha, .mando-ok {
   position: absolute;
-  width: 34px;
-  height: 34px;
-  background: linear-gradient(180deg, #4b5563 0%, #1f2937 100%);
-  border: 1px solid #111827;
-  color: #9ca3af;
-  font-size: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
+  border: none;
   cursor: pointer;
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: bold;
+  transition: all 0.1s;
+}
+
+.mando-flecha {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(180deg, #374151 0%, #1f2937 100%);
+  color: #9ca3af;
+  font-size: 12px;
   border-radius: 6px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.1);
-  transition: all 0.1s;
-  z-index: 2;
 }
 
-.btn-dir:active {
+.mando-flecha:active {
   background: #111827;
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
-  color: #9ca3af;
 }
 
-/* Posicionamiento de las flechas (dentro del círculo de 120x120) */
-.btn-arriba { top: 10px; left: 50%; transform: translateX(-50%); }
-.btn-abajo { bottom: 10px; left: 50%; transform: translateX(-50%); }
-.btn-izquierda { left: 10px; top: 50%; transform: translateY(-50%); }
-.btn-derecha { right: 10px; top: 50%; transform: translateY(-50%); }
-
-/* Botón central OK */
-.btn-centro { 
-  position: relative;
-  width: 44px;
-  height: 44px;
-  background: linear-gradient(180deg, #e11d48 0%, #be123c 100%); 
-  color: #fff; 
-  border-radius: 50%; 
-  font-size: 13px; 
-  font-weight: bold; 
-  box-shadow: 0 0 12px rgba(225, 29, 72, 0.5), inset 0 1px 2px rgba(255,255,255,0.4); 
-  border: 2px solid #9f1239; 
+.mando-ok {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(180deg, #e11d48 0%, #be123c 100%);
+  color: #fff;
+  font-size: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(225, 29, 72, 0.5), inset 0 1px 2px rgba(255,255,255,0.4);
+  border: 2px solid #9f1239;
   z-index: 3;
 }
-.btn-centro:active {
+
+.mando-ok:active {
   background: #be123c;
   box-shadow: inset 0 3px 6px rgba(0,0,0,0.4);
 }
 
-/* Botones ESC y MENU */
+.mando-arriba { top: 5px; left: 50%; transform: translateX(-50%); border-radius: 12px 12px 4px 4px; }
+.mando-abajo { bottom: 5px; left: 50%; transform: translateX(-50%); border-radius: 4px 4px 12px 12px; }
+.mando-izquierda { left: 5px; top: 50%; transform: translateY(-50%); border-radius: 12px 4px 4px 12px; }
+.mando-derecha { right: 5px; top: 50%; transform: translateY(-50%); border-radius: 4px 12px 12px 4px; }
+
 .btn-maquina {
   width: 50px;
   height: 40px;
@@ -550,14 +538,9 @@ input[type="checkbox"] { transform: scale(1.3); cursor: pointer; accent-color: #
   
   .botonera-fisica { flex: 1 0 100%; order: 3; margin-top: 15px; gap: 10px; justify-content: center; }
   
-  .d-pad { width: 90px; height: 90px; }
-  .d-pad::before { width: 75px; height: 75px; }
-  .btn-dir { width: 28px; height: 28px; font-size: 10px; }
-  .btn-arriba { top: 5px; }
-  .btn-abajo { bottom: 5px; }
-  .btn-izquierda { left: 5px; }
-  .btn-derecha { right: 5px; }
-  .btn-centro { width: 34px; height: 34px; font-size: 10px; }
+  .mando-dpad { width: 90px; height: 90px; }
+  .mando-flecha { width: 28px; height: 28px; font-size: 10px; }
+  .mando-ok { width: 34px; height: 34px; font-size: 10px; }
   .btn-maquina { width: 40px; height: 32px; font-size: 9px; }
 
   .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 15px 8px; margin-bottom: 15px; border-radius: 8px; justify-items: center; }
