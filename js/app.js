@@ -830,12 +830,17 @@ function renderGrafico() {
       maintainAspectRatio: false,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { labels: { color: '#e2e8f0', font: { size: 14, weight: 'bold' } } },
+        legend: { 
+            labels: { 
+                color: '#000000', // FORZADO A NEGRO PARA QUE SE VEA BIEN EN EL PDF
+                font: { size: 14, weight: 'bold' } 
+            } 
+        },
         tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleColor: '#fff', bodyColor: '#e2e8f0', borderColor: '#374151', borderWidth: 1 }
       },
       scales: {
-        x: { ticks: { color: '#9ca3af', font: { size: 12 } }, grid: { color: 'rgba(55, 65, 81, 0.5)' } },
-        y: { ticks: { color: '#9ca3af', font: { size: 12 } }, grid: { color: 'rgba(55, 65, 81, 0.5)' } }
+        x: { ticks: { color: '#000000', font: { size: 12 } }, grid: { color: 'rgba(55, 65, 81, 0.5)' } },
+        y: { ticks: { color: '#000000', font: { size: 12 } }, grid: { color: 'rgba(55, 65, 81, 0.5)' } }
       }
     }
   });
@@ -1029,7 +1034,7 @@ function generarPDF(accion = false) {
     if (logoImg && logoImg.src) {
       try {
         doc.saveGraphicsState();
-        doc.setGState(new doc.GState({opacity: 0.03})); // Opacidad más baja para que no lave el texto
+        doc.setGState(new doc.GState({opacity: 0.03}));
         doc.addImage(logoImg.src, 'PNG', (pageW - 150) / 2, (pageH - 150) / 2, 150, 150);
         doc.restoreGraphicsState();
       } catch(e) { console.log("Error al añadir logo al PDF", e); }
@@ -1219,7 +1224,6 @@ function exportarGraficoPDF(accion) {
     const canvas = document.getElementById('miGrafico');
     if (!canvas) return;
     
-    // Aseguramos que el canvas tenga un fondo sólido para que el PDF no lo lave
     const imgData = canvas.toDataURL('image/png', 1.0);
     
     const doc = new jsPDF('p', 'mm', 'a4');
@@ -1230,7 +1234,7 @@ function exportarGraficoPDF(accion) {
     if (logoImg && logoImg.src) {
       try {
         doc.saveGraphicsState();
-        doc.setGState(new doc.GState({opacity: 0.03})); // Opacidad más baja
+        doc.setGState(new doc.GState({opacity: 0.03})); 
         doc.addImage(logoImg.src, 'PNG', (pageW - 150) / 2, 50, 150, 150);
         doc.restoreGraphicsState();
       } catch(e) {}
