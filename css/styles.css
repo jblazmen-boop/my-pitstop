@@ -46,12 +46,12 @@ header {
 
 /* --- LOGO --- */
 .logo-container {
-  width: 95px;  
-  height: 95px;
+  width: 105px;  /* Más grande */
+  height: 105px;
   border-radius: 15px;
-  background-color: transparent; /* Quitamos el fondo blanco */
-  box-shadow: none !important; /* Quitamos la sombra */
-  border: none !important; /* Quitamos el borde */
+  background-color: transparent; 
+  box-shadow: none !important; 
+  border: none !important; 
   display: flex;
   justify-content: center; 
   align-items: center;     
@@ -63,9 +63,9 @@ header {
   object-fit: contain;
   
   /* Hace que el fondo blanco de la foto se vuelva transparente */
-  mix-blend-mode: screen; 
+  mix-blend-mode: multiply; 
   
-  /* Zoom para centrar el dibujo y quitar el marco gris exterior */
+  /* Zoom para centrar el dibujo y ocultar el marco exterior */
   transform: scale(1.1); 
 }
 

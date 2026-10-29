@@ -1030,15 +1030,7 @@ function generarPDF(accion = false) {
     const pageH = doc.internal.pageSize.getHeight();
     let y = 15;
 
-    const logoImg = document.querySelector('.logo-img');
-    if (logoImg && logoImg.src) {
-      try {
-        doc.saveGraphicsState();
-        doc.setGState(new doc.GState({opacity: 0.03}));
-        doc.addImage(logoImg.src, 'PNG', (pageW - 150) / 2, (pageH - 150) / 2, 150, 150);
-        doc.restoreGraphicsState();
-      } catch(e) { console.log("Error al añadir logo al PDF", e); }
-    }
+    // MARCA DE AGUA ELIMINADA
 
     doc.setFillColor(15, 23, 42); 
     doc.rect(0, 0, pageW, 20, 'F'); 
@@ -1230,15 +1222,7 @@ function exportarGraficoPDF(accion) {
     const pageW = doc.internal.pageSize.getWidth();
     let y = 15;
 
-    const logoImg = document.querySelector('.logo-img');
-    if (logoImg && logoImg.src) {
-      try {
-        doc.saveGraphicsState();
-        doc.setGState(new doc.GState({opacity: 0.03})); 
-        doc.addImage(logoImg.src, 'PNG', (pageW - 150) / 2, 50, 150, 150);
-        doc.restoreGraphicsState();
-      } catch(e) {}
-    }
+    // MARCA DE AGUA ELIMINADA
 
     doc.setFillColor(15, 23, 42); 
     doc.rect(0, 0, pageW, 20, 'F'); 
