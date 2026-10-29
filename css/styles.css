@@ -46,28 +46,27 @@ header {
 
 /* --- LOGO --- */
 .logo-container {
-  width: 80px; 
-  height: 80px;
+  width: 95px;  
+  height: 95px;
   border-radius: 15px;
-  background-color: #ffffff;
-  box-shadow: 0 0 25px rgba(225, 29, 72, 0.8) !important; 
-  border: 2px solid #ffffff !important;
+  background-color: transparent; /* Quitamos el fondo blanco */
+  box-shadow: none !important; /* Quitamos la sombra */
+  border: none !important; /* Quitamos el borde */
   display: flex;
   justify-content: center; 
   align-items: center;     
-  overflow: hidden;
+  overflow: visible; 
 }
 .logo-img {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* Cambiado de cover a contain para que no se corte */
-  padding: 5px;
+  object-fit: contain;
   
-  /* LA MAGIA: Elimina el fondo gris del logo original */
-  mix-blend-mode: multiply; 
+  /* Hace que el fondo blanco de la foto se vuelva transparente */
+  mix-blend-mode: screen; 
   
-  /* Reseteamos el zoom para que quede centrado de forma natural */
-  transform: none; 
+  /* Zoom para centrar el dibujo y quitar el marco gris exterior */
+  transform: scale(1.1); 
 }
 
 /* --- TÍTULO TIPO FIRMA --- */
@@ -150,19 +149,6 @@ header h1 {
   border-color: #e11d48 !important; 
   box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 20px rgba(225, 29, 72, 0.8) !important; 
   transform: translateY(-2px);
-}
-
-/* Estilo extra para el emoji del icono de gastos */
-.tab span { 
-  transition: all 0.3s ease;
-}
-.tab:hover span { 
-  transform: translateY(-5px); 
-  text-shadow: 0 0 15px rgba(225, 29, 72, 0.8); 
-}
-.tab.active span { 
-  transform: translateY(-2px);
-  text-shadow: 0 0 20px rgba(225, 29, 72, 1); 
 }
 
 .panel { 
