@@ -186,13 +186,13 @@ header h1 {
    ========================================= */
 .tabs { 
   display: flex; 
-  gap: 20px; /* Más espacio entre iconos */
+  gap: 20px; 
   margin-bottom: 25px; 
   flex-wrap: wrap; 
   justify-content: center; 
   align-items: center;
   background: linear-gradient(180deg, #111827 0%, #1f2937 100%);
-  padding: 20px 15px; /* Más padding vertical */
+  padding: 20px 15px; 
   border-radius: 12px;
   border: 2px solid #111827;
   border-top-color: #374151;
@@ -213,8 +213,8 @@ header h1 {
 }
 
 .tab-icon {
-  height: 85px; /* Aumentado de 70px a 85px */
-  width: 85px;  /* Aumentado de 70px a 85px */
+  height: 85px; 
+  width: 85px;  
   object-fit: contain; 
   border-radius: 12px; 
   background-color: #1f2937 !important; 
@@ -243,7 +243,7 @@ header h1 {
 .tab::after {
   content: attr(title); 
   position: absolute;
-  bottom: -50px; /* Ajustado por el mayor tamaño del icono */
+  bottom: -50px; 
   left: 50%;
   transform: translateX(-50%) scale(0.8);
   background: rgba(15, 23, 42, 0.95); 
@@ -451,7 +451,7 @@ input[type="checkbox"] {
 }
 
 /* =========================================
-   OPTIMIZACIÓN PARA MÓVILES
+   OPTIMIZACIÓN PARA MÓVILES (CORREGIDO)
    ========================================= */
 @media (max-width: 768px) {
   body::before {
@@ -466,7 +466,6 @@ input[type="checkbox"] {
   .title-block { align-items: center; }
   .lang-switch { width: auto; justify-content: center; margin-top: 10px; }
   
-  /* Tamaño de letras adaptado a móviles */
   header h1 { font-size: 60px; }
   .author { font-size: 28px; }
 
@@ -482,9 +481,27 @@ input[type="checkbox"] {
   
   .tornillo-botones { display: none; }
 
-  /* Ajuste de las pestañas en móvil: más grandes pero sin desbordar */
-  .tabs { gap: 12px; padding: 12px 8px; margin-bottom: 15px; border-radius: 8px; }
-  .tab-icon { height: 65px; width: 65px; padding: 4px; border-width: 2px; }
+  /* 
+   * SOLUCIÓN ALINEACIÓN MÓVIL:
+   * Ponemos un Grid de 3 columnas exactas para que siempre queden
+   * 3 arriba y 3 abajo (perfectamente alineados).
+   */
+  .tabs { 
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* 3 columnas exactas */
+    gap: 12px; 
+    padding: 15px 8px; 
+    margin-bottom: 15px; 
+    border-radius: 8px;
+    justify-items: center;
+  }
+  
+  .tab-icon { 
+    height: 65px; 
+    width: 65px; 
+    padding: 4px; 
+    border-width: 2px; 
+  }
   
   .pantalla-lcd { padding: 8px; border-width: 4px; }
   .panel { padding: 12px; border-left-width: 3px; border-radius: 6px; }
