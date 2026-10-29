@@ -125,33 +125,43 @@ header h1 {
 .container { max-width: 1100px; margin: 20px auto 30px auto; padding: 0 16px; position: relative; z-index: 10; }
 
 /* =========================================
-   NUEVA MÁQUINA DE DIAGNOSIS
+   MÁQUINA DE DIAGNOSIS REALISTA
    ========================================= */
 .maquina-diagnosis {
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-  border: 12px solid #374151;
+  /* Textura de metal cepillado */
+  background: repeating-linear-gradient(
+    45deg,
+    #2a323d,
+    #2a323d 2px,
+    #303945 2px,
+    #303945 4px
+  );
+  border: 12px solid #1a202c;
   border-radius: 20px;
   box-shadow: 
-    0 20px 50px rgba(0,0,0,0.8),
-    inset 0 0 0 4px #1f2937,
-    inset 0 0 20px rgba(0,0,0,0.9);
+    0 25px 60px rgba(0,0,0,0.9),
+    inset 0 0 0 3px #4a5568,
+    inset 0 0 20px rgba(0,0,0,0.8);
   padding: 20px;
   position: relative;
 }
 
-/* Tornillos decorativos de la máquina */
+/* Tornillos de la máquina */
 .maquina-diagnosis::before, .maquina-diagnosis::after {
   content: "⨁";
   position: absolute;
-  color: #4b5563;
-  font-size: 24px;
+  color: #718096;
+  font-size: 26px;
   font-weight: bold;
+  text-shadow: 1px 1px 2px #000;
 }
-.maquina-diagnosis::before { top: 10px; left: 10px; }
-.maquina-diagnosis::after { top: 10px; right: 10px; }
-.maquina-diagnosis .tornillo-botones {
-  display: flex; justify-content: space-between; padding: 0 10px; margin-top: -10px; margin-bottom: 10px;
-  color: #4b5563; font-size: 24px; font-weight: bold;
+.maquina-diagnosis::before { top: 8px; left: 8px; }
+.maquina-diagnosis::after { top: 8px; right: 8px; }
+
+.tornillo-botones {
+  display: flex; justify-content: space-between; padding: 0 10px; margin-top: -5px; margin-bottom: 15px;
+  color: #718096; font-size: 26px; font-weight: bold;
+  text-shadow: 1px 1px 2px #000;
 }
 
 /* Panel de botones (Pestañas) */
@@ -162,11 +172,14 @@ header h1 {
   flex-wrap: wrap; 
   justify-content: center; 
   align-items: center;
-  background: rgba(17, 24, 39, 0.5);
+  /* Efecto de ranura metálica */
+  background: linear-gradient(180deg, #111827 0%, #1f2937 100%);
   padding: 15px;
   border-radius: 12px;
-  border: 1px solid #374151;
-  box-shadow: inset 0 5px 15px rgba(0,0,0,0.5);
+  border: 2px solid #111827;
+  border-top-color: #374151;
+  border-bottom-color: #0f172a;
+  box-shadow: inset 0 5px 15px rgba(0,0,0,0.8);
 }
 
 .tab { 
@@ -235,16 +248,39 @@ header h1 {
   transform: translateX(-50%) scale(1) translateY(-5px); 
 }
 
-/* Pantalla LCD donde van los paneles */
+/* =========================================
+   PANTALLA LCD CON BISEL Y REFLEJOS
+   ========================================= */
 .pantalla-lcd {
   background: #0f172a;
-  border: 6px solid #111827;
+  /* Bisel grueso simulando cristal */
+  border: 8px solid #1a202c;
+  border-top-color: #0f172a;
+  border-bottom-color: #2d3748;
   border-radius: 12px;
   padding: 20px;
   box-shadow: 
-    inset 0 0 20px rgba(0,0,0,0.8),
-    0 0 15px rgba(56, 189, 248, 0.2);
+    inset 0 0 30px rgba(0,0,0,0.9),
+    0 0 20px rgba(56, 189, 248, 0.15),
+    0 5px 10px rgba(0,0,0,0.5);
   position: relative;
+  overflow: hidden;
+}
+
+/* Reflejo del cristal (diagonal) */
+.pantalla-lcd::after {
+  content: "";
+  position: absolute;
+  top: -50%; left: -50%; width: 200%; height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(255, 255, 255, 0.08) 0%,
+    rgba(255, 255, 255, 0.02) 40%,
+    transparent 40.1%
+  );
+  pointer-events: none;
+  z-index: 10;
+  transform: rotate(15deg);
 }
 
 /* Efecto de líneas de escaneo en la pantalla */
@@ -253,9 +289,9 @@ header h1 {
   display: block;
   position: absolute;
   top: 0; left: 0; bottom: 0; right: 0;
-  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
   z-index: 2;
-  background-size: 100% 2px, 3px 100%;
+  background-size: 100% 4px, 6px 100%;
   pointer-events: none;
   border-radius: 6px;
 }
