@@ -46,25 +46,23 @@ header {
 
 /* --- LOGO --- */
 .logo-container {
-  width: 90px;  /* Lo reducimos un poco para que no se coma la pantalla */
+  width: 90px; 
   height: 90px;
   border-radius: 15px;
-  background-color: #ffffff; /* Volvemos a poner el fondo blanco para que el dibujo resalte */
+  background-color: #ffffff;
   box-shadow: 0 0 15px rgba(225, 29, 72, 0.6) !important; 
   border: 2px solid #ffffff !important; 
   display: flex;
   justify-content: center; 
   align-items: center;     
-  overflow: hidden; /* ESTO ES CLAVE: corta lo que se salga de la caja */
+  overflow: hidden; 
 }
 .logo-img {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* Obliga a la imagen a llenar todo el cuadrado */
-  
-  /* Eliminamos el blend-mode y el zoom exagerado */
+  object-fit: cover; 
   mix-blend-mode: normal; 
-  transform: scale(1.1); /* Un zoom suave solo para ocultar los bordes de la foto */
+  transform: scale(1.1); 
 }
 
 /* --- TÍTULO TIPO FIRMA --- */
@@ -128,7 +126,21 @@ header h1 {
 
 /* --- PESTAÑAS DE ICONOS --- */
 .tabs { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; justify-content: center; align-items: center; }
-.tab { background: transparent; border: none; padding: 0; cursor: pointer; display: flex; align-items: center; justify-content: center; position: relative; }
+
+/* Contenedor de la pestaña con efecto hover */
+.tab { 
+  background: transparent; 
+  border: none; 
+  padding: 0; 
+  cursor: pointer; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  position: relative;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Efecto rebote suave */
+}
+
+/* El icono en sí */
 .tab-icon {
   height: 70px; 
   width: 70px;  
@@ -139,17 +151,54 @@ header h1 {
   box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 5px 15px rgba(0,0,0,0.6) !important; 
   transition: all 0.3s ease;
 }
-.tab:hover .tab-icon { 
-  transform: translateY(-5px); 
-  border-color: #e11d48 !important;
-  box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 15px rgba(225, 29, 72, 0.5) !important; 
+
+/* --- EFECTOS AL PASAR EL RATÓN (HOVER) --- */
+.tab:hover {
+  transform: scale(1.15) translateY(-5px); /* Hacemos que toda la pestaña crezca y se levante */
+  z-index: 20; /* Nos aseguramos de que se ponga por encima del resto */
 }
+.tab:hover .tab-icon { 
+  border-color: #e11d48 !important;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 25px rgba(225, 29, 72, 0.9) !important; 
+}
+
+/* Pestaña activa */
 .tab.active .tab-icon { 
   border-color: #e11d48 !important; 
   box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 20px rgba(225, 29, 72, 0.8) !important; 
   transform: translateY(-2px);
 }
 
+/* --- NUEVO SISTEMA DE TOOLTIP PERSONALIZADO --- */
+/* Ocultamos el tooltip feo por defecto del navegador */
+.tab::after {
+  content: attr(title); /* Coge el texto del atributo title del HTML */
+  position: absolute;
+  bottom: -45px; /* Lo colocamos debajo de la pestaña */
+  left: 50%;
+  transform: translateX(-50%) scale(0.8);
+  background: rgba(15, 23, 42, 0.95); /* Fondo oscuro a juego con la app */
+  color: #e11d48; /* Texto rojo PitStop */
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #e11d48;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap; /* Para que el texto no se rompa en varias líneas */
+  pointer-events: none; /* Para que no moleste al clicar */
+  opacity: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.8);
+  z-index: 30;
+}
+
+/* Mostramos el tooltip al pasar el ratón */
+.tab:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) scale(1) translateY(-5px); /* Animación de entrada */
+}
+
+/* --- PANELES --- */
 .panel { 
   display: none; 
   background: rgba(31, 41, 55, 0.9) !important; 
