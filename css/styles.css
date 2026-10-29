@@ -147,30 +147,63 @@ header h1 {
 }
 
 /* =========================================
-   NUEVA BOTONERA FÍSICA
+   NUEVA BOTONERA CIRCULAR (D-PAD)
    ========================================= */
 .botonera-fisica {
   display: flex;
-  gap: 8px;
+  gap: 15px;
   align-items: center;
   justify-content: center;
   flex: 1;
 }
 
+.d-pad {
+  display: grid;
+  grid-template-columns: 35px 35px 35px;
+  grid-template-rows: 35px 35px 35px;
+  gap: 2px;
+  background: #111827;
+  border-radius: 50%;
+  padding: 5px;
+  box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 4px 6px rgba(0,0,0,0.5);
+  position: relative;
+}
+
+.btn-dir {
+  background: linear-gradient(180deg, #4b5563 0%, #374151 100%);
+  border: 1px solid #1f2937;
+  color: #9ca3af;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+  transition: all 0.1s;
+}
+
+.btn-dir:active {
+  background: #1f2937;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+}
+
+.btn-arriba { grid-column: 2; grid-row: 1; border-radius: 8px 8px 2px 2px; }
+.btn-izquierda { grid-column: 1; grid-row: 2; border-radius: 8px 2px 2px 8px; }
+.btn-centro { grid-column: 2; grid-row: 2; background: #e11d48; color: #fff; border-radius: 50%; font-size: 12px; font-weight: bold; box-shadow: 0 0 8px rgba(225, 29, 72, 0.6), inset 0 1px 0 rgba(255,255,255,0.3); border: 1px solid #9f1239; }
+.btn-derecha { grid-column: 3; grid-row: 2; border-radius: 2px 8px 8px 2px; }
+.btn-abajo { grid-column: 2; grid-row: 3; border-radius: 2px 2px 8px 8px; }
+
 .btn-maquina {
-  width: 45px;
+  width: 50px;
   height: 40px;
   border-radius: 6px;
   border: none;
   font-family: 'Segoe UI', sans-serif;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 12px;
   color: #fff;
   cursor: pointer;
-  box-shadow: 
-    0 5px 0 #111827, /* Sombra inferior para efecto 3D */
-    0 6px 10px rgba(0,0,0,0.6),
-    inset 0 1px 0 rgba(255,255,255,0.3);
+  box-shadow: 0 5px 0 #111827, 0 6px 10px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.3);
   text-shadow: 0 1px 2px rgba(0,0,0,0.5);
   transition: all 0.1s;
   display: flex;
@@ -178,28 +211,9 @@ header h1 {
   justify-content: center;
 }
 
-/* Efecto al pulsar el botón */
-.btn-maquina:active {
-  transform: translateY(5px);
-  box-shadow: 
-    0 0px 0 #111827,
-    0 1px 3px rgba(0,0,0,0.6),
-    inset 0 2px 5px rgba(0,0,0,0.4);
-}
-
-/* Colores de los botones */
-.btn-rojo { 
-  background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); 
-  font-size: 12px;
-}
-.btn-verde { 
-  background: linear-gradient(180deg, #22c55e 0%, #15803d 100%); 
-  font-size: 12px;
-}
-.btn-azul { 
-  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%); 
-  font-size: 12px;
-}
+.btn-maquina:active { transform: translateY(5px); box-shadow: 0 0px 0 #111827, 0 1px 3px rgba(0,0,0,0.6), inset 0 2px 5px rgba(0,0,0,0.4); }
+.btn-rojo { background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); }
+.btn-verde { background: linear-gradient(180deg, #22c55e 0%, #15803d 100%); }
 
 /* =========================================
    LOGOS DE MARCAS (PEGATINAS)
@@ -300,10 +314,7 @@ header h1 {
   text-transform: uppercase !important;
 }
 
-.tab:hover::after {
-  opacity: 1;
-  transform: translateX(-50%) scale(1) translateY(-5px); 
-}
+.tab:hover::after { opacity: 1; transform: translateX(-50%) scale(1) translateY(-5px); }
 
 /* =========================================
    PANTALLA LCD CON BISEL Y REFLEJOS
@@ -472,24 +483,13 @@ input[type="checkbox"] { transform: scale(1.3); cursor: pointer; accent-color: #
   .texto-maquina { font-size: 22px; }
   
   /* Ajuste de la botonera en móvil */
-  .botonera-fisica { 
-    flex: 1 0 100%; 
-    order: 3; 
-    margin-top: 10px; 
-    gap: 5px;
-  }
-  .btn-maquina { width: 38px; height: 35px; font-size: 11px; }
-
-  .tabs { 
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px; 
-    padding: 15px 8px; 
-    margin-bottom: 15px; 
-    border-radius: 8px;
-    justify-items: center;
-  }
+  .botonera-fisica { flex: 1 0 100%; order: 3; margin-top: 15px; gap: 10px; flex-wrap: wrap; }
   
+  .d-pad { grid-template-columns: 30px 30px 30px; grid-template-rows: 30px 30px 30px; gap: 1px; padding: 4px; }
+  .btn-dir { font-size: 10px; }
+  .btn-maquina { width: 45px; height: 35px; font-size: 11px; }
+
+  .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 15px 8px; margin-bottom: 15px; border-radius: 8px; justify-items: center; }
   .tab-icon { height: 65px; width: 65px; padding: 4px; border-width: 2px; }
   
   .pantalla-lcd { padding: 8px; border-width: 4px; }
