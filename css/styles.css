@@ -128,7 +128,6 @@ header h1 {
    MÁQUINA DE DIAGNOSIS REALISTA
    ========================================= */
 .maquina-diagnosis {
-  /* Textura de metal cepillado */
   background: repeating-linear-gradient(
     45deg,
     #2a323d,
@@ -155,17 +154,17 @@ header h1 {
   font-size: 22px;
   font-weight: bold;
   text-shadow: 1px 1px 2px #000;
-  padding: 0 10px;
+  padding: 10px 15px;
 }
 
 .marco-superior {
-  margin-top: -10px;
+  margin-top: -5px; 
   margin-bottom: 15px;
 }
 
 .marco-inferior {
   margin-top: 15px;
-  margin-bottom: -10px;
+  margin-bottom: -5px; 
   justify-content: center;
 }
 
@@ -174,8 +173,7 @@ header h1 {
   font-family: 'Caveat', cursive !important;
   font-size: 32px;
   letter-spacing: 1px;
-  color: #718096; /* Color gris metal */
-  /* Efecto grabado a cincel: sombra blanca arriba, negra abajo */
+  color: #718096; 
   text-shadow: 
     -1px -1px 0px rgba(255, 255, 255, 0.2),
     1px 1px 1px rgba(0, 0, 0, 0.8),
@@ -280,7 +278,6 @@ header h1 {
    ========================================= */
 .pantalla-lcd {
   background: #0f172a;
-  /* Bisel grueso simulando cristal */
   border: 8px solid #1a202c;
   border-top-color: #0f172a;
   border-bottom-color: #2d3748;
@@ -294,7 +291,6 @@ header h1 {
   overflow: hidden;
 }
 
-/* Reflejo del cristal (diagonal) */
 .pantalla-lcd::after {
   content: "";
   position: absolute;
@@ -310,7 +306,6 @@ header h1 {
   transform: rotate(15deg);
 }
 
-/* Efecto de líneas de escaneo en la pantalla */
 .pantalla-lcd::before {
   content: " ";
   display: block;
@@ -469,7 +464,7 @@ input[type="checkbox"] {
     background-size: cover; 
   }
   
-  /* Margen superior extra en móvil para que no choque con la barra de estado */
+  /* Margen superior extra en móvil para bajar la máquina de la barra de estado */
   .container { padding: 0 10px; margin-top: 40px; }
   
   .header-container { flex-direction: column; gap: 10px; }
@@ -478,12 +473,25 @@ input[type="checkbox"] {
   .title-block { align-items: center; }
   .lang-switch { width: auto; justify-content: center; margin-top: 10px; }
   
-  .maquina-diagnosis { padding: 8px; border-width: 4px; border-radius: 12px; }
-  .marco-superior, .marco-inferior { padding: 0 5px; }
+  /* Máquina más compacta */
+  .maquina-diagnosis { padding: 10px; border-width: 6px; border-radius: 12px; }
   
-  /* Ajuste del texto de la máquina en móvil */
+  /* Ajuste de los marcos superior e inferior */
+  .marco-superior, .marco-inferior { 
+    padding: 5px 10px;
+  }
+  .marco-superior {
+    margin-top: 5px;
+    margin-bottom: 10px;
+  }
+  .marco-inferior {
+    margin-top: 10px;
+    margin-bottom: 5px;
+  }
+  
+  /* Texto de la máquina más pequeño y ajustado */
   .texto-maquina { font-size: 24px; }
-  .texto-autor { font-size: 18px; }
+  .texto-autor { font-size: 20px; }
   
   .tornillo-botones { display: none; }
 
@@ -500,6 +508,8 @@ input[type="checkbox"] {
   button.primary { padding: 10px 16px; font-size: 13px; }
   button.secondary { padding: 6px 10px; font-size: 12px; }
   
+  /* Ajuste de tablas para móvil */
+  table { margin-top: 15px; }
   table th, table td { padding: 8px 6px; font-size: 11px; }
 }
 
