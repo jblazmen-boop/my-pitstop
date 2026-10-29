@@ -181,16 +181,18 @@ header h1 {
   transform: scale(1.1);
 }
 
-/* Panel de botones (Pestañas) */
+/* =========================================
+   PESTAÑAS / BOTONES FÍSICOS (MÁS GRANDES)
+   ========================================= */
 .tabs { 
   display: flex; 
-  gap: 15px; 
+  gap: 20px; /* Más espacio entre iconos */
   margin-bottom: 25px; 
   flex-wrap: wrap; 
   justify-content: center; 
   align-items: center;
   background: linear-gradient(180deg, #111827 0%, #1f2937 100%);
-  padding: 15px;
+  padding: 20px 15px; /* Más padding vertical */
   border-radius: 12px;
   border: 2px solid #111827;
   border-top-color: #374151;
@@ -211,12 +213,13 @@ header h1 {
 }
 
 .tab-icon {
-  height: 70px; 
-  width: 70px;  
-  object-fit: contain; border-radius: 10px; 
+  height: 85px; /* Aumentado de 70px a 85px */
+  width: 85px;  /* Aumentado de 70px a 85px */
+  object-fit: contain; 
+  border-radius: 12px; 
   background-color: #1f2937 !important; 
   border: 2px solid #374151 !important;
-  padding: 5px;
+  padding: 6px;
   box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 5px 15px rgba(0,0,0,0.6) !important; 
   transition: all 0.3s ease;
 }
@@ -240,7 +243,7 @@ header h1 {
 .tab::after {
   content: attr(title); 
   position: absolute;
-  bottom: -45px; 
+  bottom: -50px; /* Ajustado por el mayor tamaño del icono */
   left: 50%;
   transform: translateX(-50%) scale(0.8);
   background: rgba(15, 23, 42, 0.95); 
@@ -479,8 +482,9 @@ input[type="checkbox"] {
   
   .tornillo-botones { display: none; }
 
-  .tabs { gap: 8px; padding: 8px; margin-bottom: 15px; border-radius: 8px; }
-  .tab-icon { height: 50px; width: 50px; padding: 3px; border-width: 1px; }
+  /* Ajuste de las pestañas en móvil: más grandes pero sin desbordar */
+  .tabs { gap: 12px; padding: 12px 8px; margin-bottom: 15px; border-radius: 8px; }
+  .tab-icon { height: 65px; width: 65px; padding: 4px; border-width: 2px; }
   
   .pantalla-lcd { padding: 8px; border-width: 4px; }
   .panel { padding: 12px; border-left-width: 3px; border-radius: 6px; }
