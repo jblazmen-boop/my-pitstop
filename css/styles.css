@@ -44,7 +44,7 @@ header {
   gap: 15px;
 }
 
-/* --- TÍTULO TIPO FIRMA (AGRANDADO) --- */
+/* --- TÍTULO TIPO FIRMA --- */
 .title-block {
   display: flex;
   flex-direction: column;
@@ -107,19 +107,10 @@ header h1 {
    MÁQUINA DE DIAGNOSIS REALISTA
    ========================================= */
 .maquina-diagnosis {
-  background: repeating-linear-gradient(
-    45deg,
-    #2a323d,
-    #2a323d 2px,
-    #303945 2px,
-    #303945 4px
-  );
+  background: repeating-linear-gradient(45deg, #2a323d, #2a323d 2px, #303945 2px, #303945 4px);
   border: 12px solid #1a202c;
   border-radius: 20px;
-  box-shadow: 
-    0 25px 60px rgba(0,0,0,0.9),
-    inset 0 0 0 3px #4a5568,
-    inset 0 0 20px rgba(0,0,0,0.8);
+  box-shadow: 0 25px 60px rgba(0,0,0,0.9), inset 0 0 0 3px #4a5568, inset 0 0 20px rgba(0,0,0,0.8);
   padding: 15px;
   position: relative;
 }
@@ -145,17 +136,69 @@ header h1 {
   padding: 5px;
 }
 
-/* Texto superior y inferior con fuente Caveat y efecto grabado */
+/* Texto superior e inferior con fuente Caveat y efecto grabado */
 .texto-maquina {
   font-family: 'Caveat', cursive !important;
   font-size: 32px;
   letter-spacing: 1px;
   color: #718096; 
-  text-shadow: 
-    -1px -1px 0px rgba(255, 255, 255, 0.2),
-    1px 1px 1px rgba(0, 0, 0, 0.8),
-    inset 0 0 5px rgba(0,0,0,0.5);
+  text-shadow: -1px -1px 0px rgba(255, 255, 255, 0.2), 1px 1px 1px rgba(0, 0, 0, 0.8), inset 0 0 5px rgba(0,0,0,0.5);
   font-weight: 700;
+}
+
+/* =========================================
+   NUEVA BOTONERA FÍSICA
+   ========================================= */
+.botonera-fisica {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.btn-maquina {
+  width: 45px;
+  height: 40px;
+  border-radius: 6px;
+  border: none;
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: bold;
+  font-size: 14px;
+  color: #fff;
+  cursor: pointer;
+  box-shadow: 
+    0 5px 0 #111827, /* Sombra inferior para efecto 3D */
+    0 6px 10px rgba(0,0,0,0.6),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+  transition: all 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Efecto al pulsar el botón */
+.btn-maquina:active {
+  transform: translateY(5px);
+  box-shadow: 
+    0 0px 0 #111827,
+    0 1px 3px rgba(0,0,0,0.6),
+    inset 0 2px 5px rgba(0,0,0,0.4);
+}
+
+/* Colores de los botones */
+.btn-rojo { 
+  background: linear-gradient(180deg, #ef4444 0%, #b91c1c 100%); 
+  font-size: 12px;
+}
+.btn-verde { 
+  background: linear-gradient(180deg, #22c55e 0%, #15803d 100%); 
+  font-size: 12px;
+}
+.btn-azul { 
+  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%); 
+  font-size: 12px;
 }
 
 /* =========================================
@@ -177,12 +220,10 @@ header h1 {
   transition: transform 0.2s ease;
 }
 
-.logo-pegatina:hover {
-  transform: scale(1.1);
-}
+.logo-pegatina:hover { transform: scale(1.1); }
 
 /* =========================================
-   PESTAÑAS / BOTONES FÍSICOS (MÁS GRANDES)
+   PESTAÑAS / BOTONES PRINCIPALES
    ========================================= */
 .tabs { 
   display: flex; 
@@ -224,10 +265,7 @@ header h1 {
   transition: all 0.3s ease;
 }
 
-.tab:hover {
-  transform: scale(1.1) translateY(-3px); 
-  z-index: 20; 
-}
+.tab:hover { transform: scale(1.1) translateY(-3px); z-index: 20; }
 .tab:hover .tab-icon { 
   border-color: #e11d48 !important;
   box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 0 25px rgba(225, 29, 72, 0.9) !important; 
@@ -277,10 +315,7 @@ header h1 {
   border-bottom-color: #2d3748;
   border-radius: 12px;
   padding: 20px;
-  box-shadow: 
-    inset 0 0 30px rgba(0,0,0,0.9),
-    0 0 20px rgba(56, 189, 248, 0.15),
-    0 5px 10px rgba(0,0,0,0.5);
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.9), 0 0 20px rgba(56, 189, 248, 0.15), 0 5px 10px rgba(0,0,0,0.5);
   position: relative;
   overflow: hidden;
 }
@@ -289,12 +324,7 @@ header h1 {
   content: "";
   position: absolute;
   top: -50%; left: -50%; width: 200%; height: 200%;
-  background: linear-gradient(
-    to bottom right,
-    rgba(255, 255, 255, 0.08) 0%,
-    rgba(255, 255, 255, 0.02) 40%,
-    transparent 40.1%
-  );
+  background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 40%, transparent 40.1%);
   pointer-events: none;
   z-index: 10;
   transform: rotate(15deg);
@@ -320,16 +350,9 @@ header h1 {
   margin-bottom: 10px;
   padding-bottom: 5px;
 }
-.tabla-responsive::-webkit-scrollbar {
-  height: 8px;
-}
-.tabla-responsive::-webkit-scrollbar-thumb {
-  background: #e11d48;
-  border-radius: 4px;
-}
-.tabla-responsive::-webkit-scrollbar-track {
-  background: #1f2937;
-}
+.tabla-responsive::-webkit-scrollbar { height: 8px; }
+.tabla-responsive::-webkit-scrollbar-thumb { background: #e11d48; border-radius: 4px; }
+.tabla-responsive::-webkit-scrollbar-track { background: #1f2937; }
 
 /* --- PANELES --- */
 .panel { 
@@ -347,14 +370,7 @@ header h1 {
 .panel.active { display: block; }
 h2 { margin-top: 0; font-size: 20px; color: #ffffff !important; }
 .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-
-.grid-avisos { 
-  display: grid; 
-  grid-template-columns: 1.2fr 1fr 1fr 1fr; 
-  gap: 15px; 
-  margin-bottom: 20px; 
-  align-items: end; 
-}
+.grid-avisos { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px; align-items: end; }
 
 label { display: block; font-size: 12px; color: #9ca3af !important; margin-bottom: 6px; font-weight: 700; }
 input, select, textarea { 
@@ -363,17 +379,8 @@ input, select, textarea {
   color: #ffffff !important; 
   transition: border-color 0.2s, box-shadow 0.2s; 
 }
-
-input[type="date"] {
-  cursor: pointer;
-  min-height: 40px;
-}
-
-input:focus, select:focus, textarea:focus { 
-  border-color: #e11d48 !important; 
-  box-shadow: 0 0 8px rgba(225, 29, 72, 0.4) !important;
-  outline: none; 
-}
+input[type="date"] { cursor: pointer; min-height: 40px; }
+input:focus, select:focus, textarea:focus { border-color: #e11d48 !important; box-shadow: 0 0 8px rgba(225, 29, 72, 0.4) !important; outline: none; }
 textarea { resize: vertical; min-height: 60px; }
 
 button.primary { 
@@ -417,16 +424,8 @@ td button { margin-right: 4px; }
 
 footer { border-top: 1px solid #374151 !important; background-color: rgba(15, 23, 42, 0.95) !important; width: 100%; color: #9ca3af !important; position: relative; z-index: 10; }
 
-h2, label, th {
-  text-transform: uppercase !important;
-  letter-spacing: 1px !important;
-}
-h2 {
-  font-weight: 900 !important;
-  border-bottom: 2px solid #374151 !important;
-  padding-bottom: 10px;
-  margin-bottom: 20px;
-}
+h2, label, th { text-transform: uppercase !important; letter-spacing: 1px !important; }
+h2 { font-weight: 900 !important; border-bottom: 2px solid #374151 !important; padding-bottom: 10px; margin-bottom: 20px; }
 
 .file-btn {
   display: inline-block;
@@ -444,22 +443,15 @@ h2 {
 }
 .file-btn:hover { background: #4b5563 !important; border-color: #e11d48 !important; }
 
-input[type="checkbox"] {
-  transform: scale(1.3);
-  cursor: pointer;
-  accent-color: #e11d48;
-}
+input[type="checkbox"] { transform: scale(1.3); cursor: pointer; accent-color: #e11d48; }
 
 /* =========================================
-   OPTIMIZACIÓN PARA MÓVILES (CORREGIDO)
+   OPTIMIZACIÓN PARA MÓVILES
    ========================================= */
 @media (max-width: 768px) {
-  body::before {
-    background-size: cover; 
-  }
+  body::before { background-size: cover; }
   
   .container { padding: 0 10px; margin-top: 50px; }
-  
   .header-container { flex-direction: column; gap: 10px; }
   .header-spacer { display: none; }
   .header-content { flex-direction: column; gap: 5px; }
@@ -472,23 +464,25 @@ input[type="checkbox"] {
   .maquina-diagnosis { padding: 8px; border-width: 6px; border-radius: 12px; }
   
   .marco-superior { padding-top: 15px; padding-bottom: 10px; margin-bottom: 10px; }
-  .marco-inferior { padding-top: 10px; padding-bottom: 15px; margin-top: 10px; }
+  .marco-inferior { padding-top: 10px; padding-bottom: 15px; margin-top: 10px; flex-wrap: wrap; gap: 10px; }
   
   .logo-pegatina { height: 18px; }
   .pegatinas-izq, .pegatinas-der { min-width: 60px; gap: 6px; }
 
   .texto-maquina { font-size: 22px; }
   
-  .tornillo-botones { display: none; }
+  /* Ajuste de la botonera en móvil */
+  .botonera-fisica { 
+    flex: 1 0 100%; 
+    order: 3; 
+    margin-top: 10px; 
+    gap: 5px;
+  }
+  .btn-maquina { width: 38px; height: 35px; font-size: 11px; }
 
-  /* 
-   * SOLUCIÓN ALINEACIÓN MÓVIL:
-   * Ponemos un Grid de 3 columnas exactas para que siempre queden
-   * 3 arriba y 3 abajo (perfectamente alineados).
-   */
   .tabs { 
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columnas exactas */
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px; 
     padding: 15px 8px; 
     margin-bottom: 15px; 
@@ -496,12 +490,7 @@ input[type="checkbox"] {
     justify-items: center;
   }
   
-  .tab-icon { 
-    height: 65px; 
-    width: 65px; 
-    padding: 4px; 
-    border-width: 2px; 
-  }
+  .tab-icon { height: 65px; width: 65px; padding: 4px; border-width: 2px; }
   
   .pantalla-lcd { padding: 8px; border-width: 4px; }
   .panel { padding: 12px; border-left-width: 3px; border-radius: 6px; }
