@@ -150,18 +150,13 @@ header h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 5px; /* Padding base */
+  padding: 10px 5px;
 }
 
-.marco-superior {
-  margin-bottom: 15px;
-}
+.marco-superior { margin-bottom: 15px; }
+.marco-inferior { margin-top: 15px; }
 
-.marco-inferior {
-  margin-top: 15px;
-}
-
-/* Contenedor central de los textos para obligarlos a estar centrados */
+/* Contenedor central de los textos */
 .texto-maquina-contenedor {
   flex: 1;
   text-align: center;
@@ -194,36 +189,33 @@ header h1 {
 }
 
 /* =========================================
-   PEGATINAS DE MARCAS
+   LOGOS DE MARCAS (PEGATINAS)
    ========================================= */
 .pegatinas-izq, .pegatinas-der {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   align-items: center;
-  min-width: 120px; /* Para que no se aplasten */
+  min-width: 150px; 
 }
 .pegatinas-der { justify-content: flex-end; }
 
-.pegatina {
-  font-family: 'Segoe UI', Arial, sans-serif;
-  font-size: 11px;
-  font-weight: 900;
-  padding: 3px 6px;
-  border-radius: 3px;
-  letter-spacing: 1px;
-  box-shadow: 1px 2px 4px rgba(0,0,0,0.6);
-  transform: rotate(-3deg); /* Efecto de pegatina puesta a mano */
-  border: 1px solid rgba(255,255,255,0.2);
-  display: inline-block;
+/* Estilo para las imágenes de los logos */
+.logo-pegatina {
+  height: 28px; /* Altura fija para que todos se vean proporcionados */
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.8)); /* Sombra para que parezcan pegatinas */
+  transition: transform 0.2s ease;
 }
 
-/* Estilos específicos de cada marca */
-.brembo { background: #fff; color: #e11d48; font-style: italic; transform: rotate(-5deg); }
-.porsche { background: #000; color: #fff; border: 1px solid #d4af37; transform: rotate(2deg); }
-.shell { background: #ffd700; color: #d00; font-weight: 900; transform: rotate(-2deg); }
-.pirelli { background: #000; color: #ffd700; transform: rotate(4deg); }
-.bmw { background: #0066b1; color: #fff; font-style: italic; transform: rotate(-4deg); }
-.motul { background: #e11d48; color: #fff; font-style: italic; transform: rotate(3deg); }
+.logo-pegatina:hover {
+  transform: scale(1.1);
+}
+
+/* Filtro para logos que son blancos o muy claros (Porsche, Pirelli) */
+.logo-blanco {
+  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.8)) brightness(0) invert(1);
+}
 
 /* Panel de botones (Pestañas) */
 .tabs { 
@@ -499,7 +491,7 @@ input[type="checkbox"] {
     background-size: cover; 
   }
   
-  /* Margen superior extra en móvil para bajar la máquina de la barra de estado */
+  /* Margen superior extra en móvil */
   .container { padding: 0 10px; margin-top: 50px; }
   
   .header-container { flex-direction: column; gap: 10px; }
@@ -508,20 +500,17 @@ input[type="checkbox"] {
   .title-block { align-items: center; }
   .lang-switch { width: auto; justify-content: center; margin-top: 10px; }
   
-  /* Máquina más compacta */
   .maquina-diagnosis { padding: 8px; border-width: 6px; border-radius: 12px; }
   
-  /* Ajuste de los marcos para obligar a bajar/subir los textos */
-  .marco-superior { padding-top: 25px; padding-bottom: 10px; margin-bottom: 10px; }
-  .marco-inferior { padding-top: 10px; padding-bottom: 25px; margin-top: 10px; }
+  /* Ajuste de los marcos en móvil */
+  .marco-superior { padding-top: 15px; padding-bottom: 10px; margin-bottom: 10px; }
+  .marco-inferior { padding-top: 10px; padding-bottom: 15px; margin-top: 10px; }
   
-  /* Reducimos el tamaño de las pegatinas para que quepan en el móvil */
-  .pegatina { font-size: 8px; padding: 2px 4px; }
-  .pegatinas-izq, .pegatinas-der { min-width: 60px; }
-  .pegatinas-izq { gap: 4px; }
-  .pegatinas-der { gap: 4px; }
+  /* Reducimos el tamaño de los logos en móvil */
+  .logo-pegatina { height: 18px; }
+  .pegatinas-izq, .pegatinas-der { min-width: 60px; gap: 6px; }
 
-  /* Texto de la máquina más pequeño y ajustado */
+  /* Texto de la máquina más pequeño */
   .texto-maquina { font-size: 22px; }
   .texto-autor { font-size: 18px; }
   
@@ -540,7 +529,6 @@ input[type="checkbox"] {
   button.primary { padding: 10px 16px; font-size: 13px; }
   button.secondary { padding: 6px 10px; font-size: 12px; }
   
-  /* Ajuste de tablas para móvil */
   table { margin-top: 15px; }
   table th, table td { padding: 8px 6px; font-size: 11px; }
 }
