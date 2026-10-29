@@ -8,6 +8,32 @@ let miGraficoInstancia = null;
 
 const STORAGE_KEY = 'mi_app_mantenimiento_coches'; 
 
+// ============ SISTEMA DE SONIDO (BEEP) ============
+function reproducirBeep() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return; 
+
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+
+    osc.type = 'square'; 
+    osc.frequency.setValueAtTime(880, ctx.currentTime); 
+
+    gainNode.gain.setValueAtTime(0.1, ctx.currentTime); 
+    gainNode.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.1); 
+
+    osc.connect(gainNode);
+    gainNode.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime + 0.1); 
+  } catch (e) {
+    console.log("Audio no disponible", e);
+  }
+}
+
 const translations = {
   es: {
     vehiculos_titulo: "Vehículos", matricula: "Matrícula", marca: "Marca", modelo: "Modelo", bastidor: "Nº Bastidor (VIN)",
@@ -132,7 +158,7 @@ function translatePage() {
   document.querySelectorAll('[data-i18n-title]').forEach(el => {
     const key = el.getAttribute('data-i18n-title');
     if (translations[currentLang][key]) {
-      el.title = translations[currentLang][key].toUpperCase(); // FORZADO A MAYÚSCULAS
+      el.title = translations[currentLang][key].toUpperCase(); 
     }
   });
 
@@ -220,6 +246,9 @@ function cerrarModal() {
 
 document.querySelectorAll('.tab').forEach(t => {
   t.onclick = () => {
+    // REPRODUCIR SONIDO AL CAMBIAR DE PESTAÑA
+    reproducirBeep();
+
     document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
     document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
     t.classList.add('active');
@@ -832,7 +861,7 @@ function renderGrafico() {
       plugins: {
         legend: { 
             labels: { 
-                color: '#000000', // FORZADO A NEGRO PARA QUE SE VEA BIEN EN EL PDF
+                color: '#000000', 
                 font: { size: 14, weight: 'bold' } 
             } 
         },
@@ -1030,8 +1059,6 @@ function generarPDF(accion = false) {
     const pageH = doc.internal.pageSize.getHeight();
     let y = 15;
 
-    // MARCA DE AGUA ELIMINADA
-
     doc.setFillColor(15, 23, 42); 
     doc.rect(0, 0, pageW, 20, 'F'); 
     doc.setTextColor(255,255,255);
@@ -1221,8 +1248,6 @@ function exportarGraficoPDF(accion) {
     const doc = new jsPDF('p', 'mm', 'a4');
     const pageW = doc.internal.pageSize.getWidth();
     let y = 15;
-
-    // MARCA DE AGUA ELIMINADA
 
     doc.setFillColor(15, 23, 42); 
     doc.rect(0, 0, pageW, 20, 'F'); 
