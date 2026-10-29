@@ -54,7 +54,7 @@ header {
 header h1 { 
   margin: 0; 
   font-family: 'Caveat', cursive !important; 
-  font-size: 75px; /* Aumentado de 55px a 75px */
+  font-size: 75px;
   font-weight: 700; 
   color: #ffffff !important;
   text-shadow: 0 0 10px rgba(225, 29, 72, 0.8), 0 0 20px rgba(225, 29, 72, 0.4) !important; 
@@ -63,7 +63,7 @@ header h1 {
 }
 .author {
   font-family: 'Caveat', cursive !important;
-  font-size: 35px; /* Aumentado de 24px a 35px */
+  font-size: 35px;
   color: #e11d48;
   margin-top: -5px;
   font-weight: 700;
@@ -156,15 +156,6 @@ header h1 {
     1px 1px 1px rgba(0, 0, 0, 0.8),
     inset 0 0 5px rgba(0,0,0,0.5);
   font-weight: 700;
-}
-
-.texto-autor {
-  font-family: 'Caveat', cursive !important;
-  font-size: 24px;
-  color: #e11d48;
-  text-shadow: 0 0 5px rgba(225, 29, 72, 0.5);
-  letter-spacing: 1px;
-  transform: rotate(-1deg);
 }
 
 /* =========================================
@@ -479,13 +470,12 @@ input[type="checkbox"] {
   .maquina-diagnosis { padding: 8px; border-width: 6px; border-radius: 12px; }
   
   .marco-superior { padding-top: 15px; padding-bottom: 10px; margin-bottom: 10px; }
-  .marco-inferior { padding-top: 10px; padding-bottom: 15px; margin-top: 10px; }
+  .marco-inferior { padding-top: 15px; padding-bottom: 15px; margin-top: 10px; }
   
   .logo-pegatina { height: 18px; }
   .pegatinas-izq, .pegatinas-der { min-width: 60px; gap: 6px; }
 
   .texto-maquina { font-size: 22px; }
-  .texto-autor { font-size: 18px; }
   
   .tornillo-botones { display: none; }
 
