@@ -293,16 +293,16 @@
           <canvas id="miGrafico"></canvas>
         </div>
         
-        <!-- BOTONES EXPORTAR GRÁFICO -->
-        <div class="actions" style="margin-top: 0; justify-content: flex-end;">
-          <button class="primary" onclick="exportarGraficoPDF(false)">
+        <!-- BOTONES EXPORTAR GRÁFICO ALINEADOS EN GRID -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 0; width: 100%;">
+          <button class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center;" onclick="exportarGraficoPDF(false)">
             Generar PDF
           </button>
-          <button class="primary" style="background: #25D366 !important; color: #fff !important;" onclick="exportarGraficoPDF('whatsapp')">
-            <span data-i18n="btn_share_chart">Compartir Gráfico</span> 📲
+          <button class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center; background: #25D366 !important; color: #fff !important;" onclick="exportarGraficoPDF('whatsapp')">
+            <span data-i18n="btn_share_chart">Compartir</span> 📲
           </button>
-          <button class="primary" style="background: #ea4335 !important; color: #fff !important;" onclick="exportarGraficoPDF('email')">
-            <span data-i18n="btn_email_chart">Enviar Gráfico por Correo</span> ✉️
+          <button class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center; background: #ea4335 !important; color: #fff !important;" onclick="exportarGraficoPDF('email')">
+            <span data-i18n="btn_email_chart">Correo</span> ✉️
           </button>
         </div>
         <div id="msg_grafico"></div>
