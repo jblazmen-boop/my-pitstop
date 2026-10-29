@@ -22,7 +22,7 @@ body::before {
 header { 
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.4) 100%) !important; 
   color: white !important; 
-  padding: 15px 24px 20px 24px; 
+  padding: 20px 24px 25px 24px; 
   border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important; 
   position: relative;
   z-index: 10;
@@ -44,28 +44,7 @@ header {
   gap: 15px;
 }
 
-/* --- LOGO --- */
-.logo-container {
-  width: 90px; 
-  height: 90px;
-  border-radius: 15px;
-  background-color: #ffffff;
-  box-shadow: 0 0 15px rgba(225, 29, 72, 0.6) !important; 
-  border: 2px solid #ffffff !important; 
-  display: flex;
-  justify-content: center; 
-  align-items: center;     
-  overflow: hidden; 
-}
-.logo-img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover; 
-  mix-blend-mode: normal; 
-  transform: scale(1.1); 
-}
-
-/* --- TÍTULO TIPO FIRMA --- */
+/* --- TÍTULO TIPO FIRMA (AGRANDADO) --- */
 .title-block {
   display: flex;
   flex-direction: column;
@@ -75,7 +54,7 @@ header {
 header h1 { 
   margin: 0; 
   font-family: 'Caveat', cursive !important; 
-  font-size: 55px; 
+  font-size: 75px; /* Aumentado de 55px a 75px */
   font-weight: 700; 
   color: #ffffff !important;
   text-shadow: 0 0 10px rgba(225, 29, 72, 0.8), 0 0 20px rgba(225, 29, 72, 0.4) !important; 
@@ -84,7 +63,7 @@ header h1 {
 }
 .author {
   font-family: 'Caveat', cursive !important;
-  font-size: 24px;
+  font-size: 35px; /* Aumentado de 24px a 35px */
   color: #e11d48;
   margin-top: -5px;
   font-weight: 700;
@@ -189,7 +168,7 @@ header h1 {
 }
 
 /* =========================================
-   LOGOS DE MARCAS (PEGATINAS SVG)
+   LOGOS DE MARCAS (PEGATINAS)
    ========================================= */
 .pegatinas-izq, .pegatinas-der {
   display: flex;
@@ -199,11 +178,11 @@ header h1 {
 }
 .pegatinas-der { justify-content: flex-end; }
 
-/* Estilo para los SVG de los logos */
 .logo-pegatina {
-  height: 28px; /* Altura fija para que todos se vean proporcionados */
+  height: 28px;
   width: auto;
-  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.8)); /* Sombra para que parezcan pegatinas */
+  object-fit: contain;
+  filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.8));
   transition: transform 0.2s ease;
 }
 
@@ -493,6 +472,10 @@ input[type="checkbox"] {
   .title-block { align-items: center; }
   .lang-switch { width: auto; justify-content: center; margin-top: 10px; }
   
+  /* Tamaño de letras adaptado a móviles */
+  header h1 { font-size: 60px; }
+  .author { font-size: 28px; }
+
   .maquina-diagnosis { padding: 8px; border-width: 6px; border-radius: 12px; }
   
   .marco-superior { padding-top: 15px; padding-bottom: 10px; margin-bottom: 10px; }
