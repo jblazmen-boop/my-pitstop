@@ -6,7 +6,6 @@
   <title>My PitStop - Control de Mantenimiento</title>
   
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&display=swap" rel="stylesheet">
-  <!-- EL TRUCO ESTÁ AQUÍ: ?v=2 fuerza al navegador a buscar el archivo nuevo -->
   <link rel="manifest" href="manifest.json?v=2">
   <meta name="theme-color" content="#111827">
   
@@ -41,337 +40,352 @@
 </header>
 
 <div class="container">
-  <!-- PESTAÑAS -->
-  <div class="tabs">
-    <button class="tab active" data-tab="vehiculos" title="VEHÍCULOS" data-i18n-title="vehiculos_titulo"><img src="icono-coche.png" class="tab-icon" alt="Vehículos"></button>
-    <button class="tab" data-tab="mantenimientos" title="MANTENIMIENTOS" data-i18n-title="historial"><img src="icono-llave.png" class="tab-icon" alt="Mantenimientos"></button>
-    <button class="tab" data-tab="informe" title="GENERAR INFORME / FACTURA" data-i18n-title="gen_informe"><img src="icono-libro.png" class="tab-icon" alt="Informes"></button>
-    <button class="tab" data-tab="recordatorios" title="AVISOS" data-i18n-title="recordatorios"><img src="icono-calendario.PNG" class="tab-icon" alt="Calendario"></button>
-    <button class="tab" data-tab="grafico" title="ESTADÍSTICAS" data-i18n-title="estadisticas"><img src="icono-grafico.PNG" class="tab-icon" alt="Gráfico"></button>
-    <button class="tab" data-tab="backup" title="COPIA DE SEGURIDAD" data-i18n-title="copia_seguridad"><img src="icono-copia.png" class="tab-icon" alt="Copia"></button>
-  </div>
-
-  <!-- VEHÍCULOS -->
-  <div id="vehiculos" class="panel active">
-    <h2 data-i18n="vehiculos_titulo">Vehículos</h2>
-    <div class="form-row">
-      <div class="form-group"><label data-i18n="matricula">Matrícula</label><input id="v_matricula" placeholder="1234ABC" data-i18n-placeholder="ph_matricula"></div>
-      <div class="form-group"><label data-i18n="marca">Marca</label><input id="v_marca" placeholder="Seat" data-i18n-placeholder="ph_marca"></div>
-      <div class="form-group"><label data-i18n="modelo">Modelo</label><input id="v_modelo" placeholder="León" data-i18n-placeholder="ph_modelo"></div>
-      <div class="form-group"><label data-i18n="bastidor">Nº Bastidor (VIN)</label><input id="v_bastidor" placeholder="WVWZZZ..." data-i18n-placeholder="ph_bastidor"></div>
-    </div>
-    <button class="primary" data-i18n="add_vehiculo" onclick="addVehiculo()">Añadir vehículo</button>
-    <div id="msg_vehiculo"></div>
-    <table id="tabla_vehiculos">
-      <thead><tr><th data-i18n="matricula">Matrícula</th><th data-i18n="marca">Marca</th><th data-i18n="modelo">Modelo</th><th data-i18n="bastidor">Bastidor</th><th data-i18n="acciones">Acciones</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <!-- MANTENIMIENTOS -->
-  <div id="mantenimientos" class="panel">
-    <h2 id="titulo-formulario" data-i18n="reg_mantenimiento">Registrar mantenimiento</h2>
-    <div class="grid">
-      <div><label data-i18n="vehiculo">Vehículo</label><select id="m_vehiculo"><option value="" data-i18n="selecciona">— Selecciona —</option></select></div>
-      <div><label data-i18n="fecha">Fecha</label><input type="date" id="m_fecha"></div>
-      <div><label data-i18n="km">Kms</label><input type="number" id="m_km" placeholder="85000"></div>
-      <div><label data-i18n="tipo">Tipo</label>
-        <select id="m_tipo">
-          <optgroup label="Revisión / Mantenimiento" id="group-1"><option value="type_1" id="opt-1">Revisión / Mantenimiento</option></optgroup>
-          <optgroup label="Motor" id="group-2"><option value="type_2" id="opt-2">Motor</option></optgroup>
-          <optgroup label="Transmisión" id="group-3"><option value="type_3" id="opt-3">Transmisión</option></optgroup>
-          <optgroup label="Suspensión, Dirección y Frenos" id="group-4"><option value="type_4" id="opt-4">Suspensión, Dirección y Frenos</option></optgroup>
-          <optgroup label="Electricidad / Electrónica" id="group-5"><option value="type_5" id="opt-5">Electricidad / Electrónica</option></optgroup>
-          <optgroup label="Climatización" id="group-6"><option value="type_6" id="opt-6">Climatización</option></optgroup>
-          <optgroup label="Escape" id="group-7"><option value="type_7" id="opt-7">Escape</option></optgroup>
-          <optgroup label="Interior, Habitáculo y Seguridad" id="group-8"><option value="type_8" id="opt-8">Interior, Habitáculo y Seguridad</option></optgroup>
-          <optgroup label="Chasis y Carrocería" id="group-9"><option value="type_9" id="opt-9">Chasis y Carrocería</option></optgroup>
-          <optgroup label="Otro" id="group-10"><option value="type_10" id="opt-10">Otro</option></optgroup>
-        </select>
-      </div>
-      <div><label data-i18n="taller">Taller</label><input id="m_taller" placeholder="Taller Pepe" data-i18n-placeholder="ph_taller"></div>
-      <div style="grid-column: 1 / -1;"><label data-i18n="notas">Notas</label><textarea id="m_notas"></textarea></div>
+  
+  <!-- INICIO DE LA MÁQUINA DE DIAGNOSIS -->
+  <div class="maquina-diagnosis">
+    <div class="tornillo-botones">
+      <span>⨁</span>
+      <span>⨁</span>
     </div>
 
-    <div style="margin-top: 10px; border-top: 1px solid #374151; padding-top: 10px;">
-      <h3 style="font-size: 16px; margin-bottom: 8px; color: #e11d48; text-transform: uppercase;" data-i18n="mano_obra">Mano de Obra</h3>
-      <div class="grid" style="grid-template-columns: 1fr 100px 100px; gap: 8px;">
-        <div><label data-i18n="operacion">Operación</label><input id="o_concepto" placeholder="Ej: Sustituir correa" data-i18n-placeholder="ej_operacion"></div>
-        <div><label data-i18n="precio">Precio (€)</label><input type="number" step="0.01" id="o_precio" placeholder="80"></div>
-        <div style="display: flex; align-items: flex-end;"><button type="button" class="secondary" data-i18n="add_btn" onclick="addManoObra()" style="width:100%;">+ Añadir</button></div>
-      </div>
-      <table id="tabla_mano_obra" style="font-size: 12px; width: 100%; border-collapse: collapse; margin-top: 10px;">
-        <thead><tr style="background:#111827;"><th style="padding:6px; border:1px solid #374151;" data-i18n="operacion">Operación</th><th style="padding:6px; border:1px solid #374151;" data-i18n="precio">Precio</th><th style="padding:6px; border:1px solid #374151;"></th></tr></thead>
-        <tbody></tbody>
-      </table>
-      <div style="text-align: right; font-weight: bold; margin-top: 8px;"><span data-i18n="total_mano">Total Mano de Obra:</span> <span id="total_mano">0.00 €</span></div>
+    <!-- PESTAÑAS / BOTONES FÍSICOS -->
+    <div class="tabs">
+      <button class="tab active" data-tab="vehiculos" title="VEHÍCULOS" data-i18n-title="vehiculos_titulo"><img src="icono-coche.png" class="tab-icon" alt="Vehículos"></button>
+      <button class="tab" data-tab="mantenimientos" title="MANTENIMIENTOS" data-i18n-title="historial"><img src="icono-llave.png" class="tab-icon" alt="Mantenimientos"></button>
+      <button class="tab" data-tab="informe" title="GENERAR INFORME / FACTURA" data-i18n-title="gen_informe"><img src="icono-libro.png" class="tab-icon" alt="Informes"></button>
+      <button class="tab" data-tab="recordatorios" title="AVISOS" data-i18n-title="recordatorios"><img src="icono-calendario.PNG" class="tab-icon" alt="Calendario"></button>
+      <button class="tab" data-tab="grafico" title="ESTADÍSTICAS" data-i18n-title="estadisticas"><img src="icono-grafico.PNG" class="tab-icon" alt="Gráfico"></button>
+      <button class="tab" data-tab="backup" title="COPIA DE SEGURIDAD" data-i18n-title="copia_seguridad"><img src="icono-copia.png" class="tab-icon" alt="Copia"></button>
     </div>
 
-    <div style="margin-top: 20px; border-top: 1px solid #374151; padding-top: 10px;">
-      <h3 style="font-size: 16px; margin-bottom: 8px; color: #e11d48; text-transform: uppercase;" data-i18n="repuestos">Repuestos</h3>
-      <div class="grid" style="grid-template-columns: 80px 1fr 1fr 100px; gap: 8px;">
-        <div><label data-i18n="cant">Cant.</label><input type="number" id="r_cant" value="1" min="1"></div>
-        <div><label data-i18n="descripcion">Descripción</label><input id="r_desc" placeholder="Filtro de aceite" data-i18n-placeholder="ph_descripcion"></div>
-        <div><label data-i18n="referencia">Referencia</label><input id="r_ref" placeholder="Ej: MANN-W712" data-i18n-placeholder="ej_referencia"></div>
-        <div><label data-i18n="precio">Precio (€)</label><input type="number" step="0.01" id="r_precio" placeholder="12.50"></div>
-      </div>
+    <!-- PANTALLA LCD DONDE SE MUESTRAN LOS PANELES -->
+    <div class="pantalla-lcd">
       
-      <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
-        <div>
-          <label data-i18n="subir_foto">Subir nueva foto (opcional)</label>
-          <input type="file" id="r_foto" accept="image/*" style="display:none;">
-          <label for="r_foto" class="file-btn" id="file-btn-label" data-i18n="seleccionar_archivo">Seleccionar archivo</label>
+      <!-- VEHÍCULOS -->
+      <div id="vehiculos" class="panel active">
+        <h2 data-i18n="vehiculos_titulo">Vehículos</h2>
+        <div class="form-row">
+          <div class="form-group"><label data-i18n="matricula">Matrícula</label><input id="v_matricula" placeholder="1234ABC" data-i18n-placeholder="ph_matricula"></div>
+          <div class="form-group"><label data-i18n="marca">Marca</label><input id="v_marca" placeholder="Seat" data-i18n-placeholder="ph_marca"></div>
+          <div class="form-group"><label data-i18n="modelo">Modelo</label><input id="v_modelo" placeholder="León" data-i18n-placeholder="ph_modelo"></div>
+          <div class="form-group"><label data-i18n="bastidor">Nº Bastidor (VIN)</label><input id="v_bastidor" placeholder="WVWZZZ..." data-i18n-placeholder="ph_bastidor"></div>
         </div>
-        <div>
-          <label data-i18n="cat_foto">O elegir del catálogo (opcional)</label>
-          <select id="r_foto_catalogo">
-            <option value="" data-i18n="no_foto">— No usar foto —</option>
-          </select>
-        </div>
+        <button class="primary" data-i18n="add_vehiculo" onclick="addVehiculo()">Añadir vehículo</button>
+        <div id="msg_vehiculo"></div>
+        <table id="tabla_vehiculos">
+          <thead><tr><th data-i18n="matricula">Matrícula</th><th data-i18n="marca">Marca</th><th data-i18n="modelo">Modelo</th><th data-i18n="bastidor">Bastidor</th><th data-i18n="acciones">Acciones</th></tr></thead>
+          <tbody></tbody>
+        </table>
       </div>
-      
-      <button type="button" class="secondary" data-i18n="add_repuesto" onclick="addRepuesto()" style="margin-top:8px;">+ Añadir Repuesto</button>
-      
-      <table id="tabla_repuestos" style="font-size: 12px; width: 100%; border-collapse: collapse; margin-top: 10px;">
-        <thead><tr style="background:#111827;"><th style="padding:6px; border:1px solid #374151;" data-i18n="foto">Foto</th><th style="padding:6px; border:1px solid #374151;" data-i18n="cant">Cant</th><th style="padding:6px; border:1px solid #374151;" data-i18n="descripcion">Descripción</th><th style="padding:6px; border:1px solid #374151;" data-i18n="referencia">Ref</th><th style="padding:6px; border:1px solid #374151;" data-i18n="precio">Precio</th><th style="padding:6px; border:1px solid #374151;" data-i18n="total">Total</th><th style="padding:6px; border:1px solid #374151;"></th></tr></thead>
-        <tbody></tbody>
-      </table>
-      <div style="text-align: right; font-weight: bold; margin-top: 8px;"><span data-i18n="total_repuestos">Total Repuestos:</span> <span id="total_repuestos">0.00 €</span></div>
-    </div>
 
-    <br>
-    <button class="primary" id="btn-guardar" data-i18n="guardar_mant" onclick="guardarMantenimiento()">Guardar Mantenimiento</button>
-    <button class="secondary" id="btn-cancelar" data-i18n="cancelar_edit" onclick="cancelarEdicion()" style="display:none; margin-left: 10px;">Cancelar Edición</button>
-    
-    <div id="msg_mantenimiento"></div>
-
-    <h2 style="margin-top:24px;" data-i18n="historial">Historial de Mantenimientos</h2>
-    
-    <div class="grid">
-      <div><label data-i18n="filtrar">Filtrar por vehículo</label><select id="f_vehiculo"><option value="" data-i18n="todos">Todos</option></select></div>
-    </div>
-    <table id="tabla_mantenimientos">
-      <thead><tr><th data-i18n="fecha">Fecha</th><th data-i18n="vehiculo">Vehículo</th><th data-i18n="km">Kms</th><th data-i18n="tipo">Tipo</th><th data-i18n="operaciones">Operaciones</th><th data-i18n="mano">Mano</th><th data-i18n="piezas">Piezas</th><th data-i18n="total">Total</th><th data-i18n="acciones">Acciones</th></tr></thead>
-      <tbody></tbody>
-    </table>
-  </div>
-
-  <!-- RECORDATORIOS -->
-  <div id="recordatorios" class="panel">
-    <h2 data-i18n="recordatorios">Avisos y Recordatorios</h2>
-    
-    <div class="grid" style="grid-template-columns: 1fr;">
-      <div>
-        <label data-i18n="vehiculo">Vehículo</label>
-        <select id="rec_vehiculo" onchange="cargarRecordatorios()">
-          <option value="" data-i18n="selecciona">— Selecciona —</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- BLOQUE MANTENIMIENTO -->
-    <div style="background: rgba(17, 24, 39, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #374151; margin-bottom: 20px;">
-      <h3 style="color: #e11d48; font-size: 16px; margin-top: 0; margin-bottom: 15px;" data-i18n="prox_mant">Próximo Mantenimiento</h3>
-      <div class="grid-avisos">
-        <div>
-          <label data-i18n="fecha_prox_mant">Fecha Próx. Mantenimiento</label>
-          <input type="date" id="rec_mant">
-        </div>
-        <div>
-          <label data-i18n="km_prox_mant">Kms Próx. Mantenimiento</label>
-          <input type="number" id="rec_km_mant" placeholder="Ej: 100000">
-        </div>
-      </div>
-    </div>
-
-    <!-- BLOQUE ITV -->
-    <div style="background: rgba(17, 24, 39, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #374151; margin-bottom: 20px;">
-      <h3 style="color: #e11d48; font-size: 16px; margin-top: 0; margin-bottom: 15px;" data-i18n="itv">ITV</h3>
-      <div class="grid-avisos" style="margin-bottom: 10px;">
-        <div>
-          <label data-i18n="fecha_prox_itv">Fecha Próx. ITV</label>
-          <input type="date" id="rec_itv">
-        </div>
-        <div></div> <!-- Hueco -->
-      </div>
-      
-      <div style="margin-top: 15px; border-top: 1px dashed #4b5563; padding-top: 10px;">
-        <p style="font-size: 12px; color: #9ca3af; margin-bottom: 10px;" data-i18n="registro_itv_pasada">Al rellenar estos campos, se añadirá un registro al historial del coche:</p>
-        <div class="grid-avisos">
-          <div>
-            <label data-i18n="fecha_pasada_itv">Fecha Pasada ITV</label>
-            <input type="date" id="rec_itv_pasada">
+      <!-- MANTENIMIENTOS -->
+      <div id="mantenimientos" class="panel">
+        <h2 id="titulo-formulario" data-i18n="reg_mantenimiento">Registrar mantenimiento</h2>
+        <div class="grid">
+          <div><label data-i18n="vehiculo">Vehículo</label><select id="m_vehiculo"><option value="" data-i18n="selecciona">— Selecciona —</option></select></div>
+          <div><label data-i18n="fecha">Fecha</label><input type="date" id="m_fecha"></div>
+          <div><label data-i18n="km">Kms</label><input type="number" id="m_km" placeholder="85000"></div>
+          <div><label data-i18n="tipo">Tipo</label>
+            <select id="m_tipo">
+              <optgroup label="Revisión / Mantenimiento" id="group-1"><option value="type_1" id="opt-1">Revisión / Mantenimiento</option></optgroup>
+              <optgroup label="Motor" id="group-2"><option value="type_2" id="opt-2">Motor</option></optgroup>
+              <optgroup label="Transmisión" id="group-3"><option value="type_3" id="opt-3">Transmisión</option></optgroup>
+              <optgroup label="Suspensión, Dirección y Frenos" id="group-4"><option value="type_4" id="opt-4">Suspensión, Dirección y Frenos</option></optgroup>
+              <optgroup label="Electricidad / Electrónica" id="group-5"><option value="type_5" id="opt-5">Electricidad / Electrónica</option></optgroup>
+              <optgroup label="Climatización" id="group-6"><option value="type_6" id="opt-6">Climatización</option></optgroup>
+              <optgroup label="Escape" id="group-7"><option value="type_7" id="opt-7">Escape</option></optgroup>
+              <optgroup label="Interior, Habitáculo y Seguridad" id="group-8"><option value="type_8" id="opt-8">Interior, Habitáculo y Seguridad</option></optgroup>
+              <optgroup label="Chasis y Carrocería" id="group-9"><option value="type_9" id="opt-9">Chasis y Carrocería</option></optgroup>
+              <optgroup label="Otro" id="group-10"><option value="type_10" id="opt-10">Otro</option></optgroup>
+            </select>
           </div>
-          <div>
-            <label data-i18n="km_itv_pasada">Kms de esa ITV</label>
-            <input type="number" id="rec_km_itv_pasada" placeholder="Ej: 105000">
+          <div><label data-i18n="taller">Taller</label><input id="m_taller" placeholder="Taller Pepe" data-i18n-placeholder="ph_taller"></div>
+          <div style="grid-column: 1 / -1;"><label data-i18n="notas">Notas</label><textarea id="m_notas"></textarea></div>
+        </div>
+
+        <div style="margin-top: 10px; border-top: 1px solid #374151; padding-top: 10px;">
+          <h3 style="font-size: 16px; margin-bottom: 8px; color: #e11d48; text-transform: uppercase;" data-i18n="mano_obra">Mano de Obra</h3>
+          <div class="grid" style="grid-template-columns: 1fr 100px 100px; gap: 8px;">
+            <div><label data-i18n="operacion">Operación</label><input id="o_concepto" placeholder="Ej: Sustituir correa" data-i18n-placeholder="ej_operacion"></div>
+            <div><label data-i18n="precio">Precio (€)</label><input type="number" step="0.01" id="o_precio" placeholder="80"></div>
+            <div style="display: flex; align-items: flex-end;"><button type="button" class="secondary" data-i18n="add_btn" onclick="addManoObra()" style="width:100%;">+ Añadir</button></div>
           </div>
-        </div>
-      </div>
-    </div>
-    
-    <div style="margin-top: 15px;">
-      <button class="primary" data-i18n="guardar" onclick="guardarRecordatorio()">Guardar Datos</button>
-    </div>
-    
-    <div id="msg_recordatorios"></div>
-
-    <!-- TABLA RESUMEN -->
-    <h3 style="margin-top: 30px; color: #e2e8f0;" data-i18n="resumen_avisos">Resumen de Avisos</h3>
-    <table style="margin-top: 10px;">
-      <thead>
-        <tr>
-          <th data-i18n="vehiculo">Vehículo</th>
-          <th data-i18n="prox_mant">Próximo Mantenimiento</th>
-          <th data-i18n="prox_itv">Próxima ITV</th>
-        </tr>
-      </thead>
-      <tbody id="tabla_recordatorios_body">
-        <!-- Aquí se cargarán los avisos -->
-      </tbody>
-    </table>
-  </div>
-
-  <!-- GRÁFICO DE GASTOS Y GASTOS FIJOS INTEGRADOS -->
-  <div id="grafico" class="panel">
-    <h2 data-i18n="estadisticas">Estadísticas de Gasto</h2>
-    
-    <div class="grid">
-      <div>
-        <label data-i18n="vehiculo">Vehículo</label>
-        <select id="g_vehiculo" onchange="renderGrafico(); cargarGastosFijos();">
-          <option value="" data-i18n="todos">Todos</option>
-        </select>
-      </div>
-      <div>
-        <label data-i18n="modo_grafico">Ver por:</label>
-        <select id="g_modo" onchange="renderGrafico()">
-          <option value="anios" data-i18n="anios">Años</option>
-          <option value="meses" data-i18n="meses">Meses</option>
-        </select>
-      </div>
-      <div id="contenedor_anio_grafico" style="display: none;">
-        <label data-i18n="anio_grafico">Año:</label>
-        <select id="g_anio" onchange="renderGrafico()">
-          <!-- Se rellena desde JS -->
-        </select>
-      </div>
-    </div>
-
-    <div style="display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap;">
-      
-      <!-- COLUMNA IZQUIERDA: TOTAL Y GASTOS FIJOS -->
-      <div style="flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 20px;">
-        
-        <!-- Panel del total -->
-        <div style="background: rgba(17, 24, 39, 0.85); padding: 20px; border-radius: 8px; border: 1px solid #374151; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: inset 0 0 20px rgba(225, 29, 72, 0.1);">
-          <h3 style="color: #9ca3af; margin: 0 0 10px 0; font-size: 14px;" data-i18n="gasto_total_mix">Gasto Total (Mecánica + Fijos)</h3>
-          <span id="texto_gasto_total" style="font-size: 36px; font-weight: bold; color: #e11d48; text-shadow: 0 0 10px rgba(225, 29, 72, 0.5);">0.00 €</span>
+          <table id="tabla_mano_obra" style="font-size: 12px; width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead><tr style="background:#111827;"><th style="padding:6px; border:1px solid #374151;" data-i18n="operacion">Operación</th><th style="padding:6px; border:1px solid #374151;" data-i18n="precio">Precio</th><th style="padding:6px; border:1px solid #374151;"></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <div style="text-align: right; font-weight: bold; margin-top: 8px;"><span data-i18n="total_mano">Total Mano de Obra:</span> <span id="total_mano">0.00 €</span></div>
         </div>
 
-        <!-- Panel Gastos Fijos -->
-        <div style="background: rgba(17, 24, 39, 0.85); padding: 15px; border-radius: 8px; border: 1px solid #374151;">
-          <h3 style="color: #e11d48; font-size: 14px; margin-top: 0; margin-bottom: 15px; text-transform: uppercase;" data-i18n="gastos_fijos">Gastos Fijos (Seguro e ITV)</h3>
-          <div style="display: flex; flex-direction: column; gap: 10px;">
+        <div style="margin-top: 20px; border-top: 1px solid #374151; padding-top: 10px;">
+          <h3 style="font-size: 16px; margin-bottom: 8px; color: #e11d48; text-transform: uppercase;" data-i18n="repuestos">Repuestos</h3>
+          <div class="grid" style="grid-template-columns: 80px 1fr 1fr 100px; gap: 8px;">
+            <div><label data-i18n="cant">Cant.</label><input type="number" id="r_cant" value="1" min="1"></div>
+            <div><label data-i18n="descripcion">Descripción</label><input id="r_desc" placeholder="Filtro de aceite" data-i18n-placeholder="ph_descripcion"></div>
+            <div><label data-i18n="referencia">Referencia</label><input id="r_ref" placeholder="Ej: MANN-W712" data-i18n-placeholder="ej_referencia"></div>
+            <div><label data-i18n="precio">Precio (€)</label><input type="number" step="0.01" id="r_precio" placeholder="12.50"></div>
+          </div>
+          
+          <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
             <div>
-              <label data-i18n="coste_seguro">Coste Seguro (Anual)</label>
-              <input type="number" step="0.01" id="gf_seguro" placeholder="Ej: 350.00">
+              <label data-i18n="subir_foto">Subir nueva foto (opcional)</label>
+              <input type="file" id="r_foto" accept="image/*" style="display:none;">
+              <label for="r_foto" class="file-btn" id="file-btn-label" data-i18n="seleccionar_archivo">Seleccionar archivo</label>
             </div>
             <div>
-              <label data-i18n="coste_itv">Coste Tasa ITV (Aprox)</label>
-              <input type="number" step="0.01" id="gf_itv" placeholder="Ej: 45.00">
+              <label data-i18n="cat_foto">O elegir del catálogo (opcional)</label>
+              <select id="r_foto_catalogo">
+                <option value="" data-i18n="no_foto">— No usar foto —</option>
+              </select>
             </div>
-            <button class="secondary" style="width: 100%; margin-top: 5px;" data-i18n="guardar" onclick="guardarGastosFijos()">Guardar Fijos</button>
-            <div id="msg_gastos_fijos"></div>
+          </div>
+          
+          <button type="button" class="secondary" data-i18n="add_repuesto" onclick="addRepuesto()" style="margin-top:8px;">+ Añadir Repuesto</button>
+          
+          <table id="tabla_repuestos" style="font-size: 12px; width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead><tr style="background:#111827;"><th style="padding:6px; border:1px solid #374151;" data-i18n="foto">Foto</th><th style="padding:6px; border:1px solid #374151;" data-i18n="cant">Cant</th><th style="padding:6px; border:1px solid #374151;" data-i18n="descripcion">Descripción</th><th style="padding:6px; border:1px solid #374151;" data-i18n="referencia">Ref</th><th style="padding:6px; border:1px solid #374151;" data-i18n="precio">Precio</th><th style="padding:6px; border:1px solid #374151;" data-i18n="total">Total</th><th style="padding:6px; border:1px solid #374151;"></th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <div style="text-align: right; font-weight: bold; margin-top: 8px;"><span data-i18n="total_repuestos">Total Repuestos:</span> <span id="total_repuestos">0.00 €</span></div>
+        </div>
+
+        <br>
+        <button class="primary" id="btn-guardar" data-i18n="guardar_mant" onclick="guardarMantenimiento()">Guardar Mantenimiento</button>
+        <button class="secondary" id="btn-cancelar" data-i18n="cancelar_edit" onclick="cancelarEdicion()" style="display:none; margin-left: 10px;">Cancelar Edición</button>
+        
+        <div id="msg_mantenimiento"></div>
+
+        <h2 style="margin-top:24px;" data-i18n="historial">Historial de Mantenimientos</h2>
+        
+        <div class="grid">
+          <div><label data-i18n="filtrar">Filtrar por vehículo</label><select id="f_vehiculo"><option value="" data-i18n="todos">Todos</option></select></div>
+        </div>
+        <table id="tabla_mantenimientos">
+          <thead><tr><th data-i18n="fecha">Fecha</th><th data-i18n="vehiculo">Vehículo</th><th data-i18n="km">Kms</th><th data-i18n="tipo">Tipo</th><th data-i18n="operaciones">Operaciones</th><th data-i18n="mano">Mano</th><th data-i18n="piezas">Piezas</th><th data-i18n="total">Total</th><th data-i18n="acciones">Acciones</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+      <!-- RECORDATORIOS -->
+      <div id="recordatorios" class="panel">
+        <h2 data-i18n="recordatorios">Avisos y Recordatorios</h2>
+        
+        <div class="grid" style="grid-template-columns: 1fr;">
+          <div>
+            <label data-i18n="vehiculo">Vehículo</label>
+            <select id="rec_vehiculo" onchange="cargarRecordatorios()">
+              <option value="" data-i18n="selecciona">— Selecciona —</option>
+            </select>
           </div>
         </div>
 
-      </div>
-      
-      <!-- COLUMNA DERECHA: GRÁFICO Y BOTONES -->
-      <div style="flex: 2; min-width: 300px; display: flex; flex-direction: column; gap: 15px;">
-        <div style="background: rgba(17, 24, 39, 0.85); padding: 20px; border-radius: 8px; border: 1px solid #374151; height: 400px; position: relative;">
-          <canvas id="miGrafico"></canvas>
+        <!-- BLOQUE MANTENIMIENTO -->
+        <div style="background: rgba(17, 24, 39, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #374151; margin-bottom: 20px;">
+          <h3 style="color: #e11d48; font-size: 16px; margin-top: 0; margin-bottom: 15px;" data-i18n="prox_mant">Próximo Mantenimiento</h3>
+          <div class="grid-avisos">
+            <div>
+              <label data-i18n="fecha_prox_mant">Fecha Próx. Mantenimiento</label>
+              <input type="date" id="rec_mant">
+            </div>
+            <div>
+              <label data-i18n="km_prox_mant">Kms Próx. Mantenimiento</label>
+              <input type="number" id="rec_km_mant" placeholder="Ej: 100000">
+            </div>
+          </div>
+        </div>
+
+        <!-- BLOQUE ITV -->
+        <div style="background: rgba(17, 24, 39, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #374151; margin-bottom: 20px;">
+          <h3 style="color: #e11d48; font-size: 16px; margin-top: 0; margin-bottom: 15px;" data-i18n="itv">ITV</h3>
+          <div class="grid-avisos" style="margin-bottom: 10px;">
+            <div>
+              <label data-i18n="fecha_prox_itv">Fecha Próx. ITV</label>
+              <input type="date" id="rec_itv">
+            </div>
+            <div></div> <!-- Hueco -->
+          </div>
+          
+          <div style="margin-top: 15px; border-top: 1px dashed #4b5563; padding-top: 10px;">
+            <p style="font-size: 12px; color: #9ca3af; margin-bottom: 10px;" data-i18n="registro_itv_pasada">Al rellenar estos campos, se añadirá un registro al historial del coche:</p>
+            <div class="grid-avisos">
+              <div>
+                <label data-i18n="fecha_pasada_itv">Fecha Pasada ITV</label>
+                <input type="date" id="rec_itv_pasada">
+              </div>
+              <div>
+                <label data-i18n="km_itv_pasada">Kms de esa ITV</label>
+                <input type="number" id="rec_km_itv_pasada" placeholder="Ej: 105000">
+              </div>
+            </div>
+          </div>
         </div>
         
-        <!-- BOTONES EXPORTAR GRÁFICO ALINEADOS EN GRID -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 0; width: 100%;">
-          <button class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center;" onclick="exportarGraficoPDF(false)">
-            <span data-i18n="btn_gen_pdf">Generar PDF</span>
+        <div style="margin-top: 15px;">
+          <button class="primary" data-i18n="guardar" onclick="guardarRecordatorio()">Guardar Datos</button>
+        </div>
+        
+        <div id="msg_recordatorios"></div>
+
+        <!-- TABLA RESUMEN -->
+        <h3 style="margin-top: 30px; color: #e2e8f0;" data-i18n="resumen_avisos">Resumen de Avisos</h3>
+        <table style="margin-top: 10px;">
+          <thead>
+            <tr>
+              <th data-i18n="vehiculo">Vehículo</th>
+              <th data-i18n="prox_mant">Próximo Mantenimiento</th>
+              <th data-i18n="prox_itv">Próxima ITV</th>
+            </tr>
+          </thead>
+          <tbody id="tabla_recordatorios_body">
+            <!-- Aquí se cargarán los avisos -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- GRÁFICO DE GASTOS Y GASTOS FIJOS INTEGRADOS -->
+      <div id="grafico" class="panel">
+        <h2 data-i18n="estadisticas">Estadísticas de Gasto</h2>
+        
+        <div class="grid">
+          <div>
+            <label data-i18n="vehiculo">Vehículo</label>
+            <select id="g_vehiculo" onchange="renderGrafico(); cargarGastosFijos();">
+              <option value="" data-i18n="todos">Todos</option>
+            </select>
+          </div>
+          <div>
+            <label data-i18n="modo_grafico">Ver por:</label>
+            <select id="g_modo" onchange="renderGrafico()">
+              <option value="anios" data-i18n="anios">Años</option>
+              <option value="meses" data-i18n="meses">Meses</option>
+            </select>
+          </div>
+          <div id="contenedor_anio_grafico" style="display: none;">
+            <label data-i18n="anio_grafico">Año:</label>
+            <select id="g_anio" onchange="renderGrafico()">
+              <!-- Se rellena desde JS -->
+            </select>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 20px; margin-top: 20px; flex-wrap: wrap;">
+          
+          <!-- COLUMNA IZQUIERDA: TOTAL Y GASTOS FIJOS -->
+          <div style="flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 20px;">
+            
+            <!-- Panel del total -->
+            <div style="background: rgba(17, 24, 39, 0.85); padding: 20px; border-radius: 8px; border: 1px solid #374151; display: flex; flex-direction: column; justify-content: center; align-items: center; box-shadow: inset 0 0 20px rgba(225, 29, 72, 0.1);">
+              <h3 style="color: #9ca3af; margin: 0 0 10px 0; font-size: 14px;" data-i18n="gasto_total_mix">Gasto Total (Mecánica + Fijos)</h3>
+              <span id="texto_gasto_total" style="font-size: 36px; font-weight: bold; color: #e11d48; text-shadow: 0 0 10px rgba(225, 29, 72, 0.5);">0.00 €</span>
+            </div>
+
+            <!-- Panel Gastos Fijos -->
+            <div style="background: rgba(17, 24, 39, 0.85); padding: 15px; border-radius: 8px; border: 1px solid #374151;">
+              <h3 style="color: #e11d48; font-size: 14px; margin-top: 0; margin-bottom: 15px; text-transform: uppercase;" data-i18n="gastos_fijos">Gastos Fijos (Seguro e ITV)</h3>
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <div>
+                  <label data-i18n="coste_seguro">Coste Seguro (Anual)</label>
+                  <input type="number" step="0.01" id="gf_seguro" placeholder="Ej: 350.00">
+                </div>
+                <div>
+                  <label data-i18n="coste_itv">Coste Tasa ITV (Aprox)</label>
+                  <input type="number" step="0.01" id="gf_itv" placeholder="Ej: 45.00">
+                </div>
+                <button class="secondary" style="width: 100%; margin-top: 5px;" data-i18n="guardar" onclick="guardarGastosFijos()">Guardar Fijos</button>
+                <div id="msg_gastos_fijos"></div>
+              </div>
+            </div>
+
+          </div>
+          
+          <!-- COLUMNA DERECHA: GRÁFICO Y BOTONES -->
+          <div style="flex: 2; min-width: 300px; display: flex; flex-direction: column; gap: 15px;">
+            <div style="background: rgba(17, 24, 39, 0.85); padding: 20px; border-radius: 8px; border: 1px solid #374151; height: 400px; position: relative;">
+              <canvas id="miGrafico"></canvas>
+            </div>
+            
+            <!-- BOTONES EXPORTAR GRÁFICO ALINEADOS EN GRID -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 0; width: 100%;">
+              <button class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center;" onclick="exportarGraficoPDF(false)">
+                <span data-i18n="btn_gen_pdf">Generar PDF</span>
+              </button>
+              <button class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center; background: #25D366 !important; color: #fff !important;" onclick="exportarGraficoPDF('whatsapp')">
+                <span data-i18n="btn_share_chart">Compartir</span> 📲
+              </button>
+              <button class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center; background: #ea4335 !important; color: #fff !important;" onclick="exportarGraficoPDF('email')">
+                <span data-i18n="btn_email_chart">Correo</span> ✉️
+              </button>
+            </div>
+            <div id="msg_grafico"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- INFORME -->
+      <div id="informe" class="panel">
+        <h2 data-i18n="gen_informe">Generar Informe / Factura</h2>
+        
+        <div class="grid">
+          <div>
+            <label data-i18n="modo_generacion">Modo de generación</label>
+            <select id="i_modo" onchange="toggleModoInforme()">
+              <option value="fechas" data-i18n="por_fechas">Por rango de fechas</option>
+              <option value="seleccion" data-i18n="por_seleccion">Seleccionando mantenimientos</option>
+            </select>
+          </div>
+          <div>
+            <label data-i18n="tipo_informe">Tipo de Informe</label>
+            <select id="i_tipo_informe">
+              <option value="detallado" data-i18n="detallado">Factura Detallada (con precios)</option>
+              <option value="historico" data-i18n="historico">Histórico Técnico (sin precios)</option>
+            </select>
+          </div>
+          <div><label data-i18n="vehiculo">Vehículo</label><select id="i_vehiculo" onchange="renderTablaSeleccion()"><option value="" data-i18n="selecciona">— Selecciona —</option></select></div>
+          <div><label data-i18n="iva">IVA (%)</label><input type="number" id="i_iva" value="21" step="0.1"></div>
+        </div>
+
+        <div id="bloque_fechas" class="grid">
+          <div><label data-i18n="fecha_desde">Fecha desde</label><input type="date" id="i_desde"></div>
+          <div><label data-i18n="fecha_hasta">Fecha hasta</label><input type="date" id="i_hasta"></div>
+        </div>
+
+        <div id="bloque_seleccion" style="display:none; margin-bottom: 20px;">
+          <h3 style="font-size: 16px; color: #e11d48; margin-bottom: 10px;" data-i18n="selecciona_mant">Selecciona los mantenimientos para incluir en la factura</h3>
+          <table id="tabla_seleccion">
+            <thead><tr><th style="width: 40px; text-align: center;"><input type="checkbox" id="checkAll" onclick="toggleAllChecks(this)"></th><th data-i18n="fecha">Fecha</th><th data-i18n="km">Kms</th><th data-i18n="tipo">Tipo</th><th data-i18n="operaciones">Operaciones</th><th data-i18n="total">Total</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="actions">
+          <button class="primary" data-i18n="btn_gen_pdf" onclick="generarPDF(false)">Generar PDF</button>
+          <button class="primary" style="background: #25D366 !important; color: #fff !important;" onclick="generarPDF('whatsapp')">
+            <span data-i18n="btn_share_pdf">Compartir PDF</span> 📲
           </button>
-          <button class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center; background: #25D366 !important; color: #fff !important;" onclick="exportarGraficoPDF('whatsapp')">
-            <span data-i18n="btn_share_chart">Compartir</span> 📲
-          </button>
-          <button class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center; background: #ea4335 !important; color: #fff !important;" onclick="exportarGraficoPDF('email')">
-            <span data-i18n="btn_email_chart">Correo</span> ✉️
+          <button class="primary" style="background: #ea4335 !important; color: #fff !important;" onclick="generarPDF('email')">
+            <span data-i18n="btn_email_pdf">Enviar por Correo</span> ✉️
           </button>
         </div>
-        <div id="msg_grafico"></div>
+        <div id="msg_informe"></div>
       </div>
 
-    </div>
-  </div>
-
-  <!-- INFORME -->
-  <div id="informe" class="panel">
-    <h2 data-i18n="gen_informe">Generar Informe / Factura</h2>
-    
-    <div class="grid">
-      <div>
-        <label data-i18n="modo_generacion">Modo de generación</label>
-        <select id="i_modo" onchange="toggleModoInforme()">
-          <option value="fechas" data-i18n="por_fechas">Por rango de fechas</option>
-          <option value="seleccion" data-i18n="por_seleccion">Seleccionando mantenimientos</option>
-        </select>
+      <!-- BACKUP -->
+      <div id="backup" class="panel">
+        <h2 data-i18n="copia_seguridad">Copia de seguridad</h2>
+        <p data-i18n="copia_texto">Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.</p>
+        <div class="actions">
+          <button class="secondary" data-i18n="exportar" onclick="exportarJSON()">⬇ Exportar copia (JSON)</button>
+          <button class="secondary" data-i18n="importar" onclick="document.getElementById('fileInput').click()">⬆ Importar copia</button>
+          <input type="file" id="fileInput" accept=".json" style="display:none" onchange="importarJSON(event)">
+          <button class="danger" data-i18n="borrar" onclick="borrarTodo()">🗑 Borrar todos los datos</button>
+        </div>
+        <div id="msg_backup"></div>
       </div>
-      <div>
-        <label data-i18n="tipo_informe">Tipo de Informe</label>
-        <select id="i_tipo_informe">
-          <option value="detallado" data-i18n="detallado">Factura Detallada (con precios)</option>
-          <option value="historico" data-i18n="historico">Histórico Técnico (sin precios)</option>
-        </select>
-      </div>
-      <div><label data-i18n="vehiculo">Vehículo</label><select id="i_vehiculo" onchange="renderTablaSeleccion()"><option value="" data-i18n="selecciona">— Selecciona —</option></select></div>
-      <div><label data-i18n="iva">IVA (%)</label><input type="number" id="i_iva" value="21" step="0.1"></div>
-    </div>
 
-    <div id="bloque_fechas" class="grid">
-      <div><label data-i18n="fecha_desde">Fecha desde</label><input type="date" id="i_desde"></div>
-      <div><label data-i18n="fecha_hasta">Fecha hasta</label><input type="date" id="i_hasta"></div>
-    </div>
+    </div> <!-- FIN DE LA PANTALLA LCD -->
+  </div> <!-- FIN DE LA MÁQUINA DE DIAGNOSIS -->
 
-    <div id="bloque_seleccion" style="display:none; margin-bottom: 20px;">
-      <h3 style="font-size: 16px; color: #e11d48; margin-bottom: 10px;" data-i18n="selecciona_mant">Selecciona los mantenimientos para incluir en la factura</h3>
-      <table id="tabla_seleccion">
-        <thead><tr><th style="width: 40px; text-align: center;"><input type="checkbox" id="checkAll" onclick="toggleAllChecks(this)"></th><th data-i18n="fecha">Fecha</th><th data-i18n="km">Kms</th><th data-i18n="tipo">Tipo</th><th data-i18n="operaciones">Operaciones</th><th data-i18n="total">Total</th></tr></thead>
-        <tbody></tbody>
-      </table>
-    </div>
-
-    <div class="actions">
-      <button class="primary" data-i18n="btn_gen_pdf" onclick="generarPDF(false)">Generar PDF</button>
-      <button class="primary" style="background: #25D366 !important; color: #fff !important;" onclick="generarPDF('whatsapp')">
-        <span data-i18n="btn_share_pdf">Compartir PDF</span> 📲
-      </button>
-      <button class="primary" style="background: #ea4335 !important; color: #fff !important;" onclick="generarPDF('email')">
-        <span data-i18n="btn_email_pdf">Enviar por Correo</span> ✉️
-      </button>
-    </div>
-    <div id="msg_informe"></div>
-  </div>
-
-  <!-- BACKUP -->
-  <div id="backup" class="panel">
-    <h2 data-i18n="copia_seguridad">Copia de seguridad</h2>
-    <p data-i18n="copia_texto">Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.</p>
-    <div class="actions">
-      <button class="secondary" data-i18n="exportar" onclick="exportarJSON()">⬇ Exportar copia (JSON)</button>
-      <button class="secondary" data-i18n="importar" onclick="document.getElementById('fileInput').click()">⬆ Importar copia</button>
-      <input type="file" id="fileInput" accept=".json" style="display:none" onchange="importarJSON(event)">
-      <button class="danger" data-i18n="borrar" onclick="borrarTodo()">🗑 Borrar todos los datos</button>
-    </div>
-    <div id="msg_backup"></div>
-  </div>
 </div>
 
 <!-- PIE DE PÁGINA -->
