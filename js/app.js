@@ -1029,7 +1029,7 @@ function generarPDF(accion = false) {
     if (logoImg && logoImg.src) {
       try {
         doc.saveGraphicsState();
-        doc.setGState(new doc.GState({opacity: 0.05})); 
+        doc.setGState(new doc.GState({opacity: 0.03})); // Opacidad más baja para que no lave el texto
         doc.addImage(logoImg.src, 'PNG', (pageW - 150) / 2, (pageH - 150) / 2, 150, 150);
         doc.restoreGraphicsState();
       } catch(e) { console.log("Error al añadir logo al PDF", e); }
@@ -1219,6 +1219,7 @@ function exportarGraficoPDF(accion) {
     const canvas = document.getElementById('miGrafico');
     if (!canvas) return;
     
+    // Aseguramos que el canvas tenga un fondo sólido para que el PDF no lo lave
     const imgData = canvas.toDataURL('image/png', 1.0);
     
     const doc = new jsPDF('p', 'mm', 'a4');
@@ -1229,7 +1230,7 @@ function exportarGraficoPDF(accion) {
     if (logoImg && logoImg.src) {
       try {
         doc.saveGraphicsState();
-        doc.setGState(new doc.GState({opacity: 0.05})); 
+        doc.setGState(new doc.GState({opacity: 0.03})); // Opacidad más baja
         doc.addImage(logoImg.src, 'PNG', (pageW - 150) / 2, 50, 150, 150);
         doc.restoreGraphicsState();
       } catch(e) {}
