@@ -520,9 +520,12 @@ input[type="checkbox"] { transform: scale(1.3); cursor: pointer; accent-color: #
   .logo-pegatina { height: 18px; }
   .pegatinas-izq, .pegatinas-der { min-width: 60px; gap: 6px; }
 
-  /* Ajuste del texto en móvil para que no se baje el OBD-II */
-  .texto-maquina-contenedor { padding: 5px 0; }
-  .texto-maquina { font-size: 20px; } 
+  /* Arreglo crucial para que no se baje el OBD-II en móvil */
+  .texto-maquina-contenedor { 
+    padding: 5px 0; 
+    white-space: nowrap; 
+  }
+  .texto-maquina { font-size: 20px; } /* Letra más pequeña para que quepa en una línea */
   
   /* Ajuste de la botonera en móvil */
   .botonera-fisica { flex: 1 0 100%; order: 3; margin-top: 15px; gap: 15px; justify-content: center; }
