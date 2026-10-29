@@ -141,31 +141,34 @@ header h1 {
     0 25px 60px rgba(0,0,0,0.9),
     inset 0 0 0 3px #4a5568,
     inset 0 0 20px rgba(0,0,0,0.8);
-  padding: 20px;
+  padding: 15px;
   position: relative;
 }
 
-/* Marco superior e inferior con textos */
+/* Estructura de los marcos */
 .marco-superior, .marco-inferior {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: #718096;
-  font-size: 22px;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px #000;
-  padding: 10px 15px;
+  padding: 10px 5px; /* Padding base */
 }
 
 .marco-superior {
-  margin-top: -5px; 
   margin-bottom: 15px;
 }
 
 .marco-inferior {
   margin-top: 15px;
-  margin-bottom: -5px; 
+}
+
+/* Contenedor central de los textos para obligarlos a estar centrados */
+.texto-maquina-contenedor {
+  flex: 1;
+  text-align: center;
+  display: flex;
   justify-content: center;
+  align-items: center;
+  padding: 5px;
 }
 
 /* Texto superior con fuente Caveat y efecto grabado */
@@ -189,6 +192,38 @@ header h1 {
   letter-spacing: 1px;
   transform: rotate(-1deg);
 }
+
+/* =========================================
+   PEGATINAS DE MARCAS
+   ========================================= */
+.pegatinas-izq, .pegatinas-der {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 120px; /* Para que no se aplasten */
+}
+.pegatinas-der { justify-content: flex-end; }
+
+.pegatina {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 3px 6px;
+  border-radius: 3px;
+  letter-spacing: 1px;
+  box-shadow: 1px 2px 4px rgba(0,0,0,0.6);
+  transform: rotate(-3deg); /* Efecto de pegatina puesta a mano */
+  border: 1px solid rgba(255,255,255,0.2);
+  display: inline-block;
+}
+
+/* Estilos específicos de cada marca */
+.brembo { background: #fff; color: #e11d48; font-style: italic; transform: rotate(-5deg); }
+.porsche { background: #000; color: #fff; border: 1px solid #d4af37; transform: rotate(2deg); }
+.shell { background: #ffd700; color: #d00; font-weight: 900; transform: rotate(-2deg); }
+.pirelli { background: #000; color: #ffd700; transform: rotate(4deg); }
+.bmw { background: #0066b1; color: #fff; font-style: italic; transform: rotate(-4deg); }
+.motul { background: #e11d48; color: #fff; font-style: italic; transform: rotate(3deg); }
 
 /* Panel de botones (Pestañas) */
 .tabs { 
@@ -465,7 +500,7 @@ input[type="checkbox"] {
   }
   
   /* Margen superior extra en móvil para bajar la máquina de la barra de estado */
-  .container { padding: 0 10px; margin-top: 40px; }
+  .container { padding: 0 10px; margin-top: 50px; }
   
   .header-container { flex-direction: column; gap: 10px; }
   .header-spacer { display: none; }
@@ -474,24 +509,21 @@ input[type="checkbox"] {
   .lang-switch { width: auto; justify-content: center; margin-top: 10px; }
   
   /* Máquina más compacta */
-  .maquina-diagnosis { padding: 10px; border-width: 6px; border-radius: 12px; }
+  .maquina-diagnosis { padding: 8px; border-width: 6px; border-radius: 12px; }
   
-  /* Ajuste de los marcos superior e inferior */
-  .marco-superior, .marco-inferior { 
-    padding: 5px 10px;
-  }
-  .marco-superior {
-    margin-top: 5px;
-    margin-bottom: 10px;
-  }
-  .marco-inferior {
-    margin-top: 10px;
-    margin-bottom: 5px;
-  }
+  /* Ajuste de los marcos para obligar a bajar/subir los textos */
+  .marco-superior { padding-top: 25px; padding-bottom: 10px; margin-bottom: 10px; }
+  .marco-inferior { padding-top: 10px; padding-bottom: 25px; margin-top: 10px; }
   
+  /* Reducimos el tamaño de las pegatinas para que quepan en el móvil */
+  .pegatina { font-size: 8px; padding: 2px 4px; }
+  .pegatinas-izq, .pegatinas-der { min-width: 60px; }
+  .pegatinas-izq { gap: 4px; }
+  .pegatinas-der { gap: 4px; }
+
   /* Texto de la máquina más pequeño y ajustado */
-  .texto-maquina { font-size: 24px; }
-  .texto-autor { font-size: 20px; }
+  .texto-maquina { font-size: 22px; }
+  .texto-autor { font-size: 18px; }
   
   .tornillo-botones { display: none; }
 
