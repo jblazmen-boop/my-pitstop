@@ -252,26 +252,49 @@ function cerrarModal() {
 function abrirModalHistorico() {
   reproducirBeep(); // Sonido al abrir el modal
 
-  // Obtener el vehículo seleccionado en el desplegable actual o el primero
+  // Poblar el desplegable dentro del modal con todos los vehículos
+  const sel = document.getElementById('modal-select-vehiculo');
+  sel.innerHTML = state.vehiculos.map(v => `<option value="${v.id}">${esc(v.matricula)} — ${esc(v.marca)} ${esc(v.modelo)}</option>`).join('');
+
+  // Intentar seleccionar el vehículo que esté activo en la pestaña actual
   let vehiculoId = '';
   const selM = document.getElementById('m_vehiculo');
   const selF = document.getElementById('f_vehiculo');
-  
+  const selG = document.getElementById('g_vehiculo');
+  const selR = document.getElementById('rec_vehiculo');
+  const selI = document.getElementById('i_vehiculo');
+
   if (selM && selM.value) vehiculoId = selM.value;
   else if (selF && selF.value) vehiculoId = selF.value;
+  else if (selG && selG.value) vehiculoId = selG.value;
+  else if (selR && selR.value) vehiculoId = selR.value;
+  else if (selI && selI.value) vehiculoId = selI.value;
   else if (state.vehiculos.length > 0) vehiculoId = state.vehiculos[0].id;
 
-  if (!vehiculoId) {
-    alert(currentLang === 'es' ? 'No hay vehículos registrados.' : 'No vehicles registered.');
-    return;
-  }
+  if (vehiculoId) sel.value = vehiculoId;
+
+  // Cargar los datos del vehículo seleccionado
+  cargarHistorialEnModal();
+
+  document.getElementById('modal-historico').style.display = 'flex';
+}
+
+function cambiarVehiculoHistorico() {
+  reproducirBeep(); // Sonido al cambiar de vehículo
+  cargarHistorialEnModal();
+}
+
+function cargarHistorialEnModal() {
+  const vehiculoId = document.getElementById('modal-select-vehiculo').value;
+  if (!vehiculoId) return;
 
   const v = state.vehiculos.find(x => x.id === vehiculoId);
+  if (!v) return;
+
   document.getElementById('historial-titulo-vehiculo').textContent = `${v.marca} ${v.modelo} (${v.matricula})`;
 
-  // Filtrar mantenimientos y coger los últimos 5
   let lista = state.mantenimientos.filter(m => m.vehiculoId === vehiculoId).sort((a,b) => b.fecha.localeCompare(a.fecha));
-  lista = lista.slice(0, 5);
+  lista = lista.slice(0, 5); // Últimos 5
 
   const contenedor = document.getElementById('historial-lista');
   contenedor.innerHTML = '';
@@ -297,12 +320,9 @@ function abrirModalHistorico() {
       contenedor.appendChild(div);
     });
   }
-
-  document.getElementById('modal-historico').style.display = 'flex';
 }
 
 function cerrarModalHistorico(event) {
-  // Evitar que se cierre si se hace clic dentro del contenido
   if (event && event.target.id !== 'modal-historico' && !event.target.classList.contains('cerrar-modal') && event.target.tagName !== 'BUTTON') return;
   document.getElementById('modal-historico').style.display = 'none';
 }
