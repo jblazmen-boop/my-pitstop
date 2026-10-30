@@ -76,7 +76,9 @@ const translations = {
     coste_seguro: "Coste Seguro (Anual)", coste_itv: "Coste Tasa ITV (Aprox)", resumen_fijos: "Resumen Fijos",
     pdf_titulo_grafico: "RESUMEN DE GASTOS", pdf_gasto_fijo: "Gasto Fijo (Seguro+ITV):", 
     email_asunto_grafico: "Resumen de Gastos My PitStop", email_cuerpo_grafico: "Adjunto el resumen de gastos generado con My PitStop. Por favor, no olvides adjuntar el PDF descargado.",
-    email_asunto_informe: "Informe de Mantenimiento My PitStop", email_cuerpo_informe: "Adjunto el informe de mantenimiento generado con My PitStop. Por favor, no olvides adjuntar el PDF descargado."
+    email_asunto_informe: "Informe de Mantenimiento My PitStop", email_cuerpo_informe: "Adjunto el informe de mantenimiento generado con My PitStop. Por favor, no olvides adjuntar el PDF descargado.",
+    modal_historico_titulo: "Historial Rápido",
+    sin_mantenimientos: "No hay mantenimientos registrados para este vehículo."
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -119,7 +121,9 @@ const translations = {
     coste_seguro: "Insurance Cost (Annual)", coste_itv: "MOT Fee (Approx)", resumen_fijos: "Fixed Summary",
     pdf_titulo_grafico: "EXPENSE SUMMARY", pdf_gasto_fijo: "Fixed Cost (Insurance+MOT):",
     email_asunto_grafico: "My PitStop Expense Summary", email_cuerpo_grafico: "Attached is the expense summary generated with My PitStop. Please do not forget to attach the downloaded PDF.",
-    email_asunto_informe: "My PitStop Maintenance Report", email_cuerpo_informe: "Attached is the maintenance report generated with My PitStop. Please do not forget to attach the downloaded PDF."
+    email_asunto_informe: "My PitStop Maintenance Report", email_cuerpo_informe: "Attached is the maintenance report generated with My PitStop. Please do not forget to attach the downloaded PDF.",
+    modal_historico_titulo: "Quick History",
+    sin_mantenimientos: "No maintenance records for this vehicle."
   }
 };
 
@@ -244,9 +248,68 @@ function cerrarModal() {
   document.getElementById('modal-foto').style.display = 'none';
 }
 
+// ============ MODAL HISTÓRICO RÁPIDO ============
+function abrirModalHistorico() {
+  reproducirBeep(); // Sonido al abrir el modal
+
+  // Obtener el vehículo seleccionado en el desplegable actual o el primero
+  let vehiculoId = '';
+  const selM = document.getElementById('m_vehiculo');
+  const selF = document.getElementById('f_vehiculo');
+  
+  if (selM && selM.value) vehiculoId = selM.value;
+  else if (selF && selF.value) vehiculoId = selF.value;
+  else if (state.vehiculos.length > 0) vehiculoId = state.vehiculos[0].id;
+
+  if (!vehiculoId) {
+    alert(currentLang === 'es' ? 'No hay vehículos registrados.' : 'No vehicles registered.');
+    return;
+  }
+
+  const v = state.vehiculos.find(x => x.id === vehiculoId);
+  document.getElementById('historial-titulo-vehiculo').textContent = `${v.marca} ${v.modelo} (${v.matricula})`;
+
+  // Filtrar mantenimientos y coger los últimos 5
+  let lista = state.mantenimientos.filter(m => m.vehiculoId === vehiculoId).sort((a,b) => b.fecha.localeCompare(a.fecha));
+  lista = lista.slice(0, 5);
+
+  const contenedor = document.getElementById('historial-lista');
+  contenedor.innerHTML = '';
+
+  if (lista.length === 0) {
+    contenedor.innerHTML = `<p style="text-align:center; color:#9ca3af; padding: 20px;">${translations[currentLang].sin_mantenimientos}</p>`;
+  } else {
+    lista.forEach(m => {
+      const fechaMostrar = m.fecha.split('-').reverse().join('/');
+      const tipoTexto = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
+      
+      let ops = [];
+      if (m.manoObra) m.manoObra.forEach(o => ops.push(o.concepto));
+      if (m.repuestos) m.repuestos.forEach(r => ops.push(`${r.cant}x ${r.desc}`));
+
+      const div = document.createElement('div');
+      div.className = 'historial-item';
+      div.innerHTML = `
+        <h4>${fechaMostrar} - ${m.km ? m.km + ' Kms' : 'Sin Kms'}</h4>
+        <p><strong>${tipoTexto}</strong></p>
+        <p style="margin-top: 5px; font-size: 12px;">${ops.join(', ')}</p>
+      `;
+      contenedor.appendChild(div);
+    });
+  }
+
+  document.getElementById('modal-historico').style.display = 'flex';
+}
+
+function cerrarModalHistorico(event) {
+  // Evitar que se cierre si se hace clic dentro del contenido
+  if (event && event.target.id !== 'modal-historico' && !event.target.classList.contains('cerrar-modal') && event.target.tagName !== 'BUTTON') return;
+  document.getElementById('modal-historico').style.display = 'none';
+}
+
+// ============ TABS Y EVENTOS ============
 document.querySelectorAll('.tab').forEach(t => {
   t.onclick = () => {
-    // REPRODUCIR SONIDO AL CAMBIAR DE PESTAÑA
     reproducirBeep();
 
     document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));

@@ -9,8 +9,8 @@
   <link rel="manifest" href="manifest.json?v=3">
   <meta name="theme-color" content="#111827">
   
-  <!-- Forzamos la actualización del CSS con ?v=7 -->
-  <link rel="stylesheet" href="css/styles.css?v=7">
+  <!-- Forzamos la actualización del CSS con ?v=8 -->
+  <link rel="stylesheet" href="css/styles.css?v=8">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -386,7 +386,7 @@
             <span data-i18n="btn_share_pdf">Compartir PDF</span> 📲
           </button>
           <button class="primary" style="background: #ea4335 !important; color: #fff !important;" onclick="generarPDF('email')">
-            <span data-i18n="btn_email_pdf">Enviar por Correo</span> ✉️
+            <span data-i18n="btn_emit_pdf">Enviar por Correo</span> ✉️
           </button>
         </div>
         <div id="msg_informe"></div>
@@ -422,7 +422,7 @@
           <button class="btn-dir-digital btn-abajo" title="Abajo">▼</button>
           
           <!-- Botón Central OK -->
-          <button class="btn-ok-digital" title="OK / Enter">OK</button>
+          <button class="btn-ok-digital" title="Ver Historial Rápido" onclick="abrirModalHistorico()">OK</button>
         </div>
       </div>
       
@@ -444,6 +444,18 @@
 <div id="modal-foto" class="modal" onclick="cerrarModal()">
   <span class="cerrar-modal">&times;</span>
   <img class="modal-contenido" id="img-modal">
+</div>
+
+<!-- MODAL HISTÓRICO RÁPIDO (NUEVO) -->
+<div id="modal-historico" class="modal" onclick="cerrarModalHistorico(event)">
+  <div class="modal-historico-contenido">
+    <span class="cerrar-modal" onclick="cerrarModalHistorico(event)">&times;</span>
+    <h2 id="historial-titulo-vehiculo" style="color: #e11d48; border-bottom: 2px solid #e11d48; padding-bottom: 10px;">Historial Rápido</h2>
+    <div id="historial-lista" class="historial-lista">
+      <!-- Se rellena desde JS -->
+    </div>
+    <button class="primary" style="margin-top: 20px; width: 100%;" onclick="cerrarModalHistorico(event)">Cerrar</button>
+  </div>
 </div>
 
 <script src="js/app.js?v=2"></script>

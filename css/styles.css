@@ -162,18 +162,17 @@ header h1 {
   align-items: center;
   justify-content: center;
   position: relative;
-  width: 130px; /* Tamaño compacto y limpio */
+  width: 130px;
   height: 130px;
   background: radial-gradient(circle, #0f172a 40%, #000 100%);
   border-radius: 50%;
-  border: 3px solid #e11d48; /* Aro rojo neón */
+  border: 3px solid #e11d48;
   box-shadow: 
     0 0 15px rgba(225, 29, 72, 0.6), 
     inset 0 0 20px rgba(0,0,0,0.8), 
     inset 0 0 10px rgba(225, 29, 72, 0.3);
 }
 
-/* Botones de dirección (blancos táctiles) */
 .btn-dir-digital {
   position: absolute;
   width: 34px;
@@ -198,7 +197,6 @@ header h1 {
   text-shadow: 0 0 10px #fff;
 }
 
-/* Botón OK central (Rojo cristal con aro blanco) */
 .btn-ok-digital {
   position: relative;
   width: 46px;
@@ -226,7 +224,6 @@ header h1 {
   box-shadow: 0 0 5px rgba(225, 29, 72, 1), inset 0 4px 8px rgba(0,0,0,0.5);
 }
 
-/* Posicionamiento de las flechas */
 .btn-arriba { top: 5px; left: 50%; transform: translateX(-50%); }
 .btn-abajo { bottom: 5px; left: 50%; transform: translateX(-50%); }
 .btn-izquierda { left: 5px; top: 50%; transform: translateY(-50%); }
@@ -308,7 +305,6 @@ header h1 {
   transform: translateY(-2px);
 }
 
-/* Tooltip personalizado */
 .tab::after {
   content: attr(title); 
   position: absolute;
@@ -447,7 +443,7 @@ td button { margin-right: 4px; }
 
 .modal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.95) !important; align-items: center; justify-content: center; }
 .modal-contenido { max-width: 90%; max-height: 90%; border-radius: 8px; box-shadow: 0 0 30px rgba(225, 29, 72, 0.3) !important; background: #111827 !important; padding: 10px; border: 2px solid #e11d48 !important; }
-.cerrar-modal { position: absolute; top: 20px; right: 40px; color: #e11d48 !important; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+.cerrar-modal { position: absolute; top: 20px; right: 40px; color: #e11d48 !important; font-size: 40px; font-weight: bold; cursor: pointer; transition: 0.2s; z-index: 10001; }
 .cerrar-modal:hover { color: #fff !important; transform: scale(1.2); }
 
 footer { border-top: 1px solid #374151 !important; background-color: rgba(15, 23, 42, 0.95) !important; width: 100%; color: #9ca3af !important; position: relative; z-index: 10; }
@@ -472,6 +468,48 @@ h2 { font-weight: 900 !important; border-bottom: 2px solid #374151 !important; p
 .file-btn:hover { background: #4b5563 !important; border-color: #e11d48 !important; }
 
 input[type="checkbox"] { transform: scale(1.3); cursor: pointer; accent-color: #e11d48; }
+
+/* =========================================
+   MODAL HISTÓRICO RÁPIDO
+   ========================================= */
+.modal-historico-contenido {
+  background: #0f172a;
+  border: 3px solid #e11d48;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  padding: 20px;
+  box-shadow: 0 0 40px rgba(225, 29, 72, 0.5), inset 0 0 20px rgba(0,0,0,0.8);
+  position: relative;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.historial-lista {
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.historial-item {
+  background: rgba(31, 41, 55, 0.8);
+  border-left: 4px solid #e11d48;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+}
+
+.historial-item h4 {
+  margin: 0 0 5px 0;
+  color: #fff;
+  font-size: 15px;
+}
+
+.historial-item p {
+  margin: 0;
+  font-size: 13px;
+  color: #9ca3af;
+}
 
 /* =========================================
    OPTIMIZACIÓN PARA MÓVILES
