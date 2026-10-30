@@ -78,6 +78,7 @@ const translations = {
     email_asunto_grafico: "Resumen de Gastos My PitStop", email_cuerpo_grafico: "Adjunto el resumen de gastos generado con My PitStop. Por favor, no olvides adjuntar el PDF descargado.",
     email_asunto_informe: "Informe de Mantenimiento My PitStop", email_cuerpo_informe: "Adjunto el informe de mantenimiento generado con My PitStop. Por favor, no olvides adjuntar el PDF descargado.",
     modal_historico_titulo: "Historial Rápido",
+    seleccionar_vehiculo_modal: "Seleccionar Vehículo",
     sin_mantenimientos: "No hay mantenimientos registrados para este vehículo."
   },
   en: {
@@ -123,6 +124,7 @@ const translations = {
     email_asunto_grafico: "My PitStop Expense Summary", email_cuerpo_grafico: "Attached is the expense summary generated with My PitStop. Please do not forget to attach the downloaded PDF.",
     email_asunto_informe: "My PitStop Maintenance Report", email_cuerpo_informe: "Attached is the maintenance report generated with My PitStop. Please do not forget to attach the downloaded PDF.",
     modal_historico_titulo: "Quick History",
+    seleccionar_vehiculo_modal: "Select Vehicle",
     sin_mantenimientos: "No maintenance records for this vehicle."
   }
 };
@@ -312,6 +314,10 @@ function cargarHistorialEnModal() {
 
       const div = document.createElement('div');
       div.className = 'historial-item';
+      
+      // NUEVO: Al hacer clic, saltamos al informe de ese mantenimiento
+      div.onclick = function() { irAInformeDesdeHistorico(m.id); };
+
       div.innerHTML = `
         <h4>${fechaMostrar} - ${m.km ? m.km + ' Kms' : 'Sin Kms'}</h4>
         <p><strong>${tipoTexto}</strong></p>
@@ -325,6 +331,41 @@ function cargarHistorialEnModal() {
 function cerrarModalHistorico(event) {
   if (event && event.target.id !== 'modal-historico' && !event.target.classList.contains('cerrar-modal') && event.target.tagName !== 'BUTTON') return;
   document.getElementById('modal-historico').style.display = 'none';
+}
+
+// ============ FUNCIÓN PARA IR AL INFORME DESDE EL HISTÓRICO ============
+function irAInformeDesdeHistorico(idMantenimiento) {
+  const m = state.mantenimientos.find(x => x.id === idMantenimiento);
+  if (!m) return;
+
+  cerrarModalHistorico();
+
+  // 1. Cambiar a la pestaña de Informe
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+  document.querySelector('.tab[data-tab="informe"]').classList.add('active');
+  document.getElementById('informe').classList.add('active');
+
+  // 2. Configurar el modo de selección
+  document.getElementById('i_modo').value = 'seleccion';
+  document.getElementById('i_tipo_informe').value = 'detallado'; // Por defecto factura detallada
+  toggleModoInforme(); // Mostrar el bloque de selección
+
+  // 3. Seleccionar el vehículo
+  document.getElementById('i_vehiculo').value = m.vehiculoId;
+  renderTablaSeleccion(); // Cargar los mantenimientos de ese coche
+
+  // 4. Marcar el mantenimiento en concreto
+  setTimeout(() => {
+    const checkboxes = document.querySelectorAll('.check-mant');
+    checkboxes.forEach(cb => {
+      if (cb.value === idMantenimiento) {
+        cb.checked = true;
+      } else {
+        cb.checked = false; // Desmarcar los demás para que solo salga ese
+      }
+    });
+  }, 100);
 }
 
 // ============ TABS Y EVENTOS ============

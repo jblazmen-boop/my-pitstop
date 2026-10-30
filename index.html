@@ -9,8 +9,8 @@
   <link rel="manifest" href="manifest.json?v=3">
   <meta name="theme-color" content="#111827">
   
-  <!-- Forzamos la actualización del CSS con ?v=10 -->
-  <link rel="stylesheet" href="css/styles.css?v=10">
+  <!-- Forzamos la actualización del CSS con ?v=11 -->
+  <link rel="stylesheet" href="css/styles.css?v=11">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -454,7 +454,7 @@
     
     <!-- SELECTOR DE VEHÍCULO DENTRO DEL MODAL -->
     <div style="margin-bottom: 15px;">
-      <label style="color: #9ca3af; font-size: 12px; font-weight: bold; text-transform: uppercase;">Seleccionar Vehículo</label>
+      <label data-i18n="seleccionar_vehiculo_modal" style="color: #9ca3af; font-size: 12px; font-weight: bold; text-transform: uppercase;">Seleccionar Vehículo</label>
       <select id="modal-select-vehiculo" onchange="cambiarVehiculoHistorico()" style="width: 100%; padding: 8px; border-radius: 4px; background: #1f2937; color: #fff; border: 1px solid #374151;">
         <!-- Se rellena desde JS -->
       </select>

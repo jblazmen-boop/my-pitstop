@@ -497,6 +497,14 @@ input[type="checkbox"] { transform: scale(1.3); cursor: pointer; accent-color: #
   padding: 12px;
   margin-bottom: 10px;
   border-radius: 4px;
+  cursor: pointer; /* Hace que se vea clicable */
+  transition: all 0.2s;
+}
+
+.historial-item:hover {
+  background: rgba(55, 65, 81, 0.9);
+  transform: translateX(5px);
+  border-left-color: #fff;
 }
 
 .historial-item h4 {
