@@ -393,6 +393,10 @@
           <button class="primary" style="background: #ea4335 !important; color: #fff !important;" onclick="generarPDF('email')">
             <span data-i18n="btn_email_pdf">Enviar por Correo</span> ✉️
           </button>
+          <!-- NUEVO BOTÓN DE FIRMA -->
+          <button class="secondary" style="background: #f59e0b !important; color: #fff !important; font-weight: bold;" onclick="abrirModalFirma()">
+            ✍️ Firmar Factura
+          </button>
         </div>
         <div id="msg_informe"></div>
       </div>
@@ -475,13 +479,13 @@
 <!-- MODAL DE FIRMA (NUEVO) -->
 <div id="modal-firma" class="modal" style="z-index: 20000;">
   <div class="modal-firma-contenido">
-    <h3 style="color: #fff; margin-top: 0; text-align: center;">Firme aquí</h3>
+    <h3 data-i18n="firma_titulo" style="color: #fff; margin-top: 0; text-align: center;">Firme aquí</h3>
     <canvas id="canvas-firma" width="300" height="150" style="border: 2px dashed #e11d48; border-radius: 8px; background: #fff; touch-action: none; width: 100%;"></canvas>
     <div style="display: flex; gap: 10px; margin-top: 15px;">
-      <button class="secondary" style="flex: 1;" onclick="limpiarFirma()">Borrar</button>
-      <button class="primary" style="flex: 1;" onclick="guardarFirma()">Guardar Firma</button>
+      <button class="secondary" data-i18n="btn_borrar_firma" style="flex: 1;" onclick="limpiarFirma()">Borrar</button>
+      <button class="primary" data-i18n="btn_guardar_firma" style="flex: 1;" onclick="guardarFirma()">Guardar Firma</button>
     </div>
-    <button class="danger" style="width: 100%; margin-top: 10px;" onclick="cerrarModalFirma()">Cancelar</button>
+    <button class="danger" data-i18n="btn_cancelar_firma" style="width: 100%; margin-top: 10px;" onclick="cerrarModalFirma()">Cancelar</button>
   </div>
 </div>
 
