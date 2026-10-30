@@ -338,24 +338,28 @@ function irAInformeDesdeHistorico(idMantenimiento) {
   const m = state.mantenimientos.find(x => x.id === idMantenimiento);
   if (!m) return;
 
-  cerrarModalHistorico();
+  // 1. Quitar el foco del elemento pulsado (para evitar bugs en móvil)
+  document.activeElement.blur();
 
-  // 1. Cambiar a la pestaña de Informe
+  // 2. Ocultar el modal
+  document.getElementById('modal-historico').style.display = 'none';
+
+  // 3. Cambiar a la pestaña de Informe
   document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
   document.querySelector('.tab[data-tab="informe"]').classList.add('active');
   document.getElementById('informe').classList.add('active');
 
-  // 2. Configurar el modo de selección
+  // 4. Configurar el modo de selección
   document.getElementById('i_modo').value = 'seleccion';
   document.getElementById('i_tipo_informe').value = 'detallado'; // Por defecto factura detallada
   toggleModoInforme(); // Mostrar el bloque de selección
 
-  // 3. Seleccionar el vehículo
+  // 5. Seleccionar el vehículo
   document.getElementById('i_vehiculo').value = m.vehiculoId;
   renderTablaSeleccion(); // Cargar los mantenimientos de ese coche
 
-  // 4. Marcar el mantenimiento en concreto
+  // 6. Marcar el mantenimiento en concreto
   setTimeout(() => {
     const checkboxes = document.querySelectorAll('.check-mant');
     checkboxes.forEach(cb => {
@@ -365,6 +369,9 @@ function irAInformeDesdeHistorico(idMantenimiento) {
         cb.checked = false; // Desmarcar los demás para que solo salga ese
       }
     });
+    
+    // 7. Forzar scroll arriba para que se vea la pantalla en el móvil
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }, 100);
 }
 
