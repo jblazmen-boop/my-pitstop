@@ -641,10 +641,96 @@ body.modo-claro .modal-historico-contenido {
   max-width: 400px;
   box-shadow: 0 0 30px rgba(225,29,72,0.4);
 }
-function encenderMaquina() {
-  const led = document.getElementById('led-encendido');
-  if (led) {
-    led.classList.add('encendido');
-    sonidoArranque();
+/* =========================================
+   OPTIMIZACIÓN PARA MÓVILES (CORREGIDO)
+   ========================================= */
+@media (max-width: 768px) {
+  body::before { background-size: cover; }
+  
+  .container { padding: 0 10px; margin-top: 50px; }
+  .header-container { flex-direction: column; gap: 10px; }
+  .header-spacer { display: none; }
+  .header-content { flex-direction: column; gap: 5px; }
+  .title-block { align-items: center; }
+  .header-controls { width: 100%; justify-content: center; }
+  
+  header h1 { font-size: 60px; }
+  .author { font-size: 28px; }
+
+  .maquina-diagnosis { padding: 8px; border-width: 6px; border-radius: 12px; }
+  
+  /* ===== MARCO SUPERIOR EN MÓVIL (CORREGIDO) ===== */
+  .marco-superior { 
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto auto auto; /* LED, texto, logos arriba, logos abajo */
+    gap: 8px;
+    padding: 10px 8px 8px 8px;
+    align-items: center;
   }
+  
+  /* El LED va en su propia fila, centrado, para no romper el grid de logos */
+  .led-encendido {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    justify-self: center;
+    margin-right: 0;
+    width: 12px;
+    height: 12px;
+  }
+  
+  .texto-maquina-contenedor {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    padding: 4px 0;
+    white-space: nowrap;
+  }
+  .texto-maquina { font-size: 20px; }
+
+  .pegatinas-izq, .pegatinas-der {
+    display: contents;
+  }
+
+  /* Fila 3: logos arriba (Porsche izq, BMW der) */
+  .logo-porsche { grid-column: 1; grid-row: 3; justify-self: start; align-self: center; }
+  .logo-bmw     { grid-column: 3; grid-row: 3; justify-self: end;   align-self: center; }
+
+  /* Fila 4: logos abajo (Brembo izq, Shell der) */
+  .logo-brembo { grid-column: 1; grid-row: 4; justify-self: start; align-self: center; }
+  .logo-shell  { grid-column: 3; grid-row: 4; justify-self: end;   align-self: center; }
+  
+  /* 👇 En móvil los logos vuelven a 18px para no romper el grid */
+  .logo-pegatina { height: 18px; }
+
+  .marco-inferior { padding-top: 10px; padding-bottom: 15px; margin-top: 10px; flex-wrap: wrap; gap: 10px; justify-content: space-between; }
+  
+  .botonera-fisica { flex: 1 0 100%; order: 3; margin-top: 15px; gap: 10px; justify-content: center; }
+  
+  .d-pad-digital { width: 110px; height: 110px; }
+  .btn-dir-digital { width: 28px; height: 28px; font-size: 12px; }
+  .btn-ok-digital { width: 38px; height: 38px; font-size: 11px; }
+
+  .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 15px 8px; margin-bottom: 15px; border-radius: 8px; justify-items: center; }
+  .tab-icon { height: 65px; width: 65px; padding: 4px; border-width: 2px; }
+  
+  .pantalla-lcd { padding: 8px; border-width: 4px; }
+  .panel { padding: 12px; border-left-width: 3px; border-radius: 6px; }
+  h2 { font-size: 16px; margin-bottom: 15px; }
+  
+  .grid, .grid-avisos { grid-template-columns: 1fr; gap: 10px; }
+  
+  input, select, textarea { padding: 8px; font-size: 13px; }
+  button.primary { padding: 10px 16px; font-size: 13px; }
+  button.secondary { padding: 6px 10px; font-size: 12px; }
+  
+  table { margin-top: 15px; }
+  table th, table td { padding: 8px 6px; font-size: 11px; }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  header { padding: 10px 24px; }
+  .logo-container { width: 60px; height: 60px; }
+  header h1 { font-size: 40px; }
+  .author { font-size: 18px; }
+  .container { margin-top: 10px; }
 }
