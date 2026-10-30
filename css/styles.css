@@ -148,7 +148,7 @@ header h1 {
 }
 
 /* =========================================
-   BOTONERA DIGITAL UNIFICADA (TODO EN 1)
+   BOTONERA DIGITAL (Solo D-Pad)
    ========================================= */
 .botonera-fisica {
   display: flex;
@@ -162,7 +162,7 @@ header h1 {
   align-items: center;
   justify-content: center;
   position: relative;
-  width: 150px; /* Un poco más ancho para los botones laterales */
+  width: 130px; /* Tamaño compacto y limpio */
   height: 130px;
   background: radial-gradient(circle, #0f172a 40%, #000 100%);
   border-radius: 50%;
@@ -231,34 +231,6 @@ header h1 {
 .btn-abajo { bottom: 5px; left: 50%; transform: translateX(-50%); }
 .btn-izquierda { left: 5px; top: 50%; transform: translateY(-50%); }
 .btn-derecha { right: 5px; top: 50%; transform: translateY(-50%); }
-
-/* =========================================
-   BOTONES ESC Y MENU (FUERA DEL ARO, CON CÁPSULA)
-   ========================================= */
-.btn-extra-digital {
-  position: absolute;
-  background: #1a202c; /* Fondo oscuro para que resalten */
-  border: 1px solid #374151;
-  color: #e2e8f0;
-  font-size: 10px;
-  font-weight: bold;
-  padding: 5px 10px;
-  border-radius: 15px; /* Forma de cápsula */
-  cursor: pointer;
-  transition: all 0.2s;
-  z-index: 4;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.5);
-}
-
-.btn-extra-digital:hover {
-  background: #e11d48;
-  color: #fff;
-  border-color: #e11d48;
-}
-
-/* Posicionamos las cápsulas a los lados, bien separadas */
-.btn-esc { top: 50%; left: -50px; transform: translateY(-50%); }
-.btn-menu { top: 50%; right: -50px; transform: translateY(-50%); }
 
 /* =========================================
    LOGOS DE MARCAS (PEGATINAS)
@@ -557,10 +529,6 @@ input[type="checkbox"] { transform: scale(1.3); cursor: pointer; accent-color: #
   .d-pad-digital { width: 110px; height: 110px; }
   .btn-dir-digital { width: 28px; height: 28px; font-size: 12px; }
   .btn-ok-digital { width: 38px; height: 38px; font-size: 11px; }
-  
-  .btn-extra-digital { font-size: 8px; padding: 3px 6px; }
-  .btn-esc { left: -35px; }
-  .btn-menu { right: -35px; }
 
   .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; padding: 15px 8px; margin-bottom: 15px; border-radius: 8px; justify-items: center; }
   .tab-icon { height: 65px; width: 65px; padding: 4px; border-width: 2px; }
