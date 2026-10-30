@@ -9,14 +9,15 @@
   <link rel="manifest" href="manifest.json?v=3">
   <meta name="theme-color" content="#111827">
   
-  <!-- Forzamos la actualización del CSS con ?v=11 -->
-  <link rel="stylesheet" href="css/styles.css?v=11">
+  <!-- Forzamos la actualización del CSS con ?v=12 -->
+  <link rel="stylesheet" href="css/styles.css?v=12">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.7/dist/signature_pad.umd.min.js"></script>
 </head>
-<body>
+<body class="modo-oscuro">
 
 <header>
   <div class="header-container">
@@ -29,9 +30,12 @@
       </div>
     </div>
 
-    <div class="lang-switch">
-      <button class="lang-btn active" id="lang-es" onclick="setLanguage('es')" title="Español"></button>
-      <button class="lang-btn" id="lang-en" onclick="setLanguage('en')" title="English"></button>
+    <div class="header-controls">
+      <button class="theme-btn" id="btn-tema" onclick="toggleTema()" title="Cambiar Tema">🌙</button>
+      <div class="lang-switch">
+        <button class="lang-btn active" id="lang-es" onclick="setLanguage('es')" title="Español"></button>
+        <button class="lang-btn" id="lang-en" onclick="setLanguage('en')" title="English"></button>
+      </div>
     </div>
   </div>
 </header>
@@ -41,9 +45,10 @@
   <!-- INICIO DE LA MÁQUINA DE DIAGNOSIS -->
   <div class="maquina-diagnosis">
     
-    <!-- MARCO SUPERIOR -->
+    <!-- MARCO SUPERIOR CON LED -->
     <div class="marco-superior">
       <div class="pegatinas-izq">
+        <div class="led-encendido" id="led-encendido"></div>
         <img src="logo-porsche.PNG" alt="Porsche" class="logo-pegatina logo-porsche">
         <img src="logo-brembo.PNG" alt="Brembo" class="logo-pegatina logo-brembo">
       </div>
@@ -464,6 +469,19 @@
       <!-- Se rellena desde JS -->
     </div>
     <button class="primary" style="margin-top: 20px; width: 100%;" onclick="cerrarModalHistorico(event)">Cerrar</button>
+  </div>
+</div>
+
+<!-- MODAL DE FIRMA (NUEVO) -->
+<div id="modal-firma" class="modal" style="z-index: 20000;">
+  <div class="modal-firma-contenido">
+    <h3 style="color: #fff; margin-top: 0; text-align: center;">Firme aquí</h3>
+    <canvas id="canvas-firma" width="300" height="150" style="border: 2px dashed #e11d48; border-radius: 8px; background: #fff; touch-action: none; width: 100%;"></canvas>
+    <div style="display: flex; gap: 10px; margin-top: 15px;">
+      <button class="secondary" style="flex: 1;" onclick="limpiarFirma()">Borrar</button>
+      <button class="primary" style="flex: 1;" onclick="guardarFirma()">Guardar Firma</button>
+    </div>
+    <button class="danger" style="width: 100%; margin-top: 10px;" onclick="cerrarModalFirma()">Cancelar</button>
   </div>
 </div>
 
