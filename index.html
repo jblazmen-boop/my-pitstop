@@ -282,12 +282,15 @@
             </div>
             
             <!-- BOTONES EXPORTAR GRÁFICO ALINEADOS -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 0; width: 100%;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 0; width: 100%;">
               <button class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center;" onclick="exportarGraficoPDF(false)">
                 <span data-i18n="btn_gen_pdf">GENERAR PDF</span>
               </button>
               <button class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center; background: #25D366 !important; color: #fff !important;" onclick="exportarGraficoPDF('share')">
-                <span data-i18n="btn_share_pdf">COMPARTIR</span> 📲
+                <span data-i18n="btn_share_chart">COMPARTIR</span> 📲
+              </button>
+              <button class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center; background: #ea4335 !important; color: #fff !important;" onclick="exportarGraficoPDF('email')">
+                <span data-i18n="btn_email_chart">CORREO</span> ✉️
               </button>
             </div>
             <div id="msg_grafico"></div>
@@ -338,8 +341,8 @@
           <button class="primary" style="background: #25D366 !important; color: #fff !important;" onclick="generarPDF('share')">
             <span data-i18n="btn_share_pdf">Compartir PDF</span> 📲
           </button>
-          <button class="secondary" style="background: #10b981 !important; color: #fff !important; font-weight: bold;" onclick="exportarExcel()">
-            ⬇ EXPORTAR A EXCEL
+          <button class="secondary" style="background: #10b981 !important; color: #fff !important; font-weight: bold; text-transform: uppercase;" onclick="exportarExcel()">
+            ⬇ <span data-i18n="btn_export_excel">Exportar a Excel</span>
           </button>
           <button class="secondary" style="background: #f59e0b !important; color: #fff !important; font-weight: bold; text-transform: uppercase;" onclick="abrirModalFirma()">
             ✍️ <span data-i18n="btn_firmar_informe">FIRMAR INFORME/FACTURA</span>
@@ -362,7 +365,6 @@
       </div>
 
     </div> <!-- FIN DE LA PANTALLA LCD -->
-
     <!-- MARCO INFERIOR CON LA BOTONERA DIGITAL -->
     <div class="marco-inferior">
       <div class="pegatinas-izq">
