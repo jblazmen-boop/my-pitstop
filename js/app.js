@@ -450,7 +450,12 @@ function abrirModalFirma() {
 }
 
 function cerrarModalFirma() { document.getElementById('modal-firma').style.display = 'none'; }
-function limpiarFirma() { if (signaturePad) signaturePad.clear(); }
+
+function limpiarFirma() { 
+  if (signaturePad) signaturePad.clear(); 
+  firmaGuardada = null;
+  localStorage.removeItem('pitstop_firma');
+}
 
 function guardarFirma() {
   if (signaturePad && !signaturePad.isEmpty()) {
@@ -1409,10 +1414,6 @@ function generarPDF(accion = false) {
     const tipoInforme = document.getElementById('i_tipo_informe').value;
     const t = translations[currentLang]; 
     
-    // === RESCATE DE LA FIRMA PARA MÓVIL ===
-    // Buscamos la firma en localStorage por si se perdió de la memoria del móvil
-    firmaGuardada = localStorage.getItem('pitstop_firma') || firmaGuardada;
-    
     const vehiculoId = document.getElementById('i_vehiculo').value;
     if (!vehiculoId) { mostrarMsg('msg_informe', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err'); return; }
 
@@ -1444,7 +1445,6 @@ function generarPDF(accion = false) {
     const pageW = doc.internal.pageSize.getWidth();
     let y = 15;
 
-    // --- CABECERA PDF (SIN MARCA DE AGUA) ---
     doc.setFillColor(15, 23, 42); 
     doc.rect(0, 0, pageW, 20, 'F'); 
     doc.setTextColor(255,255,255);
@@ -1512,11 +1512,18 @@ function generarPDF(accion = false) {
           doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
           doc.text(t.pdf_firma, 15, yFirma);
           try {
-            // FORZAMOS EL FORMATO PNG PARA MÓVIL
             doc.addImage(firmaGuardada, 'PNG', 15, yFirma + 5, 60, 30);
           } catch(e) { console.error("Error al añadir firma al PDF histórico:", e); }
           doc.setDrawColor(0,0,0);
           doc.line(15, yFirma + 35, 75, yFirma + 35);
+      } else {
+          // RECUADRO EN BLANCO PARA FIRMAR A MANO
+          let yFirma = doc.lastAutoTable.finalY + 20;
+          if (yFirma > 220) { doc.addPage(); yFirma = 20; }
+          doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
+          doc.text(t.pdf_firma, 15, yFirma);
+          doc.setDrawColor(0,0,0);
+          doc.rect(15, yFirma + 5, 60, 30); 
       }
 
     } else {
@@ -1603,11 +1610,18 @@ function generarPDF(accion = false) {
           doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
           doc.text(t.pdf_firma, 15, y);
           try {
-            // FORZAMOS EL FORMATO PNG PARA MÓVIL
             doc.addImage(firmaGuardada, 'PNG', 15, y + 5, 60, 30);
           } catch(e) { console.error("Error al añadir firma al PDF factura:", e); }
           doc.setDrawColor(0,0,0);
           doc.line(15, y + 35, 75, y + 35);
+      } else {
+          // RECUADRO EN BLANCO PARA FIRMAR A MANO
+          if (y > 220) { doc.addPage(); y = 20; }
+          y += 20; 
+          doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
+          doc.text(t.pdf_firma, 15, y);
+          doc.setDrawColor(0,0,0);
+          doc.rect(15, y + 5, 60, 30);
       }
     }
 
