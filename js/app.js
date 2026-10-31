@@ -421,23 +421,21 @@ function irAInformeDesdeHistorico(idMantenimiento) {
   }, 100);
 }
 
-// ============ MODAL DE FIRMA (CORREGIDO PARA MÓVIL Y ESCRITORIO) ============
+// ============ MODAL DE FIRMA ============
 function abrirModalFirma() {
   document.getElementById('modal-firma').style.display = 'flex';
   const canvas = document.getElementById('canvas-firma');
   
-  // Pequeño delay para que el navegador renderice el modal y calcule su tamaño real
   setTimeout(() => {
     const rect = canvas.getBoundingClientRect();
     const ratio = Math.max(window.devicePixelRatio || 1, 1);
     
-    // Ajustamos la resolución del canvas al tamaño exacto en pantalla
     canvas.width = rect.width * ratio;
     canvas.height = rect.height * ratio;
     canvas.getContext("2d").scale(ratio, ratio);
 
     if (signaturePad) {
-      signaturePad.off(); // Limpiamos eventos anteriores para que no se dupliquen
+      signaturePad.off();
     }
 
     signaturePad = new SignaturePad(canvas, {
@@ -458,33 +456,25 @@ function guardarFirma() {
   if (signaturePad && !signaturePad.isEmpty()) {
     const canvas = document.getElementById('canvas-firma');
     
-    // Canvas temporal de 800x400 para el PDF
+    // Canvas temporal más ligero (400x200) para que quepa en móviles
     const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = 800;
-    tempCanvas.height = 400;
+    tempCanvas.width = 400;
+    tempCanvas.height = 200;
     const ctx = tempCanvas.getContext('2d');
     
-    // Fondo blanco
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
     
-    // Dibujamos la firma escalada
+    // Escalamos la firma al tamaño ligero
     ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, tempCanvas.width, tempCanvas.height);
     
-    // TRUCO PARA MÓVILES: Intentamos JPEG, si falla o da error (Safari), usamos PNG
-    try {
-      firmaGuardada = tempCanvas.toDataURL('image/jpeg', 0.8);
-      if (!firmaGuardada || firmaGuardada === 'data:,') {
-        firmaGuardada = tempCanvas.toDataURL('image/png');
-      }
-    } catch(e) {
-      firmaGuardada = tempCanvas.toDataURL('image/png');
-    }
+    // Usamos PNG (el más compatible y ligero)
+    firmaGuardada = tempCanvas.toDataURL('image/png');
     
     try {
       localStorage.setItem('pitstop_firma', firmaGuardada);
     } catch(e) {
-      console.log("Error al guardar la firma en localStorage", e);
+      console.log("Firma guardada solo en memoria (límite de almacenamiento alcanzado).");
     }
     
     document.getElementById('modal-firma').style.display = 'none';
@@ -1419,7 +1409,8 @@ function generarPDF(accion = false) {
     const tipoInforme = document.getElementById('i_tipo_informe').value;
     const t = translations[currentLang]; 
     
-    // Recuperar la firma del almacenamiento
+    // === RESCATE DE LA FIRMA PARA MÓVIL ===
+    // Buscamos la firma en localStorage por si se perdió de la memoria del móvil
     firmaGuardada = localStorage.getItem('pitstop_firma') || firmaGuardada;
     
     const vehiculoId = document.getElementById('i_vehiculo').value;
@@ -1453,6 +1444,7 @@ function generarPDF(accion = false) {
     const pageW = doc.internal.pageSize.getWidth();
     let y = 15;
 
+    // --- CABECERA PDF (SIN MARCA DE AGUA) ---
     doc.setFillColor(15, 23, 42); 
     doc.rect(0, 0, pageW, 20, 'F'); 
     doc.setTextColor(255,255,255);
@@ -1520,9 +1512,8 @@ function generarPDF(accion = false) {
           doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
           doc.text(t.pdf_firma, 15, yFirma);
           try {
-            // Detecta si es PNG o JPEG automáticamente para que funcione en móvil
-            const formato = firmaGuardada.includes('image/png') ? 'PNG' : 'JPEG';
-            doc.addImage(firmaGuardada, formato, 15, yFirma + 5, 60, 30);
+            // FORZAMOS EL FORMATO PNG PARA MÓVIL
+            doc.addImage(firmaGuardada, 'PNG', 15, yFirma + 5, 60, 30);
           } catch(e) { console.error("Error al añadir firma al PDF histórico:", e); }
           doc.setDrawColor(0,0,0);
           doc.line(15, yFirma + 35, 75, yFirma + 35);
@@ -1612,9 +1603,8 @@ function generarPDF(accion = false) {
           doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
           doc.text(t.pdf_firma, 15, y);
           try {
-            // Detecta si es PNG o JPEG automáticamente para que funcione en móvil
-            const formato = firmaGuardada.includes('image/png') ? 'PNG' : 'JPEG';
-            doc.addImage(firmaGuardada, formato, 15, y + 5, 60, 30);
+            // FORZAMOS EL FORMATO PNG PARA MÓVIL
+            doc.addImage(firmaGuardada, 'PNG', 15, y + 5, 60, 30);
           } catch(e) { console.error("Error al añadir firma al PDF factura:", e); }
           doc.setDrawColor(0,0,0);
           doc.line(15, y + 35, 75, y + 35);
