@@ -207,7 +207,8 @@ const tiposMantenimiento = {
   "type_7": { es: "Escape", en: "Exhaust" },
   "type_8": { es: "Interior, Habitáculo y Seguridad", en: "Interior, Cabin & Safety" },
   "type_9": { es: "Chasis y Carrocería", en: "Chassis & Bodywork" },
-  "type_10": { es: "Otro", en: "Other" }
+  "type_10": { es: "Otro", en: "Other" },
+  "type_11": { es: "Vida / Salud Batería", en: "Battery Life / Health" }
 };
 function translatePage() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
@@ -452,7 +453,6 @@ function guardarFirma() {
     alert(currentLang === 'es' ? 'Por favor, firme antes de guardar.' : 'Please sign before saving.');
   }
 }
-
 // ============ TABS Y EVENTOS ============
 document.querySelectorAll('.tab').forEach(t => {
   t.onclick = () => {
