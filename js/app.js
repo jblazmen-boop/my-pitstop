@@ -5,35 +5,28 @@ let manoObraTemporal = [];
 let editandoMantenimientoId = null;
 let currentLang = 'es'; 
 let miGraficoInstancia = null; 
-let signaturePad = null; // Instancia de la firma
-let firmaGuardada = null; // Base64 de la firma
+let signaturePad = null; 
+let firmaGuardada = null; 
 
 const STORAGE_KEY = 'mi_app_mantenimiento_coches'; 
 
-// ============ SISTEMA DE SONIDO (BEEP Y ARRANQUE) ============
+// ============ SISTEMA DE SONIDO ============
 function reproducirBeep() {
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return; 
-
     const ctx = new AudioContext();
     const osc = ctx.createOscillator();
     const gainNode = ctx.createGain();
-
     osc.type = 'square'; 
     osc.frequency.setValueAtTime(880, ctx.currentTime); 
-
     gainNode.gain.setValueAtTime(0.1, ctx.currentTime); 
     gainNode.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.1); 
-
     osc.connect(gainNode);
     gainNode.connect(ctx.destination);
-
     osc.start();
     osc.stop(ctx.currentTime + 0.1); 
-  } catch (e) {
-    console.log("Audio no disponible", e);
-  }
+  } catch (e) { console.log("Audio no disponible", e); }
 }
 
 function sonidoArranque() {
@@ -43,14 +36,11 @@ function sonidoArranque() {
     const ctx = new AudioContext();
     const osc = ctx.createOscillator();
     const gainNode = ctx.createGain();
-
-    osc.type = 'sawtooth'; // Sonido más agudo y "eléctrico"
+    osc.type = 'sawtooth'; 
     osc.frequency.setValueAtTime(100, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.3); // Sube de tono
-
+    osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.3); 
     gainNode.gain.setValueAtTime(0.05, ctx.currentTime);
     gainNode.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.5);
-
     osc.connect(gainNode);
     gainNode.connect(ctx.destination);
     osc.start();
@@ -63,15 +53,16 @@ function toggleTema() {
   const body = document.body;
   const btn = document.getElementById('btn-tema');
   reproducirBeep();
-  
   body.classList.toggle('modo-claro');
-  
   if (body.classList.contains('modo-claro')) {
     btn.textContent = '☀️';
     localStorage.setItem('pitstop_tema', 'claro');
   } else {
     btn.textContent = '🌙';
     localStorage.setItem('pitstop_tema', 'oscuro');
+  }
+  if (document.getElementById('grafico').classList.contains('active')) {
+    renderGrafico();
   }
 }
 
@@ -92,11 +83,11 @@ function encenderMaquina() {
   const led = document.getElementById('led-encendido');
   if (led) {
     led.classList.add('encendido');
-    sonidoArranque(); // Sonido de arranque
+    sonidoArranque(); 
   }
 }
 
-// ============ TRANSLATIONS Y RESTO DEL CÓDIGO ============
+// ============ TRANSLATIONS ============
 const translations = {
   es: {
     vehiculos_titulo: "Vehículos", matricula: "Matrícula", marca: "Marca", modelo: "Modelo", bastidor: "Nº Bastidor (VIN)",
@@ -111,7 +102,7 @@ const translations = {
     gen_informe: "Generar Informe / Factura", tipo_informe: "Tipo de Informe", detallado: "Factura Detallada (con precios)",
     historico: "Histórico Técnico (sin precios)", fecha_desde: "Fecha desde", fecha_hasta: "Fecha hasta",
     iva: "IVA (%)", btn_gen_pdf: "Generar PDF", btn_share_pdf: "Compartir PDF", btn_email_pdf: "Enviar por Correo",
-    btn_share_chart: "Compartir Gráfico", btn_email_chart: "Enviar Gráfico por Correo",
+    btn_share_chart: "Compartir", btn_email_chart: "Correo",
     copia_seguridad: "Copia de seguridad", copia_texto: "Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.",
     exportar: "⬇ Exportar copia (JSON)", importar: "⬆ Importar copia", borrar: "🗑 Borrar todos los datos",
     derechos: "Todos los derechos reservados.", selecciona: "— Selecciona —", no_foto: "— No usar foto —",
@@ -147,7 +138,8 @@ const translations = {
     btn_borrar_firma: "Borrar",
     btn_guardar_firma: "Guardar Firma",
     btn_cancelar_firma: "Cancelar",
-    pdf_firma: "Firma del Cliente:"
+    pdf_firma: "Firma del Cliente:",
+    btn_firmar_informe: "Firmar Informe/Factura"
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -162,7 +154,7 @@ const translations = {
     gen_informe: "Generate Report / Invoice", tipo_informe: "Report Type", detallado: "Detailed Invoice (with prices)",
     historico: "Technical History (no prices)", fecha_desde: "Date from", fecha_hasta: "Date to",
     iva: "VAT (%)", btn_gen_pdf: "Generate PDF", btn_share_pdf: "Share PDF", btn_email_pdf: "Send by Email",
-    btn_share_chart: "Share Chart", btn_email_chart: "Email Chart",
+    btn_share_chart: "Share", btn_email_chart: "Email",
     copia_seguridad: "Backup", copia_texto: "Data is stored in this browser. If you clear your history or change devices, it will be lost. Export a backup regularly.",
     exportar: "⬇ Export backup (JSON)", importar: "⬆ Import backup", borrar: "🗑 Delete all data",
     derechos: "All rights reserved.", selecciona: "— Select —", no_foto: "— No photo —",
@@ -198,7 +190,8 @@ const translations = {
     btn_borrar_firma: "Clear",
     btn_guardar_firma: "Save Signature",
     btn_cancelar_firma: "Cancel",
-    pdf_firma: "Customer Signature:"
+    pdf_firma: "Customer Signature:",
+    btn_firmar_informe: "Sign Report/Invoice"
   }
 };
 
@@ -214,7 +207,6 @@ const tiposMantenimiento = {
   "type_9": { es: "Chasis y Carrocería", en: "Chassis & Bodywork" },
   "type_10": { es: "Otro", en: "Other" }
 };
-
 function translatePage() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
@@ -326,7 +318,6 @@ function cerrarModal() {
 // ============ MODAL HISTÓRICO RÁPIDO ============
 function abrirModalHistorico() {
   reproducirBeep();
-
   const sel = document.getElementById('modal-select-vehiculo');
   sel.innerHTML = state.vehiculos.map(v => `<option value="${v.id}">${esc(v.matricula)} — ${esc(v.marca)} ${esc(v.modelo)}</option>`).join('');
 
@@ -345,9 +336,7 @@ function abrirModalHistorico() {
   else if (state.vehiculos.length > 0) vehiculoId = state.vehiculos[0].id;
 
   if (vehiculoId) sel.value = vehiculoId;
-
   cargarHistorialEnModal();
-
   document.getElementById('modal-historico').style.display = 'flex';
 }
 
@@ -377,7 +366,6 @@ function cargarHistorialEnModal() {
     lista.forEach(m => {
       const fechaMostrar = m.fecha.split('-').reverse().join('/');
       const tipoTexto = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
-      
       let ops = [];
       if (m.manoObra) m.manoObra.forEach(o => ops.push(o.concepto));
       if (m.repuestos) m.repuestos.forEach(r => ops.push(`${r.cant}x ${r.desc}`));
@@ -404,7 +392,6 @@ function cerrarModalHistorico(event) {
 function irAInformeDesdeHistorico(idMantenimiento) {
   const m = state.mantenimientos.find(x => x.id === idMantenimiento);
   if (!m) return;
-
   document.activeElement.blur();
   document.getElementById('modal-historico').style.display = 'none';
 
@@ -423,11 +410,8 @@ function irAInformeDesdeHistorico(idMantenimiento) {
   setTimeout(() => {
     const checkboxes = document.querySelectorAll('.check-mant');
     checkboxes.forEach(cb => {
-      if (cb.value === idMantenimiento) {
-        cb.checked = true;
-      } else {
-        cb.checked = false;
-      }
+      if (cb.value === idMantenimiento) cb.checked = true;
+      else cb.checked = false;
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, 100);
@@ -436,9 +420,7 @@ function irAInformeDesdeHistorico(idMantenimiento) {
 // ============ MODAL DE FIRMA ============
 function abrirModalFirma() {
   document.getElementById('modal-firma').style.display = 'flex';
-  
   const canvas = document.getElementById('canvas-firma');
-  // Ajustar tamaño real del canvas para evitar distorsión
   const ratio =  Math.max(window.devicePixelRatio || 1, 1);
   canvas.width = canvas.offsetWidth * ratio;
   canvas.height = canvas.offsetHeight * ratio;
@@ -453,19 +435,11 @@ function abrirModalFirma() {
     signaturePad.clear();
   }
 
-  if (firmaGuardada) {
-      // Si ya había una firma, la dibujamos
-      signaturePad.fromDataURL(firmaGuardada);
-  }
+  if (firmaGuardada) signaturePad.fromDataURL(firmaGuardada);
 }
 
-function cerrarModalFirma() {
-  document.getElementById('modal-firma').style.display = 'none';
-}
-
-function limpiarFirma() {
-  if (signaturePad) signaturePad.clear();
-}
+function cerrarModalFirma() { document.getElementById('modal-firma').style.display = 'none'; }
+function limpiarFirma() { if (signaturePad) signaturePad.clear(); }
 
 function guardarFirma() {
   if (signaturePad && !signaturePad.isEmpty()) {
@@ -481,7 +455,6 @@ function guardarFirma() {
 document.querySelectorAll('.tab').forEach(t => {
   t.onclick = () => {
     reproducirBeep();
-
     document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
     document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
     t.classList.add('active');
@@ -495,7 +468,7 @@ document.querySelectorAll('.tab').forEach(t => {
   };
 });
 
-// ============ RESTO DE FUNCIONES (CRUD, GRÁFICOS, ETC.) ============
+// ============ RESTO DE FUNCIONES (CRUD) ============
 function addVehiculo() {
   const mat = document.getElementById('v_matricula').value.trim().toUpperCase();
   const marca = document.getElementById('v_marca').value.trim();
@@ -572,7 +545,6 @@ function renderManoObraTemporal() {
   }
   document.getElementById('total_mano').textContent = fmt(total);
 }
-
 function addRepuesto() {
   const cant = parseInt(document.getElementById('r_cant').value) || 1;
   const desc = document.getElementById('r_desc').value.trim();
@@ -926,9 +898,11 @@ function mostrarMsg(id, texto, tipo) {
   el.innerHTML = `<div class="msg ${tipo}">${esc(texto)}</div>`;
   setTimeout(() => { el.innerHTML = ''; }, 4000);
 }
-
+// ============ GRÁFICO Y ESTADÍSTICAS ============
 function renderGrafico() {
   if (typeof Chart === 'undefined') return; 
+  const canvas = document.getElementById('miGrafico');
+  if (!canvas) return;
 
   const vehiculoId = document.getElementById('g_vehiculo').value;
   const modo = document.getElementById('g_modo').value;
@@ -989,17 +963,13 @@ function renderGrafico() {
         if (v) {
             const fijos = (parseFloat(v.costeSeguro)||0) + (parseFloat(v.costeItv)||0);
             const indexActual = etiquetas.indexOf(anioActual);
-            if (indexActual !== -1) {
-                dataMano[indexActual] += fijos;
-            }
+            if (indexActual !== -1) dataMano[indexActual] += fijos;
         }
     } else {
         let fijosTotales = 0;
         state.vehiculos.forEach(v => fijosTotales += (parseFloat(v.costeSeguro)||0) + (parseFloat(v.costeItv)||0));
         const indexActual = etiquetas.indexOf(anioActual);
-        if (indexActual !== -1) {
-            dataMano[indexActual] += fijosTotales;
-        }
+        if (indexActual !== -1) dataMano[indexActual] += fijosTotales;
     }
     
     gastoTotal = dataMano.reduce((s, v) => s + v, 0) + dataPiezas.reduce((s, v) => s + v, 0);
@@ -1041,7 +1011,7 @@ function renderGrafico() {
 
   document.getElementById('texto_gasto_total').textContent = fmt(gastoTotal);
 
-  const ctx = document.getElementById('miGrafico').getContext('2d');
+  const ctx = canvas.getContext('2d');
   if (miGraficoInstancia) miGraficoInstancia.destroy();
 
   let gradientMano = ctx.createLinearGradient(0, 0, 0, 400);
@@ -1090,20 +1060,21 @@ function renderGrafico() {
       plugins: {
         legend: { 
             labels: { 
-                color: '#000000', 
+                color: '#e2e8f0',
                 font: { size: 14, weight: 'bold' } 
             } 
         },
         tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleColor: '#fff', bodyColor: '#e2e8f0', borderColor: '#374151', borderWidth: 1 }
       },
       scales: {
-        x: { ticks: { color: '#000000', font: { size: 12 } }, grid: { color: 'rgba(55, 65, 81, 0.5)' } },
-        y: { ticks: { color: '#000000', font: { size: 12 } }, grid: { color: 'rgba(55, 65, 81, 0.5)' } }
+        x: { ticks: { color: '#9ca3af', font: { size: 12 } }, grid: { color: 'rgba(55, 65, 81, 0.5)' } },
+        y: { ticks: { color: '#9ca3af', font: { size: 12 } }, grid: { color: 'rgba(55, 65, 81, 0.5)' } }
       }
     }
   });
 }
 
+// ============ RECORDATORIOS ============
 function cargarRecordatorios() {
   const sel = document.getElementById('rec_vehiculo');
   if (!sel) return;
@@ -1157,10 +1128,8 @@ function cargarRecordatorios() {
 
 function guardarRecordatorio() {
   const vehiculoId = document.getElementById('rec_vehiculo').value;
-  
   const mantFecha = document.getElementById('rec_mant').value;
   const mantKm = document.getElementById('rec_km_mant').value;
-  
   const itvProx = document.getElementById('rec_itv').value;
   const itvPasada = document.getElementById('rec_itv_pasada').value;
   const itvKmPasada = document.getElementById('rec_km_itv_pasada').value;
@@ -1210,7 +1179,106 @@ function guardarRecordatorio() {
     renderAll();
   }
 }
+// ============ PDF DEL GRÁFICO ============
+function exportarGraficoPDF(accion = false) {
+  try {
+    const { jsPDF } = window.jspdf;
+    const t = translations[currentLang];
+    const vehiculoId = document.getElementById('g_vehiculo').value;
+    const v = state.vehiculos.find(x => x.id === vehiculoId);
+    const titulo = v ? `${v.marca} ${v.modelo} (${v.matricula})` : t.todos;
 
+    // 1. Crear el PDF
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageW = doc.internal.pageSize.getWidth();
+    
+    // Cabecera
+    doc.setFillColor(15, 23, 42); 
+    doc.rect(0, 0, pageW, 20, 'F'); 
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(16); 
+    doc.setFont(undefined, 'bold');
+    doc.text(t.pdf_titulo_grafico, pageW / 2, 13, { align: 'center' });
+
+    doc.setTextColor(0,0,0);
+    doc.setFontSize(12); 
+    doc.setFont(undefined, 'normal');
+    doc.text(`${t.pdf_vehiculo} ${titulo}`, 15, 35);
+    doc.text(`${t.pdf_fecha_inf} ${new Date().toLocaleDateString()}`, 15, 42);
+
+    // Total
+    const totalTexto = document.getElementById('texto_gasto_total').textContent;
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(225, 29, 72);
+    doc.text(`${t.gasto_total_mix}: ${totalTexto}`, 15, 52);
+
+    // Gastos Fijos
+    if (v) {
+      const seguro = parseFloat(v.costeSeguro) || 0;
+      const itv = parseFloat(v.costeItv) || 0;
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(0,0,0);
+      doc.text(`${t.coste_seguro}: ${fmt(seguro)}`, 15, 62);
+      doc.text(`${t.coste_itv}: ${fmt(itv)}`, 15, 68);
+    }
+
+    // 2. Capturar el gráfico (con fondo blanco forzado para el PDF)
+    const canvasGrafico = document.getElementById('miGrafico');
+    if (canvasGrafico) {
+      const canvasTemp = document.createElement('canvas');
+      canvasTemp.width = canvasGrafico.width;
+      canvasTemp.height = canvasGrafico.height;
+      const ctx = canvasTemp.getContext('2d');
+      ctx.fillStyle = '#ffffff'; // Fondo blanco
+      ctx.fillRect(0, 0, canvasTemp.width, canvasTemp.height);
+      ctx.drawImage(canvasGrafico, 0, 0);
+
+      const imgData = canvasTemp.toDataURL('image/png', 1.0);
+      const imgProps = doc.getImageProperties(imgData);
+      const pdfWidth = pageW - 30; 
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      
+      doc.addImage(imgData, 'PNG', 15, 80, pdfWidth, pdfHeight);
+    }
+
+    const nombre = `Gastos_${v ? v.matricula : 'Todos'}.pdf`;
+
+    // 3. Gestión de acciones (Compartir, Email o Descargar)
+    if (accion === 'email') {
+        doc.save(nombre);
+        enviarPorCorreo(t.email_asunto_grafico, t.email_cuerpo_grafico);
+        mostrarMsg('msg_grafico', currentLang === 'es' ? 'PDF descargado. Se ha abierto tu gestor de correo.' : 'PDF downloaded. Your email client has been opened.', 'ok');
+    } else if (accion && navigator.share && navigator.canShare) {
+      const pdfBlob = doc.output('blob');
+      const file = new File([pdfBlob], nombre, { type: 'application/pdf' });
+      
+      if (navigator.canShare({ files: [file] })) {
+        navigator.share({
+          files: [file],
+          title: nombre,
+          text: currentLang === 'es' ? 'Aquí tienes el resumen de gastos.' : 'Here is the expense summary.'
+        }).then(() => {
+          mostrarMsg('msg_grafico', currentLang === 'es' ? 'Compartido con éxito.' : 'Shared successfully.', 'ok');
+        }).catch((err) => {
+          console.log("Error al compartir:", err);
+          doc.save(nombre);
+        });
+        return;
+      }
+    }
+    
+    doc.save(nombre);
+    mostrarMsg('msg_grafico', currentLang === 'es' ? 'Informe generado y descargado.' : 'Report generated and downloaded.', 'ok');
+
+  } catch (error) {
+    console.error(error);
+    mostrarMsg('msg_grafico', currentLang === 'es' ? 'Error al generar el PDF del gráfico.' : 'Error generating chart PDF.', 'err');
+  }
+}
+
+// ============ GENERADOR DE PDF DE MANTENIMIENTO / FACTURA ============
 function toggleModoInforme() {
   const modo = document.getElementById('i_modo').value;
   document.getElementById('bloque_fechas').style.display = modo === 'fechas' ? 'grid' : 'none';
@@ -1282,7 +1350,6 @@ function generarPDF(accion = false) {
 
     const doc = new jsPDF('p', 'mm', 'a4');
     const pageW = doc.internal.pageSize.getWidth();
-    const pageH = doc.internal.pageSize.getHeight();
     let y = 15;
 
     doc.setFillColor(15, 23, 42); 
@@ -1424,15 +1491,10 @@ function generarPDF(accion = false) {
       // --- FIRMA EN EL PDF ---
       if (firmaGuardada) {
           if (y > 230) { doc.addPage(); y = 20; }
-          y += 20; // Espacio antes de la firma
-          
+          y += 20; 
           doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
           doc.text(t.pdf_firma, 15, y);
-          
-          // Añadir la imagen de la firma
           doc.addImage(firmaGuardada, 'PNG', 15, y + 5, 60, 30);
-          
-          // Línea para firmar
           doc.setDrawColor(0,0,0);
           doc.line(15, y + 35, 75, y + 35);
       }
@@ -1450,13 +1512,10 @@ function generarPDF(accion = false) {
       const file = new File([pdfBlob], nombre, { type: 'application/pdf' });
       
       if (navigator.canShare({ files: [file] })) {
-        let tituloShare = nombre;
-        let textoShare = currentLang === 'es' ? 'Aquí tienes el informe de mantenimiento.' : 'Here is the maintenance report.';
-
         navigator.share({
           files: [file],
-          title: tituloShare,
-          text: textoShare
+          title: nombre,
+          text: currentLang === 'es' ? 'Aquí tienes el informe de mantenimiento.' : 'Here is the maintenance report.'
         }).then(() => {
           mostrarMsg('msg_informe', currentLang === 'es' ? 'Compartido con éxito.' : 'Shared successfully.', 'ok');
         }).catch((err) => {
@@ -1476,15 +1535,86 @@ function generarPDF(accion = false) {
   }
 }
 
-// Resto de funciones (exportarGraficoPDF, exportarJSON, etc.) se mantienen igual
-function exportarGraficoPDF(accion) { /* ... igual que antes ... */ }
-function enviarPorCorreo(asunto, cuerpo) { /* ... igual ... */ }
-function exportarJSON() { /* ... igual ... */ }
-function importarJSON(e) { /* ... igual ... */ }
-function borrarTodo() { /* ... igual ... */ }
-async function solicitarPersistencia() { /* ... igual ... */ }
-function comprobarRecordatorioBackup() { /* ... igual ... */ }
-function mostrarAvisoGiro() { /* ... igual ... */ }
+// ============ FUNCIONES DE APOYO (CORREO Y BACKUP) ============
+function enviarPorCorreo(asunto, cuerpo) {
+    const mailtoLink = `mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+    window.location.href = mailtoLink;
+}
+
+function exportarJSON() {
+  try {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+    const dlAnchorElem = document.createElement('a');
+    dlAnchorElem.setAttribute("href", dataStr);
+    dlAnchorElem.setAttribute("download", `MyPitStop_Backup_${new Date().toISOString().slice(0,10)}.json`);
+    dlAnchorElem.click();
+    mostrarMsg('msg_backup', currentLang === 'es' ? 'Copia exportada correctamente.' : 'Backup exported successfully.', 'ok');
+  } catch (e) {
+    mostrarMsg('msg_backup', currentLang === 'es' ? 'Error al exportar.' : 'Error exporting.', 'err');
+  }
+}
+
+function importarJSON(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const importedData = JSON.parse(e.target.result);
+      if (importedData.vehiculos && importedData.mantenimientos) {
+        if (confirm(currentLang === 'es' ? 'Esto sobrescribirá tus datos actuales. ¿Continuar?' : 'This will overwrite your current data. Continue?')) {
+          state = importedData;
+          if (!state.catalogoFotos) state.catalogoFotos = [];
+          guardar();
+          renderAll();
+          cargarRecordatorios();
+          cargarGastosFijos();
+          mostrarMsg('msg_backup', currentLang === 'es' ? 'Datos importados correctamente.' : 'Data imported successfully.', 'ok');
+        }
+      } else {
+        mostrarMsg('msg_backup', currentLang === 'es' ? 'El archivo no tiene el formato correcto.' : 'The file does not have the correct format.', 'err');
+      }
+    } catch (err) {
+      mostrarMsg('msg_backup', currentLang === 'es' ? 'Error al leer el archivo.' : 'Error reading file.', 'err');
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function borrarTodo() {
+  if (confirm(currentLang === 'es' ? '¿Estás seguro de que quieres borrar TODOS los datos? Esta acción no se puede deshacer.' : 'Are you sure you want to delete ALL data? This action cannot be undone.')) {
+    state = { vehiculos: [], mantenimientos: [], catalogoFotos: [] };
+    guardar();
+    renderAll();
+    cargarRecordatorios();
+    cargarGastosFijos();
+    mostrarMsg('msg_backup', currentLang === 'es' ? 'Todos los datos han sido borrados.' : 'All data has been deleted.', 'ok');
+  }
+}
+
+async function solicitarPersistencia() {
+  if (navigator.storage && navigator.storage.persist) {
+    const isPersisted = await navigator.storage.persist();
+    console.log(`Persistencia de almacenamiento: ${isPersisted}`);
+  }
+}
+
+function comprobarRecordatorioBackup() {
+  const ultimoBackup = localStorage.getItem('pitstop_ultimo_backup');
+  const hoy = new Date().toISOString().slice(0,10);
+  if (ultimoBackup !== hoy && state.mantenimientos.length > 0) {
+    // Aquí podrías mostrar un aviso, pero para no ser molesto lo dejamos silencioso.
+    console.log("Recuerda hacer una copia de seguridad hoy.");
+  }
+}
+
+function mostrarAvisoGiro() {
+  if (window.innerHeight > window.innerWidth && window.innerWidth < 768) {
+    // Podría mostrar un toast, pero lo omitimos para no molestar
+    console.log(translations[currentLang].aviso_horizontal);
+  }
+}
 
 // ============ INIT ============
 const idiomaGuardado = localStorage.getItem('pitstop_idioma');
@@ -1495,7 +1625,7 @@ if (idiomaGuardado && (idiomaGuardado === 'es' || idiomaGuardado === 'en')) {
   document.getElementById('lang-' + currentLang).classList.add('active');
 }
 
-cargarTema(); // Cargar tema guardado
+cargarTema(); 
 cargar();
 document.getElementById('m_fecha').value = new Date().toISOString().slice(0,10);
 renderManoObraTemporal();
@@ -1503,10 +1633,7 @@ renderRepuestosTemporales();
 translatePage(); 
 renderAll();
 
-// Iniciar LED y sonido de arranque
 setTimeout(encenderMaquina, 500);
-
-// Iniciar aviso de rotación
 setTimeout(mostrarAvisoGiro, 2000);
 
 solicitarPersistencia();

@@ -209,7 +209,7 @@ header h1 {
   flex: 1;
   text-align: center;
   display: flex;
-  flex-direction: column; /* Apila texto y LED */
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   padding: 5px;
@@ -233,7 +233,7 @@ header h1 {
   height: 14px;
   background-color: #22c55e;
   border-radius: 50%;
-  margin-top: 5px; /* Separación del texto */
+  margin-top: 6px;
   box-shadow: 0 0 10px #22c55e, inset 0 0 2px #fff;
   opacity: 1;
 }
@@ -333,7 +333,7 @@ body.modo-claro .d-pad-digital {
 .btn-derecha { right: 5px; top: 50%; transform: translateY(-50%); }
 
 /* =========================================
-   LOGOS DE MARCAS (45px EN PC / 18px EN MÓVIL)
+   LOGOS DE MARCAS
    ========================================= */
 .pegatinas-izq, .pegatinas-der {
   display: flex;
@@ -344,7 +344,7 @@ body.modo-claro .d-pad-digital {
 .pegatinas-der { justify-content: flex-end; }
 
 .logo-pegatina {
-  height: 45px;              /* 👈 MÁS GRANDES EN ORDENADOR */
+  height: 45px;
   width: auto;
   object-fit: contain;
   filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.8));
@@ -643,7 +643,7 @@ body.modo-claro .modal-historico-contenido {
   box-shadow: 0 0 30px rgba(225,29,72,0.4);
 }
 /* =========================================
-   OPTIMIZACIÓN PARA MÓVILES (LED CENTRADO)
+   OPTIMIZACIÓN PARA MÓVILES (DISEÑO CUADRÍCULA)
    ========================================= */
 @media (max-width: 768px) {
   body::before { background-size: cover; }
