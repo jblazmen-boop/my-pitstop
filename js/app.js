@@ -424,11 +424,14 @@ function irAInformeDesdeHistorico(idMantenimiento) {
 function abrirModalFirma() {
   document.getElementById('modal-firma').style.display = 'flex';
   const canvas = document.getElementById('canvas-firma');
-  const ratio =  Math.max(window.devicePixelRatio || 1, 1);
-  canvas.width = canvas.offsetWidth * ratio;
-  canvas.height = canvas.offsetHeight * ratio;
-  canvas.getContext("2d").scale(ratio, ratio);
-
+  
+  // Tamaño interno fijo y generoso para asegurar resolución (evita fallos en móvil)
+  canvas.width = 800;
+  canvas.height = 400;
+  
+  const ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
   if (!signaturePad) {
     signaturePad = new SignaturePad(canvas, {
       backgroundColor: 'rgba(255, 255, 255, 0)',
@@ -438,34 +441,38 @@ function abrirModalFirma() {
     signaturePad.clear();
   }
 
-  if (firmaGuardada) signaturePad.fromDataURL(firmaGuardada);
+  if (firmaGuardada) {
+    signaturePad.fromDataURL(firmaGuardada);
+  }
 }
 
 function cerrarModalFirma() { document.getElementById('modal-firma').style.display = 'none'; }
 function limpiarFirma() { if (signaturePad) signaturePad.clear(); }
 
-// ** IMPORTANTE: CONVERSIÓN A BLANCO Y NEGRO PARA EVITAR FALLOS EN MÓVIL **
 function guardarFirma() {
   if (signaturePad && !signaturePad.isEmpty()) {
     const canvas = document.getElementById('canvas-firma');
     
-    // Crear un canvas temporal con fondo blanco para que la firma se vea nítida en el PDF
+    // Canvas temporal para asegurar fondo blanco y formato JPEG ligero
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height;
     const ctx = tempCanvas.getContext('2d');
     
-    // Fondo blanco
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-    
-    // Dibujar el canvas original encima
     ctx.drawImage(canvas, 0, 0);
     
-    // Guardar como JPEG (más ligero y compatible)
+    // Guardamos en JPEG. Es más ligero y reduce el riesgo de bloqueo en móviles
     firmaGuardada = tempCanvas.toDataURL('image/jpeg', 0.8);
     
-    localStorage.setItem('pitstop_firma', firmaGuardada); 
+    try {
+      localStorage.setItem('pitstop_firma', firmaGuardada);
+      console.log("Firma guardada correctamente en localStorage.");
+    } catch(e) {
+      console.log("Error al guardar en localStorage:", e);
+    }
+    
     document.getElementById('modal-firma').style.display = 'none';
     mostrarMsg('msg_informe', currentLang === 'es' ? 'Firma guardada. Puedes generar el PDF.' : 'Signature saved. You can generate the PDF.', 'ok');
   } else {
@@ -1399,6 +1406,9 @@ function generarPDF(accion = false) {
     // Recuperar la firma del almacenamiento por si acaso
     firmaGuardada = localStorage.getItem('pitstop_firma') || firmaGuardada;
     
+    // Log para depurar si la firma se ha cargado
+    console.log("¿Firma detectada?:", firmaGuardada ? "SÍ (Tamaño: " + firmaGuardada.length + ")" : "NO");
+    
     const vehiculoId = document.getElementById('i_vehiculo').value;
     if (!vehiculoId) { mostrarMsg('msg_informe', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err'); return; }
 
@@ -1492,11 +1502,13 @@ function generarPDF(accion = false) {
       // --- FIRMA EN EL PDF (HISTÓRICO) ---
       if (firmaGuardada) {
           let yFirma = doc.lastAutoTable.finalY + 20;
-          if (yFirma > 230) { doc.addPage(); yFirma = 20; }
+          if (yFirma > 220) { doc.addPage(); yFirma = 20; }
           
           doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
           doc.text(t.pdf_firma, 15, yFirma);
-          doc.addImage(firmaGuardada, 'JPEG', 15, yFirma + 5, 60, 30);
+          try {
+            doc.addImage(firmaGuardada, 'JPEG', 15, yFirma + 5, 60, 30);
+          } catch(e) { console.error("Error al añadir firma al PDF histórico:", e); }
           doc.setDrawColor(0,0,0);
           doc.line(15, yFirma + 35, 75, yFirma + 35);
       }
@@ -1580,12 +1592,13 @@ function generarPDF(accion = false) {
       
       // --- FIRMA EN EL PDF (FACTURA) ---
       if (firmaGuardada) {
-          if (y > 230) { doc.addPage(); y = 20; }
+          if (y > 220) { doc.addPage(); y = 20; }
           y += 20; 
           doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
           doc.text(t.pdf_firma, 15, y);
-          // AQUÍ USAMOS 'JPEG' PORQUE ASÍ LO GUARDAMOS AHORA (MÁS LIGERO Y COMPATIBLE)
-          doc.addImage(firmaGuardada, 'JPEG', 15, y + 5, 60, 30);
+          try {
+            doc.addImage(firmaGuardada, 'JPEG', 15, y + 5, 60, 30);
+          } catch(e) { console.error("Error al añadir firma al PDF factura:", e); }
           doc.setDrawColor(0,0,0);
           doc.line(15, y + 35, 75, y + 35);
       }
