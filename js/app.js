@@ -444,10 +444,28 @@ function abrirModalFirma() {
 function cerrarModalFirma() { document.getElementById('modal-firma').style.display = 'none'; }
 function limpiarFirma() { if (signaturePad) signaturePad.clear(); }
 
+// ** IMPORTANTE: CONVERSIÓN A BLANCO Y NEGRO PARA EVITAR FALLOS EN MÓVIL **
 function guardarFirma() {
   if (signaturePad && !signaturePad.isEmpty()) {
-    firmaGuardada = signaturePad.toDataURL();
-    localStorage.setItem('pitstop_firma', firmaGuardada); // Persistencia de la firma
+    const canvas = document.getElementById('canvas-firma');
+    
+    // Crear un canvas temporal con fondo blanco para que la firma se vea nítida en el PDF
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const ctx = tempCanvas.getContext('2d');
+    
+    // Fondo blanco
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    
+    // Dibujar el canvas original encima
+    ctx.drawImage(canvas, 0, 0);
+    
+    // Guardar como JPEG (más ligero y compatible)
+    firmaGuardada = tempCanvas.toDataURL('image/jpeg', 0.8);
+    
+    localStorage.setItem('pitstop_firma', firmaGuardada); 
     document.getElementById('modal-firma').style.display = 'none';
     mostrarMsg('msg_informe', currentLang === 'es' ? 'Firma guardada. Puedes generar el PDF.' : 'Signature saved. You can generate the PDF.', 'ok');
   } else {
@@ -1478,7 +1496,7 @@ function generarPDF(accion = false) {
           
           doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
           doc.text(t.pdf_firma, 15, yFirma);
-          doc.addImage(firmaGuardada, 'PNG', 15, yFirma + 5, 60, 30);
+          doc.addImage(firmaGuardada, 'JPEG', 15, yFirma + 5, 60, 30);
           doc.setDrawColor(0,0,0);
           doc.line(15, yFirma + 35, 75, yFirma + 35);
       }
@@ -1566,7 +1584,8 @@ function generarPDF(accion = false) {
           y += 20; 
           doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
           doc.text(t.pdf_firma, 15, y);
-          doc.addImage(firmaGuardada, 'PNG', 15, y + 5, 60, 30);
+          // AQUÍ USAMOS 'JPEG' PORQUE ASÍ LO GUARDAMOS AHORA (MÁS LIGERO Y COMPATIBLE)
+          doc.addImage(firmaGuardada, 'JPEG', 15, y + 5, 60, 30);
           doc.setDrawColor(0,0,0);
           doc.line(15, y + 35, 75, y + 35);
       }
