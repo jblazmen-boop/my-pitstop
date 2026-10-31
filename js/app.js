@@ -210,6 +210,7 @@ const tiposMantenimiento = {
   "type_10": { es: "Otro", en: "Other" },
   "type_11": { es: "Vida / Salud Batería", en: "Battery Life / Health" }
 };
+
 function translatePage() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
@@ -420,28 +421,34 @@ function irAInformeDesdeHistorico(idMantenimiento) {
   }, 100);
 }
 
-// ============ MODAL DE FIRMA ============
+// ============ MODAL DE FIRMA (CORREGIDO PARA MÓVIL Y ESCRITORIO) ============
 function abrirModalFirma() {
   document.getElementById('modal-firma').style.display = 'flex';
   const canvas = document.getElementById('canvas-firma');
   
-  // Tamaño interno fijo y seguro (evita punteros descolocados en escritorio y fallos en móvil)
-  canvas.width = 800;
-  canvas.height = 400;
-  canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+  // Pequeño delay para que el navegador renderice el modal y calcule su tamaño real
+  setTimeout(() => {
+    const rect = canvas.getBoundingClientRect();
+    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+    
+    // Ajustamos la resolución del canvas al tamaño exacto en pantalla
+    canvas.width = rect.width * ratio;
+    canvas.height = rect.height * ratio;
+    canvas.getContext("2d").scale(ratio, ratio);
 
-  if (!signaturePad) {
+    if (signaturePad) {
+      signaturePad.off(); // Limpiamos eventos anteriores para que no se dupliquen
+    }
+
     signaturePad = new SignaturePad(canvas, {
       backgroundColor: 'rgba(255, 255, 255, 0)',
       penColor: '#1e293b'
     });
-  } else {
-    signaturePad.clear();
-  }
 
-  if (firmaGuardada) {
-    signaturePad.fromDataURL(firmaGuardada);
-  }
+    if (firmaGuardada) {
+      signaturePad.fromDataURL(firmaGuardada);
+    }
+  }, 100);
 }
 
 function cerrarModalFirma() { document.getElementById('modal-firma').style.display = 'none'; }
@@ -451,15 +458,18 @@ function guardarFirma() {
   if (signaturePad && !signaturePad.isEmpty()) {
     const canvas = document.getElementById('canvas-firma');
     
-    // Forzar fondo blanco y convertir a JPEG para que el móvil no falle en el PDF
+    // Creamos un canvas temporal de 800x400 para estandarizar el PDF
     const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = canvas.width;
-    tempCanvas.height = canvas.height;
+    tempCanvas.width = 800;
+    tempCanvas.height = 400;
     const ctx = tempCanvas.getContext('2d');
     
+    // Fondo blanco para que el JPEG no salga con fondo negro en el PDF
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-    ctx.drawImage(canvas, 0, 0);
+    
+    // Dibujamos el canvas original escalado a 800x400
+    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, tempCanvas.width, tempCanvas.height);
     
     firmaGuardada = tempCanvas.toDataURL('image/jpeg', 0.8);
     
@@ -475,6 +485,7 @@ function guardarFirma() {
     alert(currentLang === 'es' ? 'Por favor, firme antes de guardar.' : 'Please sign before saving.');
   }
 }
+
 // ============ TABS Y EVENTOS ============
 document.querySelectorAll('.tab').forEach(t => {
   t.onclick = () => {
@@ -491,7 +502,6 @@ document.querySelectorAll('.tab').forEach(t => {
     if (t.dataset.tab === 'recordatorios') cargarRecordatorios();
   };
 });
-
 // ============ RESTO DE FUNCIONES (CRUD) ============
 function addVehiculo() {
   const mat = document.getElementById('v_matricula').value.trim().toUpperCase();
@@ -675,6 +685,7 @@ function actualizarDesplegableFotos() {
   });
   if (prev) sel.value = prev;
 }
+
 function guardarMantenimiento() {
   const vehiculoId = document.getElementById('m_vehiculo').value;
   const fecha = document.getElementById('m_fecha').value;
@@ -1250,6 +1261,7 @@ function exportarExcel() {
   
   mostrarMsg('msg_informe', currentLang === 'es' ? 'Excel exportado y descargado.' : 'Excel exported and downloaded.', 'ok');
 }
+
 // ============ RECORDATORIOS ============
 function cargarRecordatorios() {
   const sel = document.getElementById('rec_vehiculo');

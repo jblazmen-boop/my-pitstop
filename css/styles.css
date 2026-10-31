@@ -778,10 +778,10 @@ body.modo-claro .modal-historico-contenido {
     margin-bottom: 10px !important;
   }
 
-  /* Forzamos al canvas a tener un tamaño visual grande, pero sin deformar la firma */
+  /* Forzamos al canvas a tener un tamaño visual grande y altura fija para que no falle el cálculo */
   .modal-firma-contenido canvas {
     width: 100% !important;
-    height: auto !important; /* Mantiene la proporción 2:1 (800x400) */
+    height: 200px !important; /* Clave para que no se descuadre en móvil */
     touch-action: none !important; 
     background-color: #ffffff !important;
     border-radius: 6px !important;
