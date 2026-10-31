@@ -458,20 +458,28 @@ function guardarFirma() {
   if (signaturePad && !signaturePad.isEmpty()) {
     const canvas = document.getElementById('canvas-firma');
     
-    // Creamos un canvas temporal de 800x400 para estandarizar el PDF
+    // Canvas temporal de 800x400 para el PDF
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = 800;
     tempCanvas.height = 400;
     const ctx = tempCanvas.getContext('2d');
     
-    // Fondo blanco para que el JPEG no salga con fondo negro en el PDF
+    // Fondo blanco
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
     
-    // Dibujamos el canvas original escalado a 800x400
+    // Dibujamos la firma escalada
     ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, tempCanvas.width, tempCanvas.height);
     
-    firmaGuardada = tempCanvas.toDataURL('image/jpeg', 0.8);
+    // TRUCO PARA MÓVILES: Intentamos JPEG, si falla o da error (Safari), usamos PNG
+    try {
+      firmaGuardada = tempCanvas.toDataURL('image/jpeg', 0.8);
+      if (!firmaGuardada || firmaGuardada === 'data:,') {
+        firmaGuardada = tempCanvas.toDataURL('image/png');
+      }
+    } catch(e) {
+      firmaGuardada = tempCanvas.toDataURL('image/png');
+    }
     
     try {
       localStorage.setItem('pitstop_firma', firmaGuardada);
@@ -1512,7 +1520,9 @@ function generarPDF(accion = false) {
           doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
           doc.text(t.pdf_firma, 15, yFirma);
           try {
-            doc.addImage(firmaGuardada, 'JPEG', 15, yFirma + 5, 60, 30);
+            // Detecta si es PNG o JPEG automáticamente para que funcione en móvil
+            const formato = firmaGuardada.includes('image/png') ? 'PNG' : 'JPEG';
+            doc.addImage(firmaGuardada, formato, 15, yFirma + 5, 60, 30);
           } catch(e) { console.error("Error al añadir firma al PDF histórico:", e); }
           doc.setDrawColor(0,0,0);
           doc.line(15, yFirma + 35, 75, yFirma + 35);
@@ -1602,7 +1612,9 @@ function generarPDF(accion = false) {
           doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
           doc.text(t.pdf_firma, 15, y);
           try {
-            doc.addImage(firmaGuardada, 'JPEG', 15, y + 5, 60, 30);
+            // Detecta si es PNG o JPEG automáticamente para que funcione en móvil
+            const formato = firmaGuardada.includes('image/png') ? 'PNG' : 'JPEG';
+            doc.addImage(firmaGuardada, formato, 15, y + 5, 60, 30);
           } catch(e) { console.error("Error al añadir firma al PDF factura:", e); }
           doc.setDrawColor(0,0,0);
           doc.line(15, y + 35, 75, y + 35);
