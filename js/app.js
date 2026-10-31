@@ -99,7 +99,7 @@ const translations = {
     add_repuesto: "+ Añadir Repuesto", foto: "Foto", total: "Total", total_repuestos: "Total Repuestos:",
     guardar_mant: "Guardar Mantenimiento", cancelar_edit: "Cancelar Edición", historial: "Historial de Mantenimientos",
     filtrar: "Filtrar por vehículo", todos: "Todos", operaciones: "Operaciones", mano: "Mano", piezas: "Piezas",
-    gen_informe: "Generar Informe / Factura", tipo_informe: "Tipo de Informe", detallado: "Factura Detallada (con precios)",
+    gen_informe: "Generar Informe / Factura", tipo_informe: "Tipo de Informe", detallado: "Informe Detallado / Factura",
     historico: "Histórico Técnico (sin precios)", fecha_desde: "Fecha desde", fecha_hasta: "Fecha hasta",
     iva: "IVA (%)", btn_gen_pdf: "Generar PDF", btn_share_pdf: "Compartir PDF", btn_email_pdf: "Enviar por Correo",
     btn_share_chart: "Compartir", btn_email_chart: "Correo",
@@ -152,7 +152,7 @@ const translations = {
     add_repuesto: "+ Add Part", foto: "Photo", total: "Total", total_repuestos: "Total Parts:",
     guardar_mant: "Save Maintenance", cancelar_edit: "Cancel Edit", historial: "Maintenance History",
     filtrar: "Filter by vehicle", todos: "All", operaciones: "Operations", mano: "Labor", piezas: "Parts",
-    gen_informe: "Generate Report / Invoice", tipo_informe: "Report Type", detallado: "Detailed Invoice (with prices)",
+    gen_informe: "Generate Report / Invoice", tipo_informe: "Report Type", detallado: "Detailed Report / Invoice",
     historico: "Technical History (no prices)", fecha_desde: "Date from", fecha_hasta: "Date to",
     iva: "VAT (%)", btn_gen_pdf: "Generate PDF", btn_share_pdf: "Share PDF", btn_email_pdf: "Send by Email",
     btn_share_chart: "Share", btn_email_chart: "Email",
@@ -447,6 +447,7 @@ function limpiarFirma() { if (signaturePad) signaturePad.clear(); }
 function guardarFirma() {
   if (signaturePad && !signaturePad.isEmpty()) {
     firmaGuardada = signaturePad.toDataURL();
+    localStorage.setItem('pitstop_firma', firmaGuardada); // Persistencia de la firma
     document.getElementById('modal-firma').style.display = 'none';
     mostrarMsg('msg_informe', currentLang === 'es' ? 'Firma guardada. Puedes generar el PDF.' : 'Signature saved. You can generate the PDF.', 'ok');
   } else {
@@ -1377,6 +1378,9 @@ function generarPDF(accion = false) {
     const tipoInforme = document.getElementById('i_tipo_informe').value;
     const t = translations[currentLang]; 
     
+    // Recuperar la firma del almacenamiento por si acaso
+    firmaGuardada = localStorage.getItem('pitstop_firma') || firmaGuardada;
+    
     const vehiculoId = document.getElementById('i_vehiculo').value;
     if (!vehiculoId) { mostrarMsg('msg_informe', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err'); return; }
 
@@ -1467,6 +1471,18 @@ function generarPDF(accion = false) {
         margin: { left: 15, right: 15 }
       });
 
+      // --- FIRMA EN EL PDF (HISTÓRICO) ---
+      if (firmaGuardada) {
+          let yFirma = doc.lastAutoTable.finalY + 20;
+          if (yFirma > 230) { doc.addPage(); yFirma = 20; }
+          
+          doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
+          doc.text(t.pdf_firma, 15, yFirma);
+          doc.addImage(firmaGuardada, 'PNG', 15, yFirma + 5, 60, 30);
+          doc.setDrawColor(0,0,0);
+          doc.line(15, yFirma + 35, 75, yFirma + 35);
+      }
+
     } else {
       let totalGlobalMano = 0;
       let totalGlobalPiezas = 0;
@@ -1544,7 +1560,7 @@ function generarPDF(accion = false) {
       doc.setFont(undefined, 'bold'); doc.setTextColor(225, 29, 72); 
       doc.text(t.pdf_total, 130, y); doc.text(fmt(totalFinal), pageW - 15, y, {align:'right'});
       
-      // --- FIRMA EN EL PDF ---
+      // --- FIRMA EN EL PDF (FACTURA) ---
       if (firmaGuardada) {
           if (y > 230) { doc.addPage(); y = 20; }
           y += 20; 
@@ -1566,7 +1582,7 @@ function generarPDF(accion = false) {
         navigator.share({
           files: [file],
           title: nombre,
-          text: currentLang === 'es' ? 'Aquí tienes el informe de mantenimiento.' : 'Here is the maintenance report.'
+          text: currentLang === 'es' ? 'Aquí tienes el documento.' : 'Here is the document.'
         }).then(() => {
           mostrarMsg('msg_informe', currentLang === 'es' ? 'Compartido con éxito.' : 'Shared successfully.', 'ok');
         }).catch((err) => {
@@ -1680,6 +1696,9 @@ if (idiomaGuardado && (idiomaGuardado === 'es' || idiomaGuardado === 'en')) {
   document.getElementById('lang-en').classList.remove('active');
   document.getElementById('lang-' + currentLang).classList.add('active');
 }
+
+// Recuperar firma guardada al iniciar
+firmaGuardada = localStorage.getItem('pitstop_firma') || null;
 
 cargarTema(); 
 cargar();
