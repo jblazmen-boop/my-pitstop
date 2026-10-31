@@ -638,7 +638,7 @@ body.modo-claro .modal-historico-contenido {
   border-radius: 12px;
   padding: 20px;
   width: 90%;
-  max-width: 400px;
+  max-width: 500px; /* Un poco más ancho en escritorio */
   box-shadow: 0 0 30px rgba(225,29,72,0.4);
 }
 
@@ -765,7 +765,7 @@ body.modo-claro .modal-historico-contenido {
   table { margin-top: 10px; display: block; overflow-x: auto; white-space: nowrap; }
   table th, table td { padding: 6px 8px; font-size: 11px; }
 
-  /* ===== MODAL DE FIRMA EN MÓVIL (MUCHO MÁS GRANDE) ===== */
+  /* ===== MODAL DE FIRMA EN MÓVIL (TAMAÑO Y COORDENADAS CORRECTAS) ===== */
   .modal-firma-contenido {
     width: 98% !important;
     max-width: 98% !important;
@@ -778,9 +778,11 @@ body.modo-claro .modal-historico-contenido {
     margin-bottom: 10px !important;
   }
 
+  /* Forzamos al canvas a tener un tamaño visual grande, pero sin deformar la firma */
   .modal-firma-contenido canvas {
-    height: 350px !important; /* Mucho más alto para firmar con el dedo */
-    touch-action: none !important; /* Evita que el móvil haga scroll al firmar */
+    width: 100% !important;
+    height: auto !important; /* Mantiene la proporción 2:1 (800x400) */
+    touch-action: none !important; 
     background-color: #ffffff !important;
     border-radius: 6px !important;
   }

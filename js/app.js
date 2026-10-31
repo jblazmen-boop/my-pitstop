@@ -425,13 +425,11 @@ function abrirModalFirma() {
   document.getElementById('modal-firma').style.display = 'flex';
   const canvas = document.getElementById('canvas-firma');
   
-  // Tamaño interno fijo y generoso para asegurar resolución (evita fallos en móvil)
+  // Tamaño interno fijo y seguro (evita punteros descolocados en escritorio y fallos en móvil)
   canvas.width = 800;
   canvas.height = 400;
-  
-  const ctx = canvas.getContext("2d");
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
+  canvas.getContext("2d").clearRect(0, 0, canvas.width, canvas.height);
+
   if (!signaturePad) {
     signaturePad = new SignaturePad(canvas, {
       backgroundColor: 'rgba(255, 255, 255, 0)',
@@ -453,7 +451,7 @@ function guardarFirma() {
   if (signaturePad && !signaturePad.isEmpty()) {
     const canvas = document.getElementById('canvas-firma');
     
-    // Canvas temporal para asegurar fondo blanco y formato JPEG ligero
+    // Forzar fondo blanco y convertir a JPEG para que el móvil no falle en el PDF
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height;
@@ -463,14 +461,12 @@ function guardarFirma() {
     ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
     ctx.drawImage(canvas, 0, 0);
     
-    // Guardamos en JPEG. Es más ligero y reduce el riesgo de bloqueo en móviles
     firmaGuardada = tempCanvas.toDataURL('image/jpeg', 0.8);
     
     try {
       localStorage.setItem('pitstop_firma', firmaGuardada);
-      console.log("Firma guardada correctamente en localStorage.");
     } catch(e) {
-      console.log("Error al guardar en localStorage:", e);
+      console.log("Error al guardar la firma en localStorage", e);
     }
     
     document.getElementById('modal-firma').style.display = 'none';
@@ -1403,11 +1399,8 @@ function generarPDF(accion = false) {
     const tipoInforme = document.getElementById('i_tipo_informe').value;
     const t = translations[currentLang]; 
     
-    // Recuperar la firma del almacenamiento por si acaso
+    // Recuperar la firma del almacenamiento
     firmaGuardada = localStorage.getItem('pitstop_firma') || firmaGuardada;
-    
-    // Log para depurar si la firma se ha cargado
-    console.log("¿Firma detectada?:", firmaGuardada ? "SÍ (Tamaño: " + firmaGuardada.length + ")" : "NO");
     
     const vehiculoId = document.getElementById('i_vehiculo').value;
     if (!vehiculoId) { mostrarMsg('msg_informe', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err'); return; }
