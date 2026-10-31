@@ -1,72 +1,214 @@
-    <!-- MARCO INFERIOR CON LA BOTONERA DIGITAL -->
-    <div class="marco-inferior">
-      <div class="pegatinas-izq">
-        <img src="logo-pirelli.PNG" alt="Pirelli" class="logo-pegatina logo-pirelli">
-      </div>
-      
-      <div class="botonera-fisica pantalla-digital">
-        <div class="d-pad-digital">
-          <button class="btn-dir-digital btn-arriba" title="Arriba">▲</button>
-          <button class="btn-dir-digital btn-izquierda" title="Izquierda">◀</button>
-          <button class="btn-dir-digital btn-derecha" title="Derecha">▶</button>
-          <button class="btn-dir-digital btn-abajo" title="Abajo">▼</button>
-          <button class="btn-ok-digital" title="Ver Historial Rápido" onclick="abrirModalHistorico()">OK</button>
-        </div>
-      </div>
-      
-      <div class="pegatinas-der">
-        <img src="logo-castrol.PNG" alt="Castrol" class="logo-pegatina logo-castrol">
-      </div>
-    </div>
+// ============ ESTADO Y TRADUCCIONES ============
+let state = { vehiculos: [], mantenimientos: [], catalogoFotos: [] };
+let repuestosTemporales = [];
+let manoObraTemporal = [];
+let editandoMantenimientoId = null;
+let currentLang = 'es'; 
+let miGraficoInstancia = null; 
+let signaturePad = null; 
+let firmaGuardada = null; 
 
-  </div> <!-- FIN DE LA MÁQUINA DE DIAGNOSIS -->
-</div>
+const STORAGE_KEY = 'mi_app_mantenimiento_coches'; 
 
-<!-- PIE DE PÁGINA -->
-<footer style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px; margin-top: 20px; border-top: 1px solid #374151; background-color: rgba(15, 23, 42, 0.95);">
-  © 2026 My PitStop. <span data-i18n="derechos">Todos los derechos reservados.</span>
-</footer>
+// ============ SISTEMA DE SONIDO ============
+function reproducirBeep() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return; 
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    osc.type = 'square'; 
+    osc.frequency.setValueAtTime(880, ctx.currentTime); 
+    gainNode.gain.setValueAtTime(0.1, ctx.currentTime); 
+    gainNode.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.1); 
+    osc.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.1); 
+  } catch (e) { console.log("Audio no disponible", e); }
+}
 
-<!-- MODAL FOTO -->
-<div id="modal-foto" class="modal" onclick="cerrarModal()">
-  <span class="cerrar-modal">&times;</span>
-  <img class="modal-contenido" id="img-modal">
-</div>
+function sonidoArranque() {
+  try {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContext) return;
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    osc.type = 'sawtooth'; 
+    osc.frequency.setValueAtTime(100, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.3); 
+    gainNode.gain.setValueAtTime(0.05, ctx.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.00001, ctx.currentTime + 0.5);
+    osc.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.5);
+  } catch(e) { console.log(e); }
+}
 
-<!-- MODAL HISTÓRICO RÁPIDO -->
-<div id="modal-historico" class="modal" onclick="cerrarModalHistorico(event)">
-  <div class="modal-historico-contenido">
-    <span class="cerrar-modal" onclick="cerrarModalHistorico(event)">&times;</span>
-    <h2 id="historial-titulo-vehiculo" style="color: #e11d48; border-bottom: 2px solid #e11d48; padding-bottom: 10px;">Historial Rápido</h2>
-    
-    <div style="margin-bottom: 15px;">
-      <label data-i18n="seleccionar_vehiculo_modal" style="color: #9ca3af; font-size: 12px; font-weight: bold; text-transform: uppercase;">Seleccionar Vehículo</label>
-      <select id="modal-select-vehiculo" onchange="cambiarVehiculoHistorico()" style="width: 100%; padding: 8px; border-radius: 4px; background: #1f2937; color: #fff; border: 1px solid #374151;">
-        <!-- Se rellena desde JS -->
-      </select>
-    </div>
+// ============ MODO CLARO / OSCURO ============
+function toggleTema() {
+  const body = document.body;
+  const btn = document.getElementById('btn-tema');
+  reproducirBeep();
+  body.classList.toggle('modo-claro');
+  if (body.classList.contains('modo-claro')) {
+    btn.textContent = '☀️';
+    localStorage.setItem('pitstop_tema', 'claro');
+  } else {
+    btn.textContent = '🌙';
+    localStorage.setItem('pitstop_tema', 'oscuro');
+  }
+  if (document.getElementById('grafico').classList.contains('active')) {
+    renderGrafico();
+  }
+}
 
-    <div id="historial-lista" class="historial-lista"></div>
-    <button class="primary" style="margin-top: 20px; width: 100%;" onclick="cerrarModalHistorico(event)">Cerrar</button>
-  </div>
-</div>
+function cargarTema() {
+  const tema = localStorage.getItem('pitstop_tema');
+  const btn = document.getElementById('btn-tema');
+  if (tema === 'claro') {
+    document.body.classList.add('modo-claro');
+    btn.textContent = '☀️';
+  } else {
+    document.body.classList.remove('modo-claro');
+    btn.textContent = '🌙';
+  }
+}
 
-<!-- MODAL DE FIRMA -->
-<div id="modal-firma" class="modal" style="z-index: 20000;">
-  <div class="modal-firma-contenido">
-    <h3 data-i18n="firma_titulo" style="color: #fff; margin-top: 0; text-align: center;">Firme aquí</h3>
-    <canvas id="canvas-firma" width="300" height="150" style="border: 2px dashed #e11d48; border-radius: 8px; background: #fff; touch-action: none; width: 100%;"></canvas>
-    <div style="display: flex; gap: 10px; margin-top: 15px;">
-      <button class="secondary" data-i18n="btn_borrar_firma" style="flex: 1;" onclick="limpiarFirma()">Borrar</button>
-      <button class="primary" data-i18n="btn_guardar_firma" style="flex: 1;" onclick="guardarFirma()">Guardar Firma</button>
-    </div>
-    <button class="danger" data-i18n="btn_cancelar_firma" style="width: 100%; margin-top: 10px;" onclick="cerrarModalFirma()">Cancelar</button>
-  </div>
-</div>
+// ============ LED DE ENCENDIDO ============
+function encenderMaquina() {
+  const led = document.getElementById('led-encendido');
+  if (led) {
+    led.classList.add('encendido');
+    sonidoArranque(); 
+  }
+}
 
-<script src="js/app.js?v=3"></script>
-</body>
-</html>
+// ============ TRANSLATIONS ============
+const translations = {
+  es: {
+    vehiculos_titulo: "Vehículos", matricula: "Matrícula", marca: "Marca", modelo: "Modelo", bastidor: "Nº Bastidor (VIN)",
+    add_vehiculo: "Añadir vehículo", acciones: "Acciones", reg_mantenimiento: "Registrar mantenimiento",
+    vehiculo: "Vehículo", fecha: "Fecha", km: "Kms", tipo: "Tipo", taller: "Taller", notas: "Notas",
+    mano_obra: "Mano de Obra", operacion: "Operación", precio: "Precio (€)", add_btn: "+ Añadir",
+    total_mano: "Total Mano de Obra:", repuestos: "Repuestos", cant: "Cant.", descripcion: "Descripción",
+    referencia: "Referencia", subir_foto: "Subir nueva foto (opcional)", cat_foto: "O elegir del catálogo (opcional)",
+    add_repuesto: "+ Añadir Repuesto", foto: "Foto", total: "Total", total_repuestos: "Total Repuestos:",
+    guardar_mant: "Guardar Mantenimiento", cancelar_edit: "Cancelar Edición", historial: "Historial de Mantenimientos",
+    filtrar: "Filtrar por vehículo", todos: "Todos", operaciones: "Operaciones", mano: "Mano", piezas: "Piezas",
+    gen_informe: "Generar Informe / Factura", tipo_informe: "Tipo de Informe", detallado: "Factura Detallada (con precios)",
+    historico: "Histórico Técnico (sin precios)", fecha_desde: "Fecha desde", fecha_hasta: "Fecha hasta",
+    iva: "IVA (%)", btn_gen_pdf: "Generar PDF", btn_share_pdf: "Compartir PDF", btn_email_pdf: "Enviar por Correo",
+    btn_share_chart: "Compartir", btn_email_chart: "Correo",
+    copia_seguridad: "Copia de seguridad", copia_texto: "Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.",
+    exportar: "⬇ Exportar copia (JSON)", importar: "⬆ Importar copia", borrar: "🗑 Borrar todos los datos",
+    derechos: "Todos los derechos reservados.", selecciona: "— Selecciona —", no_foto: "— No usar foto —",
+    ej_operacion: "Ej: Sustituir correa", ej_referencia: "Ej: MANN-W712", seleccionar_archivo: "Seleccionar archivo",
+    ph_matricula: "1234ABC", ph_marca: "Seat", ph_modelo: "León", ph_bastidor: "WVWZZZ...", ph_taller: "Taller Pepe", ph_descripcion: "Filtro de aceite",
+    pdf_informe: "INFORME DE MANTENIMIENTO / FACTURA", pdf_factura: "INFORME DE MANTENIMIENTO / FACTURA",
+    pdf_vehiculo: "Vehículo:", pdf_matricula: "Matrícula:", pdf_bastidor: "Nº Bastidor:", pdf_fecha_inf: "Fecha informe:",
+    pdf_periodo: "Periodo:", pdf_mano_obra: "Desglose de Mano de Obra", pdf_concepto: "Concepto", pdf_importe: "Importe",
+    pdf_repuestos: "Desglose de Repuestos", pdf_desc: "Descripción", pdf_precio_ud: "Precio Ud.", pdf_base: "Base imponible:",
+    pdf_iva: "IVA", pdf_total: "TOTAL FACTURA:", pdf_servicios: "Servicio / Mano de Obra", pdf_materiales: "Materiales / Repuestos",
+    pdf_taller_txt: "Taller:", modo_generacion: "Modo de generación", por_fechas: "Por rango de fechas", 
+    por_seleccion: "Seleccionando mantenimientos", selecciona_mant: "Selecciona los mantenimientos para incluir en la factura",
+    estadisticas: "Estadísticas de Gasto", recordatorios: "Avisos y Recordatorios", 
+    prox_mant: "Próximo Mantenimiento", itv: "ITV", resumen_avisos: "Resumen de Avisos",
+    fecha_prox_mant: "Fecha Próx. Mantenimiento", km_prox_mant: "Kms Próx. Mantenimiento", 
+    fecha_prox_itv: "Fecha Próx. ITV", 
+    registro_itv_pasada: "Al rellenar estos campos, se añadirá un registro al historial del coche:",
+    fecha_pasada_itv: "Fecha Pasada ITV", km_itv_pasada: "Kms de esa ITV",
+    guardar: "Guardar Datos", estado: "Estado", 
+    itv_ok: "En regla", itv_warn: "Próximo", itv_danger: "Caducado", sin_fecha: "Sin fecha",
+    itv_nombre: "Revisión ITV", prox_itv: "Próxima ITV",
+    modo_grafico: "Ver por:", anios: "Años", meses: "Meses", anio_grafico: "Año:", gasto_total: "Gasto Total", gasto_total_mix: "Gasto Total (Mecánica + Fijos)",
+    aviso_horizontal: "Para una mejor experiencia, gira tu dispositivo a horizontal.",
+    gastos_fijos: "Gastos Fijos (Seguro e ITV)", gastos_fijos_texto: "Añade aquí el coste de tu seguro y de la tasa de la ITV para que se sumen al total de gastos del vehículo.",
+    coste_seguro: "Coste Seguro (Anual)", coste_itv: "Coste Tasa ITV (Aprox)", resumen_fijos: "Resumen Fijos",
+    pdf_titulo_grafico: "RESUMEN DE GASTOS", pdf_gasto_fijo: "Gasto Fijo (Seguro+ITV):", 
+    email_asunto_grafico: "Resumen de Gastos My PitStop", email_cuerpo_grafico: "Adjunto el resumen de gastos generado con My PitStop. Por favor, no olvides adjuntar el PDF descargado.",
+    email_asunto_informe: "Informe de Mantenimiento My PitStop", email_cuerpo_informe: "Adjunto el informe de mantenimiento generado con My PitStop. Por favor, no olvides adjuntar el PDF descargado.",
+    modal_historico_titulo: "Historial Rápido",
+    seleccionar_vehiculo_modal: "Seleccionar Vehículo",
+    sin_mantenimientos: "No hay mantenimientos registrados para este vehículo.",
+    firma_titulo: "Firme aquí",
+    btn_borrar_firma: "Borrar",
+    btn_guardar_firma: "Guardar Firma",
+    btn_cancelar_firma: "Cancelar",
+    pdf_firma: "Firma del Cliente:",
+    btn_firmar_informe: "Firmar Informe/Factura",
+    btn_export_excel: "Exportar a Excel"
+  },
+  en: {
+    vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
+    add_vehiculo: "Add vehicle", acciones: "Actions", reg_mantenimiento: "Register maintenance",
+    vehiculo: "Vehicle", fecha: "Date", km: "Miles", tipo: "Type", taller: "Workshop", notas: "Notes",
+    mano_obra: "Labor", operacion: "Operation", precio: "Price (€)", add_btn: "+ Add",
+    total_mano: "Total Labor:", repuestos: "Parts", cant: "Qty.", descripcion: "Description",
+    referencia: "Reference", subir_foto: "Upload new photo (optional)", cat_foto: "Or choose from catalog (optional)",
+    add_repuesto: "+ Add Part", foto: "Photo", total: "Total", total_repuestos: "Total Parts:",
+    guardar_mant: "Save Maintenance", cancelar_edit: "Cancel Edit", historial: "Maintenance History",
+    filtrar: "Filter by vehicle", todos: "All", operaciones: "Operations", mano: "Labor", piezas: "Parts",
+    gen_informe: "Generate Report / Invoice", tipo_informe: "Report Type", detallado: "Detailed Invoice (with prices)",
+    historico: "Technical History (no prices)", fecha_desde: "Date from", fecha_hasta: "Date to",
+    iva: "VAT (%)", btn_gen_pdf: "Generate PDF", btn_share_pdf: "Share PDF", btn_email_pdf: "Send by Email",
+    btn_share_chart: "Share", btn_email_chart: "Email",
+    copia_seguridad: "Backup", copia_texto: "Data is stored in this browser. If you clear your history or change devices, it will be lost. Export a backup regularly.",
+    exportar: "⬇ Export backup (JSON)", importar: "⬆ Import backup", borrar: "🗑 Delete all data",
+    derechos: "All rights reserved.", selecciona: "— Select —", no_foto: "— No photo —",
+    ej_operacion: "Ex: Replace belt", ej_referencia: "Ex: MANN-W712", seleccionar_archivo: "Select file",
+    ph_matricula: "1234ABC", ph_marca: "Seat", ph_modelo: "Leon", ph_bastidor: "WVWZZZ...", ph_taller: "Workshop Joe", ph_descripcion: "Oil filter",
+    pdf_informe: "MAINTENANCE REPORT / INVOICE", pdf_factura: "MAINTENANCE REPORT / INVOICE",
+    pdf_vehiculo: "Vehicle:", pdf_matricula: "Plate:", pdf_bastidor: "VIN:", pdf_fecha_inf: "Report date:",
+    pdf_periodo: "Period:", pdf_mano_obra: "Labor Breakdown", pdf_concepto: "Concept", pdf_importe: "Amount",
+    pdf_repuestos: "Parts Breakdown", pdf_desc: "Description", pdf_precio_ud: "Unit Price", pdf_base: "Subtotal:",
+    pdf_iva: "VAT", pdf_total: "TOTAL INVOICE:", pdf_servicios: "Service / Labor", pdf_materiales: "Materials / Parts",
+    pdf_taller_txt: "Workshop:", modo_generacion: "Generation mode", por_fechas: "By date range", 
+    por_seleccion: "Selecting records", selecciona_mant: "Select maintenance records to include in the invoice",
+    estadisticas: "Expense Statistics", recordatorios: "Reminders & Alerts", 
+    prox_mant: "Next Maintenance", itv: "Vehicle Inspection", resumen_avisos: "Alerts Summary",
+    fecha_prox_mant: "Next Maint. Date", km_prox_mant: "Next Maint. Miles", 
+    fecha_prox_itv: "Next Insp. Date", 
+    registro_itv_pasada: "By filling these fields, a record will be added to the car's history:",
+    fecha_pasada_itv: "Last Insp. Date", km_itv_pasada: "Miles at Last Insp.",
+    guardar: "Save Data", estado: "Status", 
+    itv_ok: "Valid", itv_warn: "Due soon", itv_danger: "Expired", sin_fecha: "No date",
+    itv_nombre: "MOT Inspection", prox_itv: "Next Vehicle Inspection",
+    modo_grafico: "View by:", anios: "Years", meses: "Months", anio_grafico: "Year:", gasto_total: "Total Expense", gasto_total_mix: "Total Expense (Mechanics + Fixed)",
+    aviso_horizontal: "For a better experience, rotate your device to landscape.",
+    gastos_fijos: "Fixed Costs (Insurance & MOT)", gastos_fijos_texto: "Add the cost of your insurance and MOT fee here so they add up to the vehicle's total expenses.",
+    coste_seguro: "Insurance Cost (Annual)", coste_itv: "MOT Fee (Approx)", resumen_fijos: "Fixed Summary",
+    pdf_titulo_grafico: "EXPENSE SUMMARY", pdf_gasto_fijo: "Fixed Cost (Insurance+MOT):",
+    email_asunto_grafico: "My PitStop Expense Summary", email_cuerpo_grafico: "Attached is the expense summary generated with My PitStop. Please do not forget to attach the downloaded PDF.",
+    email_asunto_informe: "My PitStop Maintenance Report", email_cuerpo_informe: "Attached is the maintenance report generated with My PitStop. Please do not forget to attach the downloaded PDF.",
+    modal_historico_titulo: "Quick History",
+    seleccionar_vehiculo_modal: "Select Vehicle",
+    sin_mantenimientos: "No maintenance records for this vehicle.",
+    firma_titulo: "Sign here",
+    btn_borrar_firma: "Clear",
+    btn_guardar_firma: "Save Signature",
+    btn_cancelar_firma: "Cancel",
+    pdf_firma: "Customer Signature:",
+    btn_firmar_informe: "Sign Report/Invoice",
+    btn_export_excel: "Export to Excel"
+  }
+};
+
+const tiposMantenimiento = {
+  "type_1": { es: "Revisión / Mantenimiento", en: "Service / Maintenance" },
+  "type_2": { es: "Motor", en: "Engine" },
+  "type_3": { es: "Transmisión", en: "Transmission" },
+  "type_4": { es: "Suspensión, Dirección y Frenos", en: "Suspension, Steering & Brakes" },
+  "type_5": { es: "Electricidad / Electrónica", en: "Electrical / Electronics" },
+  "type_6": { es: "Climatización", en: "Air Conditioning" },
+  "type_7": { es: "Escape", en: "Exhaust" },
+  "type_8": { es: "Interior, Habitáculo y Seguridad", en: "Interior, Cabin & Safety" },
+  "type_9": { es: "Chasis y Carrocería", en: "Chassis & Bodywork" },
+  "type_10": { es: "Otro", en: "Other" }
+};
 function translatePage() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
@@ -310,6 +452,7 @@ function guardarFirma() {
     alert(currentLang === 'es' ? 'Por favor, firme antes de guardar.' : 'Please sign before saving.');
   }
 }
+
 // ============ TABS Y EVENTOS ============
 document.querySelectorAll('.tab').forEach(t => {
   t.onclick = () => {
