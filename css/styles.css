@@ -642,7 +642,7 @@ body.modo-claro .modal-historico-contenido {
   box-shadow: 0 0 30px rgba(225,29,72,0.4);
 }
 /* =========================================
-   OPTIMIZACIÓN PARA MÓVILES (BLINDADO)
+   OPTIMIZACIÓN PARA MÓVILES (CENTRADO PERFECTO)
    ========================================= */
 @media (max-width: 768px) {
   body::before { background-size: cover; }
@@ -651,7 +651,7 @@ body.modo-claro .modal-historico-contenido {
     padding: 0 8px; 
     margin-top: 20px; 
     width: 100%;
-    overflow-x: hidden; /* Evita scroll horizontal */
+    overflow-x: hidden;
   }
   
   .header-container { flex-direction: column; gap: 10px; }
@@ -663,27 +663,27 @@ body.modo-claro .modal-historico-contenido {
   header h1 { font-size: 55px; }
   .author { font-size: 26px; }
 
-  /* LA MÁQUINA: blindada para que no se desborde */
   .maquina-diagnosis { 
     padding: 6px; 
     border-width: 4px; 
     border-radius: 10px; 
     width: 100%;
     max-width: 100%;
-    overflow: hidden; /* Si algo intenta salirse, se corta aquí */
+    overflow: hidden;
   }
   
-  /* ===== MARCO SUPERIOR EN MÓVIL (REJILLA PERFECTA) ===== */
+  /* ===== MARCO SUPERIOR EN MÓVIL (TEXTO CENTRADO) ===== */
   .marco-superior { 
     display: grid;
-    grid-template-columns: 1fr 1fr; /* 2 columnas exactas */
+    grid-template-columns: 1fr 1fr; /* 2 columnas */
+    grid-template-rows: auto auto auto auto; /* 4 filas */
     gap: 10px;
     padding: 5px;
     align-items: center;
     margin-bottom: 10px;
   }
   
-  /* El LED arriba a la izquierda */
+  /* 1. LED: Arriba a la izquierda (Fila 1, Columna 1) */
   .led-encendido {
     grid-column: 1;
     grid-row: 1;
@@ -693,31 +693,32 @@ body.modo-claro .modal-historico-contenido {
     height: 12px;
   }
 
-  /* Texto arriba a la derecha */
+  /* 2. TEXTO: Fila 2, ocupando todo el ancho (centrado) */
   .texto-maquina-contenedor {
-    grid-column: 2;
-    grid-row: 1;
-    justify-content: flex-end; /* Texto alineado a la derecha */
+    grid-column: 1 / -1; /* Ocupa las 2 columnas */
+    grid-row: 2;
+    justify-content: center; /* Centrado horizontal */
+    text-align: center;
     padding: 0;
   }
   .texto-maquina { 
-    font-size: 16px; /* Letra más pequeña para que quepa */
-    white-space: normal; /* Permite saltar de línea si es necesario */
-    text-align: right;
+    font-size: 18px; /* Un poco más grande al estar centrado */
+    white-space: nowrap;
   }
 
-  /* Deshacemos el flex de las pegatinas para usar el grid directamente */
+  /* Quitamos el flex de los contenedores para que los logos entren directos al grid */
   .pegatinas-izq, .pegatinas-der {
     display: contents;
   }
 
-  /* Fila 2: Logos Porsche (izq) y BMW (der) */
-  .logo-porsche { grid-column: 1; grid-row: 2; justify-self: start; align-self: center; }
-  .logo-bmw     { grid-column: 2; grid-row: 2; justify-self: end;   align-self: center; }
+  /* 3. LOGOS: Fila 3 y 4. */
+  /* Porsche y BMW en la fila 3 */
+  .logo-porsche { grid-column: 1; grid-row: 3; justify-self: start; align-self: center; }
+  .logo-bmw     { grid-column: 2; grid-row: 3; justify-self: end;   align-self: center; }
 
-  /* Fila 3: Logos Brembo (izq) y Shell (der) */
-  .logo-brembo  { grid-column: 1; grid-row: 3; justify-self: start; align-self: center; }
-  .logo-shell   { grid-column: 2; grid-row: 3; justify-self: end;   align-self: center; }
+  /* Brembo y Shell en la fila 4 */
+  .logo-brembo  { grid-column: 1; grid-row: 4; justify-self: start; align-self: center; }
+  .logo-shell   { grid-column: 2; grid-row: 4; justify-self: end;   align-self: center; }
   
   /* Tamaño de logos en móvil */
   .logo-pegatina { height: 18px; }
@@ -751,7 +752,7 @@ body.modo-claro .modal-historico-contenido {
   }
   
   .tab-icon { 
-    height: 55px; /* Más pequeños para que quepan 3 en fila */
+    height: 55px;
     width: 55px; 
     padding: 4px; 
     border-width: 2px; 
