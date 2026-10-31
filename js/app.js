@@ -139,7 +139,8 @@ const translations = {
     btn_guardar_firma: "Guardar Firma",
     btn_cancelar_firma: "Cancelar",
     pdf_firma: "Firma del Cliente:",
-    btn_firmar_informe: "Firmar Informe/Factura"
+    btn_firmar_informe: "Firmar Informe/Factura",
+    btn_export_excel: "Exportar a Excel"
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -191,7 +192,8 @@ const translations = {
     btn_guardar_firma: "Save Signature",
     btn_cancelar_firma: "Cancel",
     pdf_firma: "Customer Signature:",
-    btn_firmar_informe: "Sign Report/Invoice"
+    btn_firmar_informe: "Sign Report/Invoice",
+    btn_export_excel: "Export to Excel"
   }
 };
 
@@ -1074,6 +1076,152 @@ function renderGrafico() {
   });
 }
 
+// ============ PDF DEL GRÁFICO ============
+function exportarGraficoPDF(accion = false) {
+  try {
+    const { jsPDF } = window.jspdf;
+    const t = translations[currentLang];
+    const vehiculoId = document.getElementById('g_vehiculo').value;
+    const v = state.vehiculos.find(x => x.id === vehiculoId);
+    const titulo = v ? `${v.marca} ${v.modelo} (${v.matricula})` : t.todos;
+
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageW = doc.internal.pageSize.getWidth();
+    
+    doc.setFillColor(15, 23, 42); 
+    doc.rect(0, 0, pageW, 20, 'F'); 
+    doc.setTextColor(255,255,255);
+    doc.setFontSize(16); 
+    doc.setFont(undefined, 'bold');
+    doc.text(t.pdf_titulo_grafico, pageW / 2, 13, { align: 'center' });
+
+    doc.setTextColor(0,0,0);
+    doc.setFontSize(12); 
+    doc.setFont(undefined, 'normal');
+    doc.text(`${t.pdf_vehiculo} ${titulo}`, 15, 35);
+    doc.text(`${t.pdf_fecha_inf} ${new Date().toLocaleDateString()}`, 15, 42);
+
+    const totalTexto = document.getElementById('texto_gasto_total').textContent;
+    doc.setFontSize(14);
+    doc.setFont(undefined, 'bold');
+    doc.setTextColor(225, 29, 72);
+    doc.text(`${t.gasto_total_mix}: ${totalTexto}`, 15, 52);
+
+    if (v) {
+      const seguro = parseFloat(v.costeSeguro) || 0;
+      const itv = parseFloat(v.costeItv) || 0;
+      doc.setFontSize(12);
+      doc.setFont(undefined, 'normal');
+      doc.setTextColor(0,0,0);
+      doc.text(`${t.coste_seguro}: ${fmt(seguro)}`, 15, 62);
+      doc.text(`${t.coste_itv}: ${fmt(itv)}`, 15, 68);
+    }
+
+    const canvasGrafico = document.getElementById('miGrafico');
+    if (canvasGrafico) {
+      const canvasTemp = document.createElement('canvas');
+      canvasTemp.width = canvasGrafico.width;
+      canvasTemp.height = canvasGrafico.height;
+      const ctx = canvasTemp.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, canvasTemp.width, canvasTemp.height);
+      ctx.drawImage(canvasGrafico, 0, 0);
+
+      const imgData = canvasTemp.toDataURL('image/png', 1.0);
+      const imgProps = doc.getImageProperties(imgData);
+      const pdfWidth = pageW - 30; 
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      
+      doc.addImage(imgData, 'PNG', 15, 80, pdfWidth, pdfHeight);
+    }
+
+    const nombre = `Gastos_${v ? v.matricula : 'Todos'}.pdf`;
+
+    if (accion === 'share' && navigator.share && navigator.canShare) {
+      const pdfBlob = doc.output('blob');
+      const file = new File([pdfBlob], nombre, { type: 'application/pdf' });
+      
+      if (navigator.canShare({ files: [file] })) {
+        navigator.share({
+          files: [file],
+          title: nombre,
+          text: currentLang === 'es' ? 'Aquí tienes el resumen de gastos.' : 'Here is the expense summary.'
+        }).then(() => {
+          mostrarMsg('msg_grafico', currentLang === 'es' ? 'Compartido con éxito.' : 'Shared successfully.', 'ok');
+        }).catch((err) => {
+          console.log("Error al compartir:", err);
+          doc.save(nombre);
+        });
+        return;
+      }
+    }
+    
+    doc.save(nombre);
+    mostrarMsg('msg_grafico', currentLang === 'es' ? 'Informe generado y descargado.' : 'Report generated and downloaded.', 'ok');
+
+  } catch (error) {
+    console.error(error);
+    mostrarMsg('msg_grafico', currentLang === 'es' ? 'Error al generar el PDF del gráfico.' : 'Error generating chart PDF.', 'err');
+  }
+}
+
+// ============ EXPORTAR A EXCEL (CSV) ============
+function exportarExcel() {
+  const modo = document.getElementById('i_modo').value;
+  const vehiculoId = document.getElementById('i_vehiculo').value;
+  
+  if (!vehiculoId) { mostrarMsg('msg_informe', currentLang === 'es' ? 'Selecciona un vehículo para exportar.' : 'Select a vehicle to export.', 'err'); return; }
+
+  let lista = [];
+  if (modo === 'seleccion') {
+    const checkboxes = document.querySelectorAll('.check-mant:checked');
+    if (checkboxes.length === 0) { mostrarMsg('msg_informe', currentLang === 'es' ? 'Selecciona al menos un mantenimiento.' : 'Select at least one record.', 'err'); return; }
+    const ids = Array.from(checkboxes).map(cb => cb.value);
+    lista = state.mantenimientos.filter(m => ids.includes(m.id));
+  } else {
+    const desde = document.getElementById('i_desde').value;
+    const hasta = document.getElementById('i_hasta').value;
+    lista = state.mantenimientos.filter(m => m.vehiculoId === vehiculoId);
+    if (desde) lista = lista.filter(m => m.fecha >= desde);
+    if (hasta) lista = lista.filter(m => m.fecha <= hasta);
+  }
+
+  if (lista.length === 0) { mostrarMsg('msg_informe', currentLang === 'es' ? 'No hay datos para exportar.' : 'No data to export.', 'err'); return; }
+
+  let csvContent = "\uFEFF"; // BOM para que Excel reconozca los acentos
+  csvContent += "Fecha;Matricula;Kms;Tipo;Taller;Operacion/Repuesto;Cantidad;Precio Unitario;Total\n";
+
+  lista.sort((a,b) => a.fecha.localeCompare(b.fecha));
+
+  lista.forEach(m => {
+    const v = state.vehiculos.find(x => x.id === m.vehiculoId);
+    const fecha = m.fecha.split('-').reverse().join('/');
+    const matricula = v ? v.matricula : '';
+    
+    if (m.manoObra && m.manoObra.length > 0) {
+      m.manoObra.forEach(o => {
+        csvContent += `${fecha};${matricula};${m.km||''};Mano de Obra;${m.taller||''};${o.concepto};1;${o.precio};${o.precio}\n`;
+      });
+    }
+    if (m.repuestos && m.repuestos.length > 0) {
+      m.repuestos.forEach(r => {
+        const subtotal = r.cant * r.precio;
+        csvContent += `${fecha};${matricula};${m.km||''};Repuesto;${m.taller||''};${r.desc} (${r.ref});${r.cant};${r.precio};${subtotal}\n`;
+      });
+    }
+  });
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement("a");
+  const url = URL.createObjectURL(blob);
+  link.setAttribute("href", url);
+  link.setAttribute("download", `Excel_Mantenimiento_${vehiculoId ? state.vehiculos.find(x=>x.id===vehiculoId).matricula : 'Todos'}.csv`);
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  mostrarMsg('msg_informe', currentLang === 'es' ? 'Excel exportado y descargado.' : 'Excel exported and downloaded.', 'ok');
+}
 // ============ RECORDATORIOS ============
 function cargarRecordatorios() {
   const sel = document.getElementById('rec_vehiculo');
@@ -1177,104 +1325,6 @@ function guardarRecordatorio() {
     guardar();
     cargarRecordatorios();
     renderAll();
-  }
-}
-// ============ PDF DEL GRÁFICO ============
-function exportarGraficoPDF(accion = false) {
-  try {
-    const { jsPDF } = window.jspdf;
-    const t = translations[currentLang];
-    const vehiculoId = document.getElementById('g_vehiculo').value;
-    const v = state.vehiculos.find(x => x.id === vehiculoId);
-    const titulo = v ? `${v.marca} ${v.modelo} (${v.matricula})` : t.todos;
-
-    // 1. Crear el PDF
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const pageW = doc.internal.pageSize.getWidth();
-    
-    // Cabecera
-    doc.setFillColor(15, 23, 42); 
-    doc.rect(0, 0, pageW, 20, 'F'); 
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(16); 
-    doc.setFont(undefined, 'bold');
-    doc.text(t.pdf_titulo_grafico, pageW / 2, 13, { align: 'center' });
-
-    doc.setTextColor(0,0,0);
-    doc.setFontSize(12); 
-    doc.setFont(undefined, 'normal');
-    doc.text(`${t.pdf_vehiculo} ${titulo}`, 15, 35);
-    doc.text(`${t.pdf_fecha_inf} ${new Date().toLocaleDateString()}`, 15, 42);
-
-    // Total
-    const totalTexto = document.getElementById('texto_gasto_total').textContent;
-    doc.setFontSize(14);
-    doc.setFont(undefined, 'bold');
-    doc.setTextColor(225, 29, 72);
-    doc.text(`${t.gasto_total_mix}: ${totalTexto}`, 15, 52);
-
-    // Gastos Fijos
-    if (v) {
-      const seguro = parseFloat(v.costeSeguro) || 0;
-      const itv = parseFloat(v.costeItv) || 0;
-      doc.setFontSize(12);
-      doc.setFont(undefined, 'normal');
-      doc.setTextColor(0,0,0);
-      doc.text(`${t.coste_seguro}: ${fmt(seguro)}`, 15, 62);
-      doc.text(`${t.coste_itv}: ${fmt(itv)}`, 15, 68);
-    }
-
-    // 2. Capturar el gráfico (con fondo blanco forzado para el PDF)
-    const canvasGrafico = document.getElementById('miGrafico');
-    if (canvasGrafico) {
-      const canvasTemp = document.createElement('canvas');
-      canvasTemp.width = canvasGrafico.width;
-      canvasTemp.height = canvasGrafico.height;
-      const ctx = canvasTemp.getContext('2d');
-      ctx.fillStyle = '#ffffff'; // Fondo blanco
-      ctx.fillRect(0, 0, canvasTemp.width, canvasTemp.height);
-      ctx.drawImage(canvasGrafico, 0, 0);
-
-      const imgData = canvasTemp.toDataURL('image/png', 1.0);
-      const imgProps = doc.getImageProperties(imgData);
-      const pdfWidth = pageW - 30; 
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      
-      doc.addImage(imgData, 'PNG', 15, 80, pdfWidth, pdfHeight);
-    }
-
-    const nombre = `Gastos_${v ? v.matricula : 'Todos'}.pdf`;
-
-    // 3. Gestión de acciones (Compartir, Email o Descargar)
-    if (accion === 'email') {
-        doc.save(nombre);
-        enviarPorCorreo(t.email_asunto_grafico, t.email_cuerpo_grafico);
-        mostrarMsg('msg_grafico', currentLang === 'es' ? 'PDF descargado. Se ha abierto tu gestor de correo.' : 'PDF downloaded. Your email client has been opened.', 'ok');
-    } else if (accion && navigator.share && navigator.canShare) {
-      const pdfBlob = doc.output('blob');
-      const file = new File([pdfBlob], nombre, { type: 'application/pdf' });
-      
-      if (navigator.canShare({ files: [file] })) {
-        navigator.share({
-          files: [file],
-          title: nombre,
-          text: currentLang === 'es' ? 'Aquí tienes el resumen de gastos.' : 'Here is the expense summary.'
-        }).then(() => {
-          mostrarMsg('msg_grafico', currentLang === 'es' ? 'Compartido con éxito.' : 'Shared successfully.', 'ok');
-        }).catch((err) => {
-          console.log("Error al compartir:", err);
-          doc.save(nombre);
-        });
-        return;
-      }
-    }
-    
-    doc.save(nombre);
-    mostrarMsg('msg_grafico', currentLang === 'es' ? 'Informe generado y descargado.' : 'Report generated and downloaded.', 'ok');
-
-  } catch (error) {
-    console.error(error);
-    mostrarMsg('msg_grafico', currentLang === 'es' ? 'Error al generar el PDF del gráfico.' : 'Error generating chart PDF.', 'err');
   }
 }
 
@@ -1502,12 +1552,7 @@ function generarPDF(accion = false) {
 
     const nombre = tipoInforme === 'historico' ? `Historico_${v.matricula}.pdf` : `Factura_${v.matricula}.pdf`;
     
-    if (accion === 'email') {
-        doc.save(nombre);
-        enviarPorCorreo(t.email_asunto_informe, t.email_cuerpo_informe);
-        mostrarMsg('msg_informe', currentLang === 'es' ? 'PDF descargado. Se ha abierto tu gestor de correo.' : 'PDF downloaded. Your email client has been opened.', 'ok');
-        return;
-    } else if (accion && navigator.share && navigator.canShare) {
+    if (accion === 'share' && navigator.share && navigator.canShare) {
       const pdfBlob = doc.output('blob');
       const file = new File([pdfBlob], nombre, { type: 'application/pdf' });
       
@@ -1604,14 +1649,12 @@ function comprobarRecordatorioBackup() {
   const ultimoBackup = localStorage.getItem('pitstop_ultimo_backup');
   const hoy = new Date().toISOString().slice(0,10);
   if (ultimoBackup !== hoy && state.mantenimientos.length > 0) {
-    // Aquí podrías mostrar un aviso, pero para no ser molesto lo dejamos silencioso.
     console.log("Recuerda hacer una copia de seguridad hoy.");
   }
 }
 
 function mostrarAvisoGiro() {
   if (window.innerHeight > window.innerWidth && window.innerWidth < 768) {
-    // Podría mostrar un toast, pero lo omitimos para no molestar
     console.log(translations[currentLang].aviso_horizontal);
   }
 }
