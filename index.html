@@ -219,7 +219,17 @@
           </div>
         </div>
         
-        <div style="margin-top: 15px;"><button type="button" class="primary" data-i18n="guardar" onclick="guardarRecordatorio()">Guardar Datos</button></div>
+        <!-- BOTONES DE AVISOS -->
+        <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
+          <button type="button" class="primary" data-i18n="guardar" onclick="guardarRecordatorio()">Guardar Datos</button>
+          <button type="button" class="secondary" style="background: #10b981 !important; color: white !important;" onclick="descargarICS()">
+            📅 Añadir al Calendario
+          </button>
+          <button type="button" class="secondary" style="background: #3b82f6 !important; color: white !important;" onclick="activarNotificaciones()">
+            🔔 Activar Avisos
+          </button>
+        </div>
+        
         <div id="msg_recordatorios"></div>
 
         <h3 style="margin-top: 30px; color: #e2e8f0;" data-i18n="resumen_avisos">Resumen de Avisos</h3>
@@ -475,6 +485,6 @@
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js"></script>
 
 <!-- Tu aplicación (ahora como módulo) -->
-<script type="module" src="js/app.js?v=9"></script>
+<script type="module" src="js/app.js?v=10"></script>
 </body>
 </html>

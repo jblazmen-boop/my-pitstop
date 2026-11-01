@@ -2,6 +2,13 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebas
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
+// Registrar el Service Worker para las notificaciones
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').then(() => {
+    console.log("Service Worker registrado correctamente.");
+  }).catch(err => console.log("Error al registrar Service Worker:", err));
+}
+
 const firebaseConfig = {
   apiKey: "AIzaSyAr5RD3Y0azFQCwpDEq-zx7m-fH_tP4zCw",
   authDomain: "my-pitstop-5f986.firebaseapp.com",
@@ -386,7 +393,6 @@ function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('pitstop_idioma', lang); 
   
-  // Actualizar banderas del header
   const hEs = document.getElementById('lang-es');
   const hEn = document.getElementById('lang-en');
   if(hEs) hEs.classList.remove('active');
@@ -394,7 +400,6 @@ function setLanguage(lang) {
   const hCurrent = document.getElementById('lang-' + lang);
   if(hCurrent) hCurrent.classList.add('active');
   
-  // Actualizar banderas del modal
   const mEs = document.getElementById('lang-es-modal');
   const mEn = document.getElementById('lang-en-modal');
   if(mEs) mEs.classList.remove('active');
@@ -1453,6 +1458,95 @@ function guardarRecordatorio() {
   }
 }
 
+// ============ CALENDARIO Y NOTIFICACIONES ============
+function descargarICS() {
+  const vehiculoId = document.getElementById('rec_vehiculo').value;
+  if (!vehiculoId) { alert("Selecciona un vehículo primero."); return; }
+  
+  const v = state.vehiculos.find(x => x.id === vehiculoId);
+  if (!v) return;
+
+  if (!v.proxItv && !v.proxMant) {
+    alert("No hay fechas de recordatorio guardadas para este coche.");
+    return;
+  }
+
+  let icsContent = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//My PitStop//ES\r\n";
+
+  if (v.proxItv) {
+    const fechaItv = v.proxItv.replace(/-/g, '');
+    icsContent += "BEGIN:VEVENT\r\n";
+    icsContent += `SUMMARY:ITV ${v.matricula} (${v.marca} ${v.modelo})\r\n`;
+    icsContent += `DTSTART;VALUE=DATE:${fechaItv}\r\n`;
+    icsContent += `DESCRIPTION:Recordatorio de ITV para el vehículo ${v.matricula}.\r\n`;
+    icsContent += "END:VEVENT\r\n";
+  }
+
+  if (v.proxMant) {
+    const fechaMant = v.proxMant.replace(/-/g, '');
+    icsContent += "BEGIN:VEVENT\r\n";
+    icsContent += `SUMMARY:Mantenimiento ${v.matricula} (${v.marca} ${v.modelo})\r\n`;
+    icsContent += `DTSTART;VALUE=DATE:${fechaMant}\r\n`;
+    icsContent += `DESCRIPTION:Recordatorio de mantenimiento para el vehículo ${v.matricula}.\r\n`;
+    icsContent += "END:VEVENT\r\n";
+  }
+
+  icsContent += "END:VCALENDAR";
+
+  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `Recordatorios_${v.matricula}.ics`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+function activarNotificaciones() {
+  if (!("Notification" in window)) {
+    alert("Tu navegador no soporta notificaciones.");
+    return;
+  }
+  Notification.requestPermission().then(permission => {
+    if (permission === "granted") {
+      alert("¡Avisos activados! Te avisaremos cuando abras la app si hay fechas importantes.");
+      localStorage.setItem('pitstop_push_activo', 'true');
+      comprobarAvisos();
+    } else {
+      alert("Has denegado el permiso para las notificaciones.");
+    }
+  });
+}
+
+function comprobarAvisos() {
+  if (localStorage.getItem('pitstop_push_activo') !== 'true') return;
+  if (Notification.permission !== 'granted') return;
+
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+  const en7dias = new Date(hoy.getTime() + 7 * 24 * 3600 * 1000);
+
+  state.vehiculos.forEach(v => {
+    const revisarFecha = (fechaStr, tipo) => {
+      if (!fechaStr) return;
+      const [y, m, d] = fechaStr.split('-').map(Number);
+      const fecha = new Date(y, m - 1, d);
+      
+      if (fecha >= hoy && fecha <= en7dias) {
+        const diff = Math.ceil((fecha - hoy) / (1000 * 60 * 60 * 24));
+        let mensaje = diff === 0 ? `¡Hoy vence la ${tipo}!` : `Faltan ${diff} días para la ${tipo}.`;
+        
+        new Notification(`Aviso de ${v.matricula}`, {
+          body: mensaje,
+          icon: 'logo-nuevo.png'
+        });
+      }
+    };
+    revisarFecha(v.proxItv, 'ITV');
+    revisarFecha(v.proxMant, 'Revisión');
+  });
+}
+
 // ============ GENERADOR DE PDF (FACTURA / INFORME) ============
 function toggleModoInforme() {
   const modo = document.getElementById('i_modo').value;
@@ -1732,6 +1826,7 @@ setTimeout(mostrarAvisoGiro, 2000);
 
 solicitarPersistencia();
 setTimeout(comprobarRecordatorioBackup, 1500); 
+setTimeout(comprobarAvisos, 2000); // <-- AÑADIDO
 
 document.getElementById('r_foto').addEventListener('change', function() {
   const fileLabel = document.getElementById('file-btn-label');
@@ -1748,5 +1843,6 @@ Object.assign(window, {
   irAInformeDesdeHistorico, abrirModalFirma, cerrarModalFirma, limpiarFirma, guardarFirma,
   renderGrafico, cargarGastosFijos, guardarGastosFijos, exportarGraficoPDF,
   toggleModoInforme, renderTablaSeleccion, toggleAllChecks, generarPDF, exportarExcel,
-  cargarRecordatorios, guardarRecordatorio, exportarJSON, importarJSON, borrarTodo
+  cargarRecordatorios, guardarRecordatorio, exportarJSON, importarJSON, borrarTodo,
+  descargarICS, activarNotificaciones // <-- AÑADIDO
 });
