@@ -28,6 +28,9 @@
       </div>
     </div>
     <div class="header-controls">
+      <!-- BOTÓN DE CERRAR SESIÓN -->
+      <button type="button" class="danger" id="btn-logout-header" style="display: none; margin-right: 10px; padding: 6px 12px; font-size: 13px; text-transform: uppercase;" data-i18n="btn_logout">Salir</button>
+      
       <button class="theme-btn" id="btn-tema" onclick="toggleTema()" title="Cambiar Tema">🌙</button>
       <div class="lang-switch">
         <button class="lang-btn active" id="lang-es" onclick="setLanguage('es')" title="Español"></button>
@@ -436,26 +439,32 @@
 <!-- MODAL DE LOGIN / REGISTRO -->
 <div id="modal-auth" class="modal" style="display: none; z-index: 30000;">
   <div class="modal-firma-contenido">
-    <h3 style="text-align: center; color: #fff; margin-top:0;">Accede a My PitStop</h3>
-    <p style="text-align: center; color: #9ca3af; font-size: 12px; margin-bottom: 15px;">Sincroniza tus datos en todos tus dispositivos</p>
+    <!-- BANDERAS EN EL MODAL DE LOGIN -->
+    <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;">
+      <button type="button" class="lang-btn active" id="lang-es-modal" onclick="setLanguage('es')" style="width: 45px; height: 30px; border-radius: 4px; cursor: pointer; border: 2px solid #fff; background-image: url('https://flagcdn.com/w80/es.png'); background-size: cover; background-position: center;"></button>
+      <button type="button" class="lang-btn" id="lang-en-modal" onclick="setLanguage('en')" style="width: 45px; height: 30px; border-radius: 4px; cursor: pointer; border: 2px solid #fff; background-image: url('https://flagcdn.com/w80/gb.png'); background-size: cover; background-position: center;"></button>
+    </div>
+
+    <h3 style="text-align: center; color: #fff; margin-top:0;" data-i18n="auth_title">Accede a My PitStop</h3>
+    <p style="text-align: center; color: #9ca3af; font-size: 12px; margin-bottom: 15px;" data-i18n="auth_subtitle">Sincroniza tus datos en todos tus dispositivos</p>
     
     <div style="margin-top: 15px;">
-      <label style="color:#e2e8f0;">Email</label>
+      <label style="color:#e2e8f0;" data-i18n="email">Email</label>
       <input type="email" id="auth-email" placeholder="tu@email.com" autocomplete="username" style="width: 100%; padding: 10px; margin-bottom: 10px;">
-      <label style="color:#e2e8f0;">Contraseña</label>
+      <label style="color:#e2e8f0;" data-i18n="password">Contraseña</label>
       <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres" autocomplete="current-password" style="width: 100%; padding: 10px; margin-bottom: 15px;">
     </div>
     
+    <div style="text-align: center; margin-bottom: 15px; margin-top: -5px;">
+      <a href="#" id="btn-forgot-password" style="color: #ffffff; font-size: 13px; text-decoration: underline; font-weight: bold;" data-i18n="btn_forgot_pwd">He olvidado mi contraseña</a>
+    </div>
+
     <div style="display: flex; gap: 10px;">
-      <button type="button" class="primary" id="btn-login" style="flex: 1;">Iniciar Sesión</button>
-      <button type="button" class="secondary" id="btn-register" style="flex: 1;">Registrarse</button>
+      <button type="button" class="primary" id="btn-login" style="flex: 1;" data-i18n="btn_login">Iniciar Sesión</button>
+      <button type="button" class="secondary" id="btn-register" style="flex: 1;" data-i18n="btn_register">Registrarse</button>
     </div>
     
-    <div style="text-align: center; margin-top: 10px;">
-      <a href="#" id="btn-forgot-password" style="color: #9ca3af; font-size: 12px; text-decoration: underline;">He olvidado mi contraseña</a>
-    </div>
-    
-    <button type="button" class="danger" id="btn-logout" style="width: 100%; margin-top: 10px; display: none;">Cerrar Sesión</button>
+    <button type="button" class="danger" id="btn-logout" style="width: 100%; margin-top: 10px; display: none;" data-i18n="btn_logout">Cerrar Sesión</button>
     <div id="auth-error" style="color: #ef4444; text-align: center; margin-top: 10px; font-size: 12px;"></div>
   </div>
 </div>
@@ -466,6 +475,6 @@
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js"></script>
 
 <!-- Tu aplicación (ahora como módulo) -->
-<script type="module" src="js/app.js?v=8"></script>
+<script type="module" src="js/app.js?v=9"></script>
 </body>
 </html>

@@ -33,19 +33,19 @@ const STORAGE_KEY = 'mi_app_mantenimiento_coches';
 const modalAuth = document.getElementById('modal-auth');
 const btnLogin = document.getElementById('btn-login');
 const btnRegister = document.getElementById('btn-register');
-const btnLogout = document.getElementById('btn-logout');
+const btnLogoutHeader = document.getElementById('btn-logout-header');
 const authError = document.getElementById('auth-error');
 
 onAuthStateChanged(auth, (user) => {
   if (user) {
     currentUser = user;
     modalAuth.style.display = 'none'; 
-    btnLogout.style.display = 'block'; 
+    btnLogoutHeader.style.display = 'block'; 
     iniciarSincronizacion(user.uid); 
   } else {
     currentUser = null;
     modalAuth.style.display = 'flex'; 
-    btnLogout.style.display = 'none';
+    btnLogoutHeader.style.display = 'none';
     if (unsubscribeSnapshot) unsubscribeSnapshot(); 
     state = { vehiculos: [], mantenimientos: [], catalogoFotos: [] };
     renderAll();
@@ -55,45 +55,39 @@ onAuthStateChanged(auth, (user) => {
 btnLogin.onclick = () => {
   const email = document.getElementById('auth-email').value;
   const pass = document.getElementById('auth-password').value;
-  authError.textContent = "Cargando...";
+  authError.textContent = currentLang === 'es' ? "Cargando..." : "Loading...";
   signInWithEmailAndPassword(auth, email, pass).catch(e => authError.textContent = "Error: " + e.message);
 };
 
 btnRegister.onclick = () => {
   const email = document.getElementById('auth-email').value;
   const pass = document.getElementById('auth-password').value;
-  authError.textContent = "Creando cuenta...";
+  authError.textContent = currentLang === 'es' ? "Creando cuenta..." : "Creating account...";
   createUserWithEmailAndPassword(auth, email, pass).catch(e => authError.textContent = "Error: " + e.message);
 };
 
-// Recuperar contraseña
+btnLogoutHeader.onclick = () => signOut(auth);
+
 document.getElementById('btn-forgot-password').onclick = (e) => {
   e.preventDefault();
   const email = document.getElementById('auth-email').value;
-  
   if (!email) {
     authError.style.color = '#ef4444';
     authError.textContent = currentLang === 'es' ? 'Escribe tu correo arriba para enviarte el enlace.' : 'Enter your email above to send the link.';
     return;
   }
-
   authError.style.color = '#9ca3af';
-  authError.textContent = "Enviando...";
-
+  authError.textContent = currentLang === 'es' ? "Enviando..." : "Sending...";
   sendPasswordResetEmail(auth, email)
     .then(() => {
       authError.style.color = '#22c55e'; 
-      authError.textContent = currentLang === 'es' 
-        ? 'Correo enviado. Revisa tu bandeja de entrada (y spam).' 
-        : 'Email sent. Check your inbox (and spam).';
+      authError.textContent = currentLang === 'es' ? 'Correo enviado. Revisa tu bandeja de entrada (y spam).' : 'Email sent. Check your inbox (and spam).';
     })
     .catch((error) => {
       authError.style.color = '#ef4444';
       authError.textContent = "Error: " + error.message;
     });
 };
-
-btnLogout.onclick = () => signOut(auth);
 
 function iniciarSincronizacion(uid) {
   const userDocRef = doc(db, "usuarios", uid);
@@ -252,7 +246,15 @@ const translations = {
     btn_cancelar_firma: "Cancelar",
     pdf_firma: "Firma del Cliente:",
     btn_firmar_informe: "Firmar Informe/Factura",
-    btn_export_excel: "Exportar a Excel"
+    btn_export_excel: "Exportar a Excel",
+    auth_title: "Accede a My PitStop",
+    auth_subtitle: "Sincroniza tus datos en todos tus dispositivos",
+    email: "Email",
+    password: "Contraseña",
+    btn_forgot_pwd: "He olvidado mi contraseña",
+    btn_login: "Iniciar Sesión",
+    btn_register: "Registrarse",
+    btn_logout: "Salir"
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -305,7 +307,15 @@ const translations = {
     btn_cancelar_firma: "Cancel",
     pdf_firma: "Customer Signature:",
     btn_firmar_informe: "Sign Report/Invoice",
-    btn_export_excel: "Export to Excel"
+    btn_export_excel: "Export to Excel",
+    auth_title: "Log in to My PitStop",
+    auth_subtitle: "Sync your data across all devices",
+    email: "Email",
+    password: "Password",
+    btn_forgot_pwd: "Forgot password?",
+    btn_login: "Log In",
+    btn_register: "Register",
+    btn_logout: "Logout"
   }
 };
 
@@ -375,9 +385,23 @@ function translatePage() {
 function setLanguage(lang) {
   currentLang = lang;
   localStorage.setItem('pitstop_idioma', lang); 
-  document.getElementById('lang-es').classList.remove('active');
-  document.getElementById('lang-en').classList.remove('active');
-  document.getElementById('lang-' + lang).classList.add('active');
+  
+  // Actualizar banderas del header
+  const hEs = document.getElementById('lang-es');
+  const hEn = document.getElementById('lang-en');
+  if(hEs) hEs.classList.remove('active');
+  if(hEn) hEn.classList.remove('active');
+  const hCurrent = document.getElementById('lang-' + lang);
+  if(hCurrent) hCurrent.classList.add('active');
+  
+  // Actualizar banderas del modal
+  const mEs = document.getElementById('lang-es-modal');
+  const mEn = document.getElementById('lang-en-modal');
+  if(mEs) mEs.classList.remove('active');
+  if(mEn) mEn.classList.remove('active');
+  const mCurrent = document.getElementById('lang-' + lang + '-modal');
+  if(mCurrent) mCurrent.classList.add('active');
+
   translatePage();
 }
 
@@ -1415,15 +1439,15 @@ function guardarRecordatorio() {
       if (!itvExistente) {
         state.mantenimientos.push({
           id: uid(), vehiculoId: vehiculoId, fecha: itvPasada, km: Number(itvKmPasada) || 0, 
-          tipo: 'type_10', mano: 0, piezas: 0, taller: 'ITV', notas: 'Registro de ITV pasada',
+          tipo: 'type_10', mano: 0, piezas: 0, taller: 'ITV', notas: currentLang === 'es' ? 'Registro de ITV pasada' : 'MOT past record',
           manoObra: [{ concepto: translations[currentLang].itv_nombre, precio: 0 }], repuestos: []
         });
-        mostrarMsg('msg_recordatorios', 'Datos guardados e ITV añadida al historial.', 'ok');
+        mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Datos guardados e ITV añadida al historial.' : 'Data saved and MOT added to history.', 'ok');
       } else {
-        mostrarMsg('msg_recordatorios', 'Datos guardados (ITV ya en historial).', 'ok');
+        mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Datos guardados (ITV ya en historial).' : 'Data saved (MOT already in history).', 'ok');
       }
     } else {
-      mostrarMsg('msg_recordatorios', 'Datos guardados.', 'ok');
+      mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Datos guardados.' : 'Data saved.', 'ok');
     }
     guardar(); cargarRecordatorios(); renderAll();
   }
@@ -1445,7 +1469,7 @@ function renderTablaSeleccion() {
   
   const lista = state.mantenimientos.filter(m => m.vehiculoId === vehiculoId).sort((a,b) => a.fecha.localeCompare(b.fecha));
   if (lista.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888; padding:20px;">No hay mantenimientos.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888; padding:20px;">${currentLang === 'es' ? 'No hay mantenimientos.' : 'No maintenance records.'}</td></tr>`;
     return;
   }
   
@@ -1467,14 +1491,14 @@ function generarPDF(accion = false) {
     const tipoInforme = document.getElementById('i_tipo_informe').value;
     const t = translations[currentLang]; 
     const vehiculoId = document.getElementById('i_vehiculo').value;
-    if (!vehiculoId) { mostrarMsg('msg_informe', 'Selecciona un vehículo.', 'err'); return; }
+    if (!vehiculoId) { mostrarMsg('msg_informe', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err'); return; }
 
     let lista = [];
     let desde = '', hasta = '';
 
     if (modo === 'seleccion') {
       const checkboxes = document.querySelectorAll('.check-mant:checked');
-      if (checkboxes.length === 0) { mostrarMsg('msg_informe', 'Selecciona al menos un mantenimiento.', 'err'); return; }
+      if (checkboxes.length === 0) { mostrarMsg('msg_informe', currentLang === 'es' ? 'Selecciona al menos un mantenimiento.' : 'Select at least one record.', 'err'); return; }
       const ids = Array.from(checkboxes).map(cb => cb.value);
       lista = state.mantenimientos.filter(m => ids.includes(m.id));
     } else {
@@ -1485,7 +1509,7 @@ function generarPDF(accion = false) {
     }
 
     lista.sort((a,b) => a.fecha.localeCompare(b.fecha));
-    if (lista.length === 0) { mostrarMsg('msg_informe', 'No hay mantenimientos.', 'err'); return; }
+    if (lista.length === 0) { mostrarMsg('msg_informe', currentLang === 'es' ? 'No hay mantenimientos.' : 'No records.', 'err'); return; }
 
     const v = state.vehiculos.find(x => x.id === vehiculoId);
     const ivaPorcentaje = parseFloat(document.getElementById('i_iva').value) || 0;
@@ -1506,7 +1530,7 @@ function generarPDF(accion = false) {
     doc.setFont(undefined, 'bold'); doc.text(t.pdf_bastidor, 15, y); doc.setFont(undefined, 'normal'); doc.text(v.bastidor || '—', 45, y); y += 6;
     doc.setFont(undefined, 'bold'); doc.text(t.pdf_fecha_inf, 15, y); doc.setFont(undefined, 'normal'); doc.text(new Date().toLocaleDateString(currentLang === 'es' ? 'es-ES' : 'en-GB'), 45, y); y += 6;
     doc.setFont(undefined, 'bold'); doc.text(t.pdf_periodo, 15, y); doc.setFont(undefined, 'normal');
-    const per = modo === 'seleccion' ? 'Selección manual' : (desde ? desde.split('-').reverse().join('/') : 'inicio') + ' — ' + (hasta ? hasta.split('-').reverse().join('/') : 'hoy');
+    const per = modo === 'seleccion' ? (currentLang === 'es' ? 'Selección manual' : 'Manual selection') : (desde ? desde.split('-').reverse().join('/') : 'inicio') + ' — ' + (hasta ? hasta.split('-').reverse().join('/') : 'hoy');
     doc.text(per, 45, y); y += 10;
 
     if (tipoInforme === 'historico') {
@@ -1691,9 +1715,7 @@ function mostrarAvisoGiro() {
 const idiomaGuardado = localStorage.getItem('pitstop_idioma');
 if (idiomaGuardado && (idiomaGuardado === 'es' || idiomaGuardado === 'en')) {
   currentLang = idiomaGuardado;
-  document.getElementById('lang-es').classList.remove('active');
-  document.getElementById('lang-en').classList.remove('active');
-  document.getElementById('lang-' + currentLang).classList.add('active');
+  setLanguage(currentLang); // Esto también actualiza las banderas
 }
 
 firmaGuardada = localStorage.getItem('pitstop_firma') || null;
