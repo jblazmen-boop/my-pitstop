@@ -753,12 +753,28 @@ body.modo-claro .modal-historico-contenido {
   /* ===== ARREGLO DEL CARTEL DE LAS PESTAÑAS EN MÓVIL ===== */
   .tab::after {
     bottom: 100% !important; /* Lo ponemos arriba para que no se salga del marco */
-    margin-bottom: 10px !important;
-    transform: translateX(-50%) scale(0.9) !important;
+    margin-bottom: 5px !important;
+    transform: translateX(-50%) !important;
+    white-space: normal !important; /* Permite que el texto se divida en varias líneas */
+    width: 100px !important; /* Ancho fijo para que no se salga del marco */
+    text-align: center;
+    font-size: 10px;
+    line-height: 1.2;
+    padding: 4px;
+    opacity: 0;
+    transition: none; /* Quitamos la transición por defecto */
   }
-  .tab:hover::after { 
-    opacity: 1 !important; 
-    transform: translateX(-50%) scale(1) translateY(-5px) !important; 
+  
+  /* Mostrar solo al pulsar o hacer foco, y desvanecerse */
+  .tab:focus::after, .tab:active::after {
+    opacity: 1 !important;
+    animation: tooltipFade 1.5s forwards;
+  }
+  
+  @keyframes tooltipFade {
+    0% { opacity: 1; }
+    80% { opacity: 1; }
+    100% { opacity: 0; }
   }
   
   /* ===== PANTALLA LCD Y PANELES ===== */
