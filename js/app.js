@@ -261,7 +261,9 @@ const translations = {
     btn_forgot_pwd: "He olvidado mi contraseña",
     btn_login: "Iniciar Sesión",
     btn_register: "Registrarse",
-    btn_logout: "Salir"
+    btn_logout: "Salir",
+    btn_calendar: "📅 Añadir al Calendario",
+    btn_alerts: "🔔 Activar Avisos"
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -322,7 +324,9 @@ const translations = {
     btn_forgot_pwd: "Forgot password?",
     btn_login: "Log In",
     btn_register: "Register",
-    btn_logout: "Logout"
+    btn_logout: "Logout",
+    btn_calendar: "📅 Add to Calendar",
+    btn_alerts: "🔔 Activate Alerts"
   }
 };
 
@@ -1461,13 +1465,13 @@ function guardarRecordatorio() {
 // ============ CALENDARIO Y NOTIFICACIONES ============
 function descargarICS() {
   const vehiculoId = document.getElementById('rec_vehiculo').value;
-  if (!vehiculoId) { alert("Selecciona un vehículo primero."); return; }
+  if (!vehiculoId) { alert(currentLang === 'es' ? "Selecciona un vehículo primero." : "Select a vehicle first."); return; }
   
   const v = state.vehiculos.find(x => x.id === vehiculoId);
   if (!v) return;
 
   if (!v.proxItv && !v.proxMant) {
-    alert("No hay fechas de recordatorio guardadas para este coche.");
+    alert(currentLang === 'es' ? "No hay fechas de recordatorio guardadas para este coche." : "There are no reminder dates saved for this car.");
     return;
   }
 
@@ -1504,16 +1508,24 @@ function descargarICS() {
 
 function activarNotificaciones() {
   if (!("Notification" in window)) {
-    alert("Tu navegador no soporta notificaciones.");
+    alert(currentLang === 'es' ? "Tu navegador no soporta notificaciones." : "Your browser does not support notifications.");
     return;
   }
+  
+  if (Notification.permission === 'denied') {
+    alert(currentLang === 'es' 
+      ? "Has bloqueado las notificaciones en tu navegador. Para activarlas, haz clic en el icono del candado 🔒 (o del deslizador) junto a la barra de direcciones web y permite las notificaciones." 
+      : "You have blocked notifications in your browser. To enable them, click the lock icon 🔒 next to the address bar and allow notifications.");
+    return;
+  }
+
   Notification.requestPermission().then(permission => {
     if (permission === "granted") {
-      alert("¡Avisos activados! Te avisaremos cuando abras la app si hay fechas importantes.");
+      alert(currentLang === 'es' ? "¡Avisos activados! Te avisaremos cuando abras la app si hay fechas importantes." : "Alerts activated! We will notify you when you open the app if there are important dates.");
       localStorage.setItem('pitstop_push_activo', 'true');
       comprobarAvisos();
     } else {
-      alert("Has denegado el permiso para las notificaciones.");
+      alert(currentLang === 'es' ? "Has denegado el permiso para las notificaciones." : "You have denied permission for notifications.");
     }
   });
 }
@@ -1646,7 +1658,6 @@ function generarPDF(accion = false) {
         columnStyles: { 0: { cellWidth: 25 }, 1: { cellWidth: 20 }, 2: { cellWidth: 65 }, 3: { cellWidth: 70 } }, margin: { left: 15, right: 15 }
       });
 
-      // FIRMA O RECUADRO
       let yFirma = doc.lastAutoTable.finalY + 20;
       if (yFirma > 220) { doc.addPage(); yFirma = 20; }
       doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
@@ -1712,7 +1723,6 @@ function generarPDF(accion = false) {
       doc.text(`${t.pdf_iva} (${ivaPorcentaje}%):`, 130, y); doc.text(fmt(iva), pageW - 15, y, {align:'right'}); y += 6;
       doc.setFont(undefined, 'bold'); doc.setTextColor(225, 29, 72); doc.text(t.pdf_total, 130, y); doc.text(fmt(totalFinal), pageW - 15, y, {align:'right'});
       
-      // FIRMA O RECUADRO
       if (y > 220) { doc.addPage(); y = 20; }
       y += 20; 
       doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
@@ -1826,7 +1836,7 @@ setTimeout(mostrarAvisoGiro, 2000);
 
 solicitarPersistencia();
 setTimeout(comprobarRecordatorioBackup, 1500); 
-setTimeout(comprobarAvisos, 2000); // <-- AÑADIDO
+setTimeout(comprobarAvisos, 2000); 
 
 document.getElementById('r_foto').addEventListener('change', function() {
   const fileLabel = document.getElementById('file-btn-label');
@@ -1844,5 +1854,6 @@ Object.assign(window, {
   renderGrafico, cargarGastosFijos, guardarGastosFijos, exportarGraficoPDF,
   toggleModoInforme, renderTablaSeleccion, toggleAllChecks, generarPDF, exportarExcel,
   cargarRecordatorios, guardarRecordatorio, exportarJSON, importarJSON, borrarTodo,
-  descargarICS, activarNotificaciones // <-- AÑADIDO
+  descargarICS, activarNotificaciones
 });
+

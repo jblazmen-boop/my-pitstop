@@ -184,6 +184,7 @@
           </table>
         </div>
       </div>
+      
       <!-- RECORDATORIOS -->
       <div id="recordatorios" class="panel">
         <h2 data-i18n="recordatorios">Avisos y Recordatorios</h2>
@@ -222,12 +223,8 @@
         <!-- BOTONES DE AVISOS -->
         <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
           <button type="button" class="primary" data-i18n="guardar" onclick="guardarRecordatorio()">Guardar Datos</button>
-          <button type="button" class="secondary" style="background: #10b981 !important; color: white !important;" onclick="descargarICS()">
-            📅 Añadir al Calendario
-          </button>
-          <button type="button" class="secondary" style="background: #3b82f6 !important; color: white !important;" onclick="activarNotificaciones()">
-            🔔 Activar Avisos
-          </button>
+          <button type="button" class="secondary" style="background: #10b981 !important; color: white !important; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;" onclick="descargarICS()" data-i18n="btn_calendar">📅 Añadir al Calendario</button>
+          <button type="button" class="secondary" style="background: #3b82f6 !important; color: white !important; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;" onclick="activarNotificaciones()" data-i18n="btn_alerts">🔔 Activar Avisos</button>
         </div>
         
         <div id="msg_recordatorios"></div>
@@ -295,7 +292,6 @@
               <canvas id="miGrafico"></canvas>
             </div>
             
-            <!-- BOTONES EXPORTAR GRÁFICO ALINEADOS -->
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 0; width: 100%;">
               <button type="button" class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center;" onclick="exportarGraficoPDF(false)">
                 <span data-i18n="btn_gen_pdf">GENERAR PDF</span>
@@ -380,7 +376,6 @@
 
     </div> <!-- FIN DE LA PANTALLA LCD -->
 
-    <!-- MARCO INFERIOR CON LA BOTONERA DIGITAL -->
     <div class="marco-inferior">
       <div class="pegatinas-izq">
         <img src="logo-pirelli.PNG" alt="Pirelli" class="logo-pegatina logo-pirelli">
@@ -404,18 +399,15 @@
   </div> <!-- FIN DE LA MÁQUINA DE DIAGNOSIS -->
 </div>
 
-<!-- PIE DE PÁGINA -->
 <footer style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px; margin-top: 20px; border-top: 1px solid #374151; background-color: rgba(15, 23, 42, 0.95);">
   © 2026 My PitStop. <span data-i18n="derechos">Todos los derechos reservados.</span>
 </footer>
 
-<!-- MODAL FOTO -->
 <div id="modal-foto" class="modal" onclick="cerrarModal()">
   <span class="cerrar-modal">&times;</span>
   <img class="modal-contenido" id="img-modal">
 </div>
 
-<!-- MODAL HISTÓRICO RÁPIDO -->
 <div id="modal-historico" class="modal" onclick="cerrarModalHistorico(event)">
   <div class="modal-historico-contenido">
     <span class="cerrar-modal" onclick="cerrarModalHistorico(event)">&times;</span>
@@ -424,7 +416,6 @@
     <div style="margin-bottom: 15px;">
       <label data-i18n="seleccionar_vehiculo_modal" style="color: #9ca3af; font-size: 12px; font-weight: bold; text-transform: uppercase;">Seleccionar Vehículo</label>
       <select id="modal-select-vehiculo" onchange="cambiarVehiculoHistorico()" style="width: 100%; padding: 8px; border-radius: 4px; background: #1f2937; color: #fff; border: 1px solid #374151;">
-        <!-- Se rellena desde JS -->
       </select>
     </div>
 
@@ -433,7 +424,6 @@
   </div>
 </div>
 
-<!-- MODAL DE FIRMA -->
 <div id="modal-firma" class="modal" style="z-index: 20000;">
   <div class="modal-firma-contenido">
     <h3 data-i18n="firma_titulo" style="color: #fff; margin-top: 0; text-align: center;">Firme aquí</h3>
@@ -446,10 +436,8 @@
   </div>
 </div>
 
-<!-- MODAL DE LOGIN / REGISTRO -->
 <div id="modal-auth" class="modal" style="display: none; z-index: 30000;">
   <div class="modal-firma-contenido">
-    <!-- BANDERAS EN EL MODAL DE LOGIN -->
     <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;">
       <button type="button" class="lang-btn active" id="lang-es-modal" onclick="setLanguage('es')" style="width: 45px; height: 30px; border-radius: 4px; cursor: pointer; border: 2px solid #fff; background-image: url('https://flagcdn.com/w80/es.png'); background-size: cover; background-position: center;"></button>
       <button type="button" class="lang-btn" id="lang-en-modal" onclick="setLanguage('en')" style="width: 45px; height: 30px; border-radius: 4px; cursor: pointer; border: 2px solid #fff; background-image: url('https://flagcdn.com/w80/gb.png'); background-size: cover; background-position: center;"></button>
@@ -479,12 +467,9 @@
   </div>
 </div>
 
-<!-- Scripts de Firebase (Módulos) -->
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js"></script>
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js"></script>
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js"></script>
-
-<!-- Tu aplicación (ahora como módulo) -->
-<script type="module" src="js/app.js?v=10"></script>
+<script type="module" src="js/app.js?v=11"></script>
 </body>
 </html>
