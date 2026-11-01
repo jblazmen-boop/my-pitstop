@@ -2,7 +2,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebas
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
-// Registrar el Service Worker para las notificaciones
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').then(() => {
     console.log("Service Worker registrado correctamente.");
@@ -22,7 +21,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// ============ ESTADO Y TRADUCCIONES ============
 let state = { vehiculos: [], mantenimientos: [], catalogoFotos: [] };
 let repuestosTemporales = [];
 let manoObraTemporal = [];
@@ -36,7 +34,6 @@ let unsubscribeSnapshot = null;
 
 const STORAGE_KEY = 'mi_app_mantenimiento_coches'; 
 
-// ============ LÓGICA DE FIREBASE AUTH ============
 const modalAuth = document.getElementById('modal-auth');
 const btnLogin = document.getElementById('btn-login');
 const btnRegister = document.getElementById('btn-register');
@@ -123,7 +120,6 @@ function iniciarSincronizacion(uid) {
   });
 }
 
-// ============ SISTEMA DE SONIDO ============
 function reproducirBeep() {
   try {
     const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -161,7 +157,6 @@ function sonidoArranque() {
   } catch(e) { console.log(e); }
 }
 
-// ============ MODO CLARO / OSCURO ============
 function toggleTema() {
   const body = document.body;
   const btn = document.getElementById('btn-tema');
@@ -191,7 +186,6 @@ function cargarTema() {
   }
 }
 
-// ============ LED DE ENCENDIDO ============
 function encenderMaquina() {
   const led = document.getElementById('led-encendido');
   if (led) {
@@ -200,7 +194,6 @@ function encenderMaquina() {
   }
 }
 
-// ============ TRANSLATIONS ============
 const translations = {
   es: {
     vehiculos_titulo: "Vehículos", matricula: "Matrícula", marca: "Marca", modelo: "Modelo", bastidor: "Nº Bastidor (VIN)",
@@ -1418,6 +1411,9 @@ function cargarRecordatorios() {
   }
 
   state.vehiculos.forEach(v => {
+    // FILTRO CLAVE: Solo mostrar si tiene alguna fecha de aviso
+    if (!v.proxMant && !v.proxItv) return; 
+
     const formatDate = (dateStr) => {
       if (!dateStr) return '—';
       const fecha = new Date(dateStr); const hoy = new Date();
@@ -1443,12 +1439,11 @@ function cargarRecordatorios() {
 }
 
 function editarAviso(vehiculoId) {
-  // Selecciona el vehículo en el desplegable de arriba
   const sel = document.getElementById('rec_vehiculo');
   if (sel) {
     sel.value = vehiculoId;
-    cargarRecordatorios(); // Recarga los inputs con los datos de ese coche
-    window.scrollTo({ top: 0, behavior: 'smooth' }); // Sube para que veas los campos
+    cargarRecordatorios(); 
+    window.scrollTo({ top: 0, behavior: 'smooth' }); 
   }
 }
 
@@ -1469,7 +1464,6 @@ function eliminarAvisoVehiculo(vehiculoId) {
       guardar(); 
       cargarRecordatorios(); 
       
-      // Si el vehículo afectado es el que está seleccionado en los inputs, limpiamos también los inputs
       const sel = document.getElementById('rec_vehiculo');
       if (sel && sel.value === vehiculoId) {
         document.getElementById('rec_mant').value = '';
@@ -1874,13 +1868,12 @@ function mostrarAvisoGiro() {
 const idiomaGuardado = localStorage.getItem('pitstop_idioma');
 if (idiomaGuardado && (idiomaGuardado === 'es' || idiomaGuardado === 'en')) {
   currentLang = idiomaGuardado;
-  setLanguage(currentLang); // Esto también actualiza las banderas
+  setLanguage(currentLang); 
 }
 
 firmaGuardada = localStorage.getItem('pitstop_firma') || null;
 
 cargarTema(); 
-// YA NO LLAMAMOS A cargar() PORQUE FIREBASE LO HACE AL LOGUEARSE
 document.getElementById('m_fecha').value = new Date().toISOString().slice(0,10);
 renderManoObraTemporal();
 renderRepuestosTemporales();
