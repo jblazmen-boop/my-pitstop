@@ -416,6 +416,7 @@ body.modo-claro .tabs {
   transform: translateY(-2px);
 }
 
+/* TOOLTIP DESKTOP */
 .tab::after {
   content: attr(title); 
   position: absolute;
@@ -750,28 +751,48 @@ body.modo-claro .modal-historico-contenido {
     border-width: 2px; 
   }
   
-  /* ===== ARREGLO DEL CARTEL DE LAS PESTAÑAS EN MÓVIL ===== */
+  /* ===== NUEVO CARTEL DE LAS PESTAÑAS EN MÓVIL (DENTRO DEL ICONO) ===== */
   .tab::after {
-    bottom: 100% !important; /* Lo ponemos arriba para que no se salga del marco */
-    margin-bottom: 5px !important;
-    transform: translateX(-50%) !important;
-    white-space: normal !important; /* Permite que el texto se divida en varias líneas */
-    width: 100px !important; /* Ancho fijo para que no se salga del marco */
-    text-align: center;
-    font-size: 10px;
-    line-height: 1.2;
+    content: attr(title);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 55px;  /* Mismo tamaño que el icono */
+    height: 55px; /* Mismo tamaño que el icono */
+    background: rgba(225, 29, 72, 0.95); /* Fondo rojo */
+    color: white;
     padding: 4px;
+    border-radius: 12px;
+    font-size: 9px;
+    font-weight: bold;
+    white-space: normal;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.1;
+    border: 2px solid white;
     opacity: 0;
-    transition: none; /* Quitamos la transición por defecto */
+    pointer-events: none;
+    z-index: 100;
+    box-shadow: 0 0 15px rgba(225,29,72, 0.8);
+    transition: none;
   }
   
-  /* Mostrar solo al pulsar o hacer foco, y desvanecerse */
-  .tab:focus::after, .tab:active::after {
-    opacity: 1 !important;
-    animation: tooltipFade 1.5s forwards;
+  /* Anular el hover en móvil para que no se quede pegado */
+  .tab:hover::after {
+    opacity: 0 !important;
+    transform: translate(-50%, -50%) !important;
+    animation: none !important;
   }
   
-  @keyframes tooltipFade {
+  /* Mostrar al pulsar y desvanecerse */
+  .tab:active::after, .tab:focus::after {
+    animation: showTooltipMobile 1.5s forwards;
+  }
+  
+  @keyframes showTooltipMobile {
     0% { opacity: 1; }
     80% { opacity: 1; }
     100% { opacity: 0; }
