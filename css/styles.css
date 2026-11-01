@@ -751,17 +751,17 @@ body.modo-claro .modal-historico-contenido {
     border-width: 2px; 
   }
   
-  /* ===== NUEVO CARTEL DE LAS PESTAÑAS EN MÓVIL (DENTRO DEL ICONO) ===== */
+  /* ===== CARTEL DE PESTAÑAS CONTROLADO POR JS ===== */
   .tab::after {
     content: attr(title);
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 55px;  /* Mismo tamaño que el icono */
-    height: 55px; /* Mismo tamaño que el icono */
-    background: rgba(225, 29, 72, 0.95); /* Fondo rojo */
-    color: white;
+    width: 55px;
+    height: 55px;
+    background: rgba(225, 29, 72, 0.95);
+    color: #ffffff !important;
     padding: 4px;
     border-radius: 12px;
     font-size: 9px;
@@ -776,26 +776,18 @@ body.modo-claro .modal-historico-contenido {
     opacity: 0;
     pointer-events: none;
     z-index: 100;
-    box-shadow: 0 0 15px rgba(225,29,72, 0.8);
-    transition: none;
+    box-shadow: 0 0 15px rgba(225, 29, 72, 0.8);
+    transition: opacity 0.3s ease;
   }
   
-  /* Anular el hover en móvil para que no se quede pegado */
-  .tab:hover::after {
+  /* El hover en móvil no hace nada */
+  .tab:hover::after, .tab:active::after, .tab:focus::after {
     opacity: 0 !important;
-    transform: translate(-50%, -50%) !important;
-    animation: none !important;
   }
   
-  /* Mostrar al pulsar y desvanecerse */
-  .tab:active::after, .tab:focus::after {
-    animation: showTooltipMobile 1.5s forwards;
-  }
-  
-  @keyframes showTooltipMobile {
-    0% { opacity: 1; }
-    80% { opacity: 1; }
-    100% { opacity: 0; }
+  /* Esta es la clase que JS activará para mostrar el cartel */
+  .tab.tooltip-active::after {
+    opacity: 1 !important;
   }
   
   /* ===== PANTALLA LCD Y PANELES ===== */
