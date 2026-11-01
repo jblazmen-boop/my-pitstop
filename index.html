@@ -72,12 +72,12 @@
       <div id="vehiculos" class="panel active">
         <h2 data-i18n="vehiculos_titulo">Vehículos</h2>
         <div class="form-row">
-          <div class="form-group"><label data-i18n="matricula">Matrícula</label><input id="v_matricula" placeholder="1234ABC" data-i18n-placeholder="ph_matricula"></div>
-          <div class="form-group"><label data-i18n="marca">Marca</label><input id="v_marca" placeholder="Seat" data-i18n-placeholder="ph_marca"></div>
-          <div class="form-group"><label data-i18n="modelo">Modelo</label><input id="v_modelo" placeholder="León" data-i18n-placeholder="ph_modelo"></div>
-          <div class="form-group"><label data-i18n="bastidor">Nº Bastidor (VIN)</label><input id="v_bastidor" placeholder="WVWZZZ..." data-i18n-placeholder="ph_bastidor"></div>
+          <div class="form-group"><label data-i18n="matricula">Matrícula</label><input id="v_matricula" placeholder="1234ABC" data-i18n-placeholder="ph_matricula" autocomplete="new-password"></div>
+          <div class="form-group"><label data-i18n="marca">Marca</label><input id="v_marca" placeholder="Seat" data-i18n-placeholder="ph_marca" autocomplete="new-password"></div>
+          <div class="form-group"><label data-i18n="modelo">Modelo</label><input id="v_modelo" placeholder="León" data-i18n-placeholder="ph_modelo" autocomplete="new-password"></div>
+          <div class="form-group"><label data-i18n="bastidor">Nº Bastidor (VIN)</label><input id="v_bastidor" placeholder="WVWZZZ..." data-i18n-placeholder="ph_bastidor" autocomplete="new-password"></div>
         </div>
-        <button class="primary" data-i18n="add_vehiculo" onclick="addVehiculo()">Añadir vehículo</button>
+        <button type="button" class="primary" data-i18n="add_vehiculo" onclick="addVehiculo()">Añadir vehículo</button>
         <div id="msg_vehiculo"></div>
         <div class="tabla-responsive">
           <table id="tabla_vehiculos">
@@ -92,8 +92,8 @@
         <h2 id="titulo-formulario" data-i18n="reg_mantenimiento">Registrar mantenimiento</h2>
         <div class="grid">
           <div><label data-i18n="vehiculo">Vehículo</label><select id="m_vehiculo"><option value="" data-i18n="selecciona">— Selecciona —</option></select></div>
-          <div><label data-i18n="fecha">Fecha</label><input type="date" id="m_fecha"></div>
-          <div><label data-i18n="km">Kms</label><input type="number" id="m_km" placeholder="85000"></div>
+          <div><label data-i18n="fecha">Fecha</label><input type="date" id="m_fecha" autocomplete="new-password"></div>
+          <div><label data-i18n="km">Kms</label><input type="number" id="m_km" placeholder="85000" autocomplete="new-password"></div>
           <div><label data-i18n="tipo">Tipo</label>
             <select id="m_tipo">
               <optgroup label="Revisión / Mantenimiento" id="group-1"><option value="type_1" id="opt-1">Revisión / Mantenimiento</option></optgroup>
@@ -109,15 +109,15 @@
               <optgroup label="Otro" id="group-10"><option value="type_10" id="opt-10">Otro</option></optgroup>
             </select>
           </div>
-          <div><label data-i18n="taller">Taller</label><input id="m_taller" placeholder="Taller Pepe" data-i18n-placeholder="ph_taller"></div>
-          <div style="grid-column: 1 / -1;"><label data-i18n="notas">Notas</label><textarea id="m_notas"></textarea></div>
+          <div><label data-i18n="taller">Taller</label><input id="m_taller" placeholder="Taller Pepe" data-i18n-placeholder="ph_taller" autocomplete="new-password"></div>
+          <div style="grid-column: 1 / -1;"><label data-i18n="notas">Notas</label><textarea id="m_notas" autocomplete="new-password"></textarea></div>
         </div>
 
         <div style="margin-top: 10px; border-top: 1px solid #374151; padding-top: 10px;">
           <h3 style="font-size: 16px; margin-bottom: 8px; color: #e11d48; text-transform: uppercase;" data-i18n="mano_obra">Mano de Obra</h3>
           <div class="grid" style="grid-template-columns: 1fr 100px 100px; gap: 8px;">
-            <div><label data-i18n="operacion">Operación</label><input id="o_concepto" placeholder="Ej: Sustituir correa" data-i18n-placeholder="ej_operacion"></div>
-            <div><label data-i18n="precio">Precio (€)</label><input type="number" step="0.01" id="o_precio" placeholder="80"></div>
+            <div><label data-i18n="operacion">Operación</label><input id="o_concepto" placeholder="Ej: Sustituir correa" data-i18n-placeholder="ej_operacion" autocomplete="new-password"></div>
+            <div><label data-i18n="precio">Precio (€)</label><input type="number" step="0.01" id="o_precio" placeholder="80" autocomplete="new-password"></div>
             <div style="display: flex; align-items: flex-end;"><button type="button" class="secondary" data-i18n="add_btn" onclick="addManoObra()" style="width:100%;">+ Añadir</button></div>
           </div>
           <div class="tabla-responsive">
@@ -132,10 +132,10 @@
         <div style="margin-top: 20px; border-top: 1px solid #374151; padding-top: 10px;">
           <h3 style="font-size: 16px; margin-bottom: 8px; color: #e11d48; text-transform: uppercase;" data-i18n="repuestos">Repuestos</h3>
           <div class="grid" style="grid-template-columns: 80px 1fr 1fr 100px; gap: 8px;">
-            <div><label data-i18n="cant">Cant.</label><input type="number" id="r_cant" value="1" min="1"></div>
-            <div><label data-i18n="descripcion">Descripción</label><input id="r_desc" placeholder="Filtro de aceite" data-i18n-placeholder="ph_descripcion"></div>
-            <div><label data-i18n="referencia">Referencia</label><input id="r_ref" placeholder="Ej: MANN-W712" data-i18n-placeholder="ej_referencia"></div>
-            <div><label data-i18n="precio">Precio (€)</label><input type="number" step="0.01" id="r_precio" placeholder="12.50"></div>
+            <div><label data-i18n="cant">Cant.</label><input type="number" id="r_cant" value="1" min="1" autocomplete="new-password"></div>
+            <div><label data-i18n="descripcion">Descripción</label><input id="r_desc" placeholder="Filtro de aceite" data-i18n-placeholder="ph_descripcion" autocomplete="new-password"></div>
+            <div><label data-i18n="referencia">Referencia</label><input id="r_ref" placeholder="Ej: MANN-W712" data-i18n-placeholder="ej_referencia" autocomplete="new-password"></div>
+            <div><label data-i18n="precio">Precio (€)</label><input type="number" step="0.01" id="r_precio" placeholder="12.50" autocomplete="new-password"></div>
           </div>
           
           <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px;">
@@ -164,8 +164,8 @@
         </div>
 
         <br>
-        <button class="primary" id="btn-guardar" data-i18n="guardar_mant" onclick="guardarMantenimiento()">Guardar Mantenimiento</button>
-        <button class="secondary" id="btn-cancelar" data-i18n="cancelar_edit" onclick="cancelarEdicion()" style="display:none; margin-left: 10px;">Cancelar Edición</button>
+        <button type="button" class="primary" id="btn-guardar" data-i18n="guardar_mant" onclick="guardarMantenimiento()">Guardar Mantenimiento</button>
+        <button type="button" class="secondary" id="btn-cancelar" data-i18n="cancelar_edit" onclick="cancelarEdicion()" style="display:none; margin-left: 10px;">Cancelar Edición</button>
         
         <div id="msg_mantenimiento"></div>
 
@@ -181,6 +181,7 @@
           </table>
         </div>
       </div>
+      
       <!-- RECORDATORIOS -->
       <div id="recordatorios" class="panel">
         <h2 data-i18n="recordatorios">Avisos y Recordatorios</h2>
@@ -196,27 +197,27 @@
         <div style="background: rgba(17, 24, 39, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #374151; margin-bottom: 20px;">
           <h3 style="color: #e11d48; font-size: 16px; margin-top: 0; margin-bottom: 15px;" data-i18n="prox_mant">Próximo Mantenimiento</h3>
           <div class="grid-avisos">
-            <div><label data-i18n="fecha_prox_mant">Fecha Próx. Mantenimiento</label><input type="date" id="rec_mant"></div>
-            <div><label data-i18n="km_prox_mant">Kms Próx. Mantenimiento</label><input type="number" id="rec_km_mant" placeholder="Ej: 100000"></div>
+            <div><label data-i18n="fecha_prox_mant">Fecha Próx. Mantenimiento</label><input type="date" id="rec_mant" autocomplete="new-password"></div>
+            <div><label data-i18n="km_prox_mant">Kms Próx. Mantenimiento</label><input type="number" id="rec_km_mant" placeholder="Ej: 100000" autocomplete="new-password"></div>
           </div>
         </div>
 
         <div style="background: rgba(17, 24, 39, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #374151; margin-bottom: 20px;">
           <h3 style="color: #e11d48; font-size: 16px; margin-top: 0; margin-bottom: 15px;" data-i18n="itv">ITV</h3>
           <div class="grid-avisos" style="margin-bottom: 10px;">
-            <div><label data-i18n="fecha_prox_itv">Fecha Próx. ITV</label><input type="date" id="rec_itv"></div>
+            <div><label data-i18n="fecha_prox_itv">Fecha Próx. ITV</label><input type="date" id="rec_itv" autocomplete="new-password"></div>
             <div></div>
           </div>
           <div style="margin-top: 15px; border-top: 1px dashed #4b5563; padding-top: 10px;">
             <p style="font-size: 12px; color: #9ca3af; margin-bottom: 10px;" data-i18n="registro_itv_pasada">Al rellenar estos campos, se añadirá un registro al historial del coche:</p>
             <div class="grid-avisos">
-              <div><label data-i18n="fecha_pasada_itv">Fecha Pasada ITV</label><input type="date" id="rec_itv_pasada"></div>
-              <div><label data-i18n="km_itv_pasada">Kms de esa ITV</label><input type="number" id="rec_km_itv_pasada" placeholder="Ej: 105000"></div>
+              <div><label data-i18n="fecha_pasada_itv">Fecha Pasada ITV</label><input type="date" id="rec_itv_pasada" autocomplete="new-password"></div>
+              <div><label data-i18n="km_itv_pasada">Kms de esa ITV</label><input type="number" id="rec_km_itv_pasada" placeholder="Ej: 105000" autocomplete="new-password"></div>
             </div>
           </div>
         </div>
         
-        <div style="margin-top: 15px;"><button class="primary" data-i18n="guardar" onclick="guardarRecordatorio()">Guardar Datos</button></div>
+        <div style="margin-top: 15px;"><button type="button" class="primary" data-i18n="guardar" onclick="guardarRecordatorio()">Guardar Datos</button></div>
         <div id="msg_recordatorios"></div>
 
         <h3 style="margin-top: 30px; color: #e2e8f0;" data-i18n="resumen_avisos">Resumen de Avisos</h3>
@@ -265,13 +266,13 @@
               <div style="display: flex; flex-direction: column; gap: 10px;">
                 <div>
                   <label data-i18n="coste_seguro">Coste Seguro (Anual)</label>
-                  <input type="number" step="0.01" id="gf_seguro" placeholder="Ej: 350.00">
+                  <input type="number" step="0.01" id="gf_seguro" placeholder="Ej: 350.00" autocomplete="new-password">
                 </div>
                 <div>
                   <label data-i18n="coste_itv">Coste Tasa ITV (Aprox)</label>
-                  <input type="number" step="0.01" id="gf_itv" placeholder="Ej: 45.00">
+                  <input type="number" step="0.01" id="gf_itv" placeholder="Ej: 45.00" autocomplete="new-password">
                 </div>
-                <button class="secondary" style="width: 100%; margin-top: 5px;" data-i18n="guardar" onclick="guardarGastosFijos()">Guardar Fijos</button>
+                <button type="button" class="secondary" style="width: 100%; margin-top: 5px;" data-i18n="guardar" onclick="guardarGastosFijos()">Guardar Fijos</button>
                 <div id="msg_gastos_fijos"></div>
               </div>
             </div>
@@ -284,13 +285,13 @@
             
             <!-- BOTONES EXPORTAR GRÁFICO ALINEADOS -->
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 0; width: 100%;">
-              <button class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center;" onclick="exportarGraficoPDF(false)">
+              <button type="button" class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center;" onclick="exportarGraficoPDF(false)">
                 <span data-i18n="btn_gen_pdf">GENERAR PDF</span>
               </button>
-              <button class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center; background: #25D366 !important; color: #fff !important;" onclick="exportarGraficoPDF('share')">
+              <button type="button" class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center; background: #25D366 !important; color: #fff !important;" onclick="exportarGraficoPDF('share')">
                 <span data-i18n="btn_share_chart">COMPARTIR</span> 📲
               </button>
-              <button class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center; background: #ea4335 !important; color: #fff !important;" onclick="exportarGraficoPDF('email')">
+              <button type="button" class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center; background: #ea4335 !important; color: #fff !important;" onclick="exportarGraficoPDF('email')">
                 <span data-i18n="btn_email_chart">CORREO</span> ✉️
               </button>
             </div>
@@ -319,12 +320,12 @@
             </select>
           </div>
           <div><label data-i18n="vehiculo">Vehículo</label><select id="i_vehiculo" onchange="renderTablaSeleccion()"><option value="" data-i18n="selecciona">— Selecciona —</option></select></div>
-          <div><label data-i18n="iva">IVA (%)</label><input type="number" id="i_iva" value="21" step="0.1"></div>
+          <div><label data-i18n="iva">IVA (%)</label><input type="number" id="i_iva" value="21" step="0.1" autocomplete="new-password"></div>
         </div>
 
         <div id="bloque_fechas" class="grid">
-          <div><label data-i18n="fecha_desde">Fecha desde</label><input type="date" id="i_desde"></div>
-          <div><label data-i18n="fecha_hasta">Fecha hasta</label><input type="date" id="i_hasta"></div>
+          <div><label data-i18n="fecha_desde">Fecha desde</label><input type="date" id="i_desde" autocomplete="new-password"></div>
+          <div><label data-i18n="fecha_hasta">Fecha hasta</label><input type="date" id="i_hasta" autocomplete="new-password"></div>
         </div>
 
         <div id="bloque_seleccion" style="display:none; margin-bottom: 20px;">
@@ -338,14 +339,14 @@
         </div>
 
         <div class="actions">
-          <button class="primary" data-i18n="btn_gen_pdf" onclick="generarPDF(false)">Generar PDF</button>
-          <button class="primary" style="background: #25D366 !important; color: #fff !important;" onclick="generarPDF('share')">
+          <button type="button" class="primary" data-i18n="btn_gen_pdf" onclick="generarPDF(false)">Generar PDF</button>
+          <button type="button" class="primary" style="background: #25D366 !important; color: #fff !important;" onclick="generarPDF('share')">
             <span data-i18n="btn_share_chart">Compartir</span> 📲
           </button>
-          <button class="secondary" style="background: #10b981 !important; color: #fff !important; font-weight: bold; text-transform: uppercase;" onclick="exportarExcel()">
+          <button type="button" class="secondary" style="background: #10b981 !important; color: #fff !important; font-weight: bold; text-transform: uppercase;" onclick="exportarExcel()">
             ⬇ <span data-i18n="btn_export_excel">Exportar a Excel</span>
           </button>
-          <button class="secondary" style="background: #f59e0b !important; color: #fff !important; font-weight: bold; text-transform: uppercase;" onclick="abrirModalFirma()">
+          <button type="button" class="secondary" style="background: #f59e0b !important; color: #fff !important; font-weight: bold; text-transform: uppercase;" onclick="abrirModalFirma()">
             ✍️ <span data-i18n="btn_firmar_informe">FIRMAR INFORME/FACTURA</span>
           </button>
         </div>
@@ -357,10 +358,10 @@
         <h2 data-i18n="copia_seguridad">Copia de seguridad</h2>
         <p data-i18n="copia_texto">Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.</p>
         <div class="actions">
-          <button class="secondary" data-i18n="exportar" onclick="exportarJSON()">⬇ Exportar copia (JSON)</button>
-          <button class="secondary" data-i18n="importar" onclick="document.getElementById('fileInput').click()">⬆ Importar copia</button>
+          <button type="button" class="secondary" data-i18n="exportar" onclick="exportarJSON()">⬇ Exportar copia (JSON)</button>
+          <button type="button" class="secondary" data-i18n="importar" onclick="document.getElementById('fileInput').click()">⬆ Importar copia</button>
           <input type="file" id="fileInput" accept=".json" style="display:none" onchange="importarJSON(event)">
-          <button class="danger" data-i18n="borrar" onclick="borrarTodo()">🗑 Borrar todos los datos</button>
+          <button type="button" class="danger" data-i18n="borrar" onclick="borrarTodo()">🗑 Borrar todos los datos</button>
         </div>
         <div id="msg_backup"></div>
       </div>
@@ -416,7 +417,7 @@
     </div>
 
     <div id="historial-lista" class="historial-lista"></div>
-    <button class="primary" style="margin-top: 20px; width: 100%;" onclick="cerrarModalHistorico(event)">Cerrar</button>
+    <button type="button" class="primary" style="margin-top: 20px; width: 100%;" onclick="cerrarModalHistorico(event)">Cerrar</button>
   </div>
 </div>
 
@@ -426,10 +427,10 @@
     <h3 data-i18n="firma_titulo" style="color: #fff; margin-top: 0; text-align: center;">Firme aquí</h3>
     <canvas id="canvas-firma" style="border: 2px dashed #e11d48; border-radius: 8px; background: #fff; touch-action: none; width: 100%; height: 250px;"></canvas>
     <div style="display: flex; gap: 10px; margin-top: 15px;">
-      <button class="secondary" data-i18n="btn_borrar_firma" style="flex: 1;" onclick="limpiarFirma()">Borrar</button>
-      <button class="primary" data-i18n="btn_guardar_firma" style="flex: 1;" onclick="guardarFirma()">Guardar Firma</button>
+      <button type="button" class="secondary" data-i18n="btn_borrar_firma" style="flex: 1;" onclick="limpiarFirma()">Borrar</button>
+      <button type="button" class="primary" data-i18n="btn_guardar_firma" style="flex: 1;" onclick="guardarFirma()">Guardar Firma</button>
     </div>
-    <button class="danger" data-i18n="btn_cancelar_firma" style="width: 100%; margin-top: 10px;" onclick="cerrarModalFirma()">Cancelar</button>
+    <button type="button" class="danger" data-i18n="btn_cancelar_firma" style="width: 100%; margin-top: 10px;" onclick="cerrarModalFirma()">Cancelar</button>
   </div>
 </div>
 
@@ -441,17 +442,17 @@
     
     <div style="margin-top: 15px;">
       <label style="color:#e2e8f0;">Email</label>
-      <input type="email" id="auth-email" placeholder="tu@email.com" style="width: 100%; padding: 10px; margin-bottom: 10px;">
+      <input type="email" id="auth-email" placeholder="tu@email.com" autocomplete="username" style="width: 100%; padding: 10px; margin-bottom: 10px;">
       <label style="color:#e2e8f0;">Contraseña</label>
-      <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres" style="width: 100%; padding: 10px; margin-bottom: 15px;">
+      <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres" autocomplete="current-password" style="width: 100%; padding: 10px; margin-bottom: 15px;">
     </div>
     
     <div style="display: flex; gap: 10px;">
-      <button class="primary" id="btn-login" style="flex: 1;">Iniciar Sesión</button>
-      <button class="secondary" id="btn-register" style="flex: 1;">Registrarse</button>
+      <button type="button" class="primary" id="btn-login" style="flex: 1;">Iniciar Sesión</button>
+      <button type="button" class="secondary" id="btn-register" style="flex: 1;">Registrarse</button>
     </div>
     
-    <button class="danger" id="btn-logout" style="width: 100%; margin-top: 10px; display: none;">Cerrar Sesión</button>
+    <button type="button" class="danger" id="btn-logout" style="width: 100%; margin-top: 10px; display: none;">Cerrar Sesión</button>
     <div id="auth-error" style="color: #ef4444; text-align: center; margin-top: 10px; font-size: 12px;"></div>
   </div>
 </div>
