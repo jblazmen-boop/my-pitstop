@@ -263,7 +263,10 @@ const translations = {
     btn_register: "Registrarse",
     btn_logout: "Salir",
     btn_calendar: "📅 Añadir al Calendario",
-    btn_alerts: "🔔 Activar Avisos"
+    btn_alerts: "🔔 Activar Avisos",
+    delete_warning_title: "Borrar Aviso",
+    delete_warning_text: "¿Quieres borrar este aviso? (Si lo tenías en tu calendario, tendrás que quitarlo manualmente desde la app de tu calendario).",
+    delete_warning_btn: "Sí, borrar"
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -326,7 +329,10 @@ const translations = {
     btn_register: "Register",
     btn_logout: "Logout",
     btn_calendar: "📅 Add to Calendar",
-    btn_alerts: "🔔 Activate Alerts"
+    btn_alerts: "🔔 Activate Alerts",
+    delete_warning_title: "Delete Alert",
+    delete_warning_text: "Do you want to delete this alert? (If you had it in your calendar, you'll need to remove it manually from the calendar app).",
+    delete_warning_btn: "Yes, delete"
   }
 };
 
@@ -1421,11 +1427,50 @@ function cargarRecordatorios() {
       if (diffDias < 0) color = '#ef4444'; else if (diffDias <= 30) color = '#f59e0b'; else color = '#10b981';
       return `<span style="color: ${color}; font-weight: bold;">${fechaMostrar}</span>`;
     };
+    
     const kmMantFormat = v.proxKmMant ? `<span style="color: #38bdf8; font-weight: bold;">${v.proxKmMant} Kms</span><br>` : '';
+    
+    // Botones para eliminar el aviso individual
+    const btnElimMant = v.proxMant ? `<button type="button" class="danger" style="padding:2px 6px; margin-left:10px; font-size:10px;" onclick="limpiarAviso('${v.id}', 'mant')" title="Eliminar aviso de mantenimiento">🗑️</button>` : '';
+    const btnElimItv = v.proxItv ? `<button type="button" class="danger" style="padding:2px 6px; margin-left:10px; font-size:10px;" onclick="limpiarAviso('${v.id}', 'itv')" title="Eliminar aviso de ITV">🗑️</button>` : '';
+
     const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${esc(v.matricula)}</td><td>${kmMantFormat}${formatDate(v.proxMant)}</td><td>${formatDate(v.proxItv)}</td>`;
+    tr.innerHTML = `<td>${esc(v.matricula)}</td>
+      <td>${kmMantFormat}${formatDate(v.proxMant)} ${btnElimMant}</td>
+      <td>${formatDate(v.proxItv)} ${btnElimItv}</td>`;
     tbody.appendChild(tr);
   });
+}
+
+function limpiarAviso(vehiculoId, tipoAviso) {
+  const titulo = currentLang === 'es' ? translations.es.delete_warning_title : translations.en.delete_warning_title;
+  const texto = currentLang === 'es' ? translations.es.delete_warning_text : translations.en.delete_warning_text;
+
+  if (confirm(`${titulo}\n\n${texto}`)) {
+    const v = state.vehiculos.find(x => x.id === vehiculoId);
+    if (v) {
+      if (tipoAviso === 'mant') {
+        v.proxMant = '';
+        v.proxKmMant = '';
+      } else if (tipoAviso === 'itv') {
+        v.proxItv = '';
+      }
+      guardar(); 
+      cargarRecordatorios(); 
+      
+      // Si el vehículo afectado es el que está seleccionado en los inputs, limpiamos también los inputs
+      const sel = document.getElementById('rec_vehiculo');
+      if (sel && sel.value === vehiculoId) {
+        if (tipoAviso === 'mant') {
+          document.getElementById('rec_mant').value = '';
+          document.getElementById('rec_km_mant').value = '';
+        } else if (tipoAviso === 'itv') {
+          document.getElementById('rec_itv').value = '';
+        }
+      }
+      mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Aviso eliminado.' : 'Alert deleted.', 'ok');
+    }
+  }
 }
 
 function guardarRecordatorio() {
@@ -1658,6 +1703,7 @@ function generarPDF(accion = false) {
         columnStyles: { 0: { cellWidth: 25 }, 1: { cellWidth: 20 }, 2: { cellWidth: 65 }, 3: { cellWidth: 70 } }, margin: { left: 15, right: 15 }
       });
 
+      // FIRMA O RECUADRO
       let yFirma = doc.lastAutoTable.finalY + 20;
       if (yFirma > 220) { doc.addPage(); yFirma = 20; }
       doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
@@ -1723,6 +1769,7 @@ function generarPDF(accion = false) {
       doc.text(`${t.pdf_iva} (${ivaPorcentaje}%):`, 130, y); doc.text(fmt(iva), pageW - 15, y, {align:'right'}); y += 6;
       doc.setFont(undefined, 'bold'); doc.setTextColor(225, 29, 72); doc.text(t.pdf_total, 130, y); doc.text(fmt(totalFinal), pageW - 15, y, {align:'right'});
       
+      // FIRMA O RECUADRO
       if (y > 220) { doc.addPage(); y = 20; }
       y += 20; 
       doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
@@ -1854,6 +1901,6 @@ Object.assign(window, {
   renderGrafico, cargarGastosFijos, guardarGastosFijos, exportarGraficoPDF,
   toggleModoInforme, renderTablaSeleccion, toggleAllChecks, generarPDF, exportarExcel,
   cargarRecordatorios, guardarRecordatorio, exportarJSON, importarJSON, borrarTodo,
-  descargarICS, activarNotificaciones
+  descargarICS, activarNotificaciones, limpiarAviso
 });
 
