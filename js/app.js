@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -64,6 +64,33 @@ btnRegister.onclick = () => {
   const pass = document.getElementById('auth-password').value;
   authError.textContent = "Creando cuenta...";
   createUserWithEmailAndPassword(auth, email, pass).catch(e => authError.textContent = "Error: " + e.message);
+};
+
+// Recuperar contraseña
+document.getElementById('btn-forgot-password').onclick = (e) => {
+  e.preventDefault();
+  const email = document.getElementById('auth-email').value;
+  
+  if (!email) {
+    authError.style.color = '#ef4444';
+    authError.textContent = currentLang === 'es' ? 'Escribe tu correo arriba para enviarte el enlace.' : 'Enter your email above to send the link.';
+    return;
+  }
+
+  authError.style.color = '#9ca3af';
+  authError.textContent = "Enviando...";
+
+  sendPasswordResetEmail(auth, email)
+    .then(() => {
+      authError.style.color = '#22c55e'; 
+      authError.textContent = currentLang === 'es' 
+        ? 'Correo enviado. Revisa tu bandeja de entrada (y spam).' 
+        : 'Email sent. Check your inbox (and spam).';
+    })
+    .catch((error) => {
+      authError.style.color = '#ef4444';
+      authError.textContent = "Error: " + error.message;
+    });
 };
 
 btnLogout.onclick = () => signOut(auth);
@@ -511,7 +538,7 @@ function irAInformeDesdeHistorico(idMantenimiento) {
   }, 100);
 }
 
-// ============ MODAL DE FIRMA (ARRGLADO) ============
+// ============ MODAL DE FIRMA (CORREGIDO) ============
 function abrirModalFirma() {
   document.getElementById('modal-firma').style.display = 'flex';
   const canvas = document.getElementById('canvas-firma');
@@ -666,7 +693,7 @@ function renderManoObraTemporal() {
       const tr = document.createElement('tr');
       tr.innerHTML = `<td style="border:1px solid #ddd; padding:6px;">${esc(o.concepto)}</td>
         <td style="border:1px solid #ddd; padding:6px;">${fmt(o.precio)}</td>
-        <td style="border:1px solid #ddd; padding:6px;"><button class="danger" style="padding:2px 6px;" onclick="eliminarManoObraTemporal(${i})">X</button></td>`;
+        <td style="border:1px solid #ddd; padding:6px;"><button type="button" class="danger" style="padding:2px 6px;" onclick="eliminarManoObraTemporal(${i})">X</button></td>`;
       tbody.appendChild(tr);
     });
   }
@@ -760,7 +787,7 @@ function renderRepuestosTemporales() {
         <td style="border:1px solid #ddd; padding:6px;">${esc(r.ref)}</td>
         <td style="border:1px solid #ddd; padding:6px;">${fmt(r.precio)}</td>
         <td style="border:1px solid #ddd; padding:6px;">${fmt(subtotal)}</td>
-        <td style="border:1px solid #ddd; padding:6px;"><button class="danger" style="padding:2px 6px;" onclick="eliminarRepuestoTemporal(${i})">X</button></td>`;
+        <td style="border:1px solid #ddd; padding:6px;"><button type="button" class="danger" style="padding:2px 6px;" onclick="eliminarRepuestoTemporal(${i})">X</button></td>`;
       tbody.appendChild(tr);
     });
   }
@@ -956,8 +983,8 @@ function renderVehiculos() {
     tr.innerHTML = `<td>${esc(v.matricula)}</td><td>${esc(v.marca)}</td><td>${esc(v.modelo)}</td>
       <td>${esc(v.bastidor)}</td>
       <td>
-        <button class="secondary" style="padding:4px 8px; font-size:11px; margin-right:4px;" onclick="editarVehiculo('${v.id}')">${currentLang === 'es' ? 'Editar' : 'Edit'}</button>
-        <button class="danger" onclick="eliminarVehiculo('${v.id}')">${currentLang === 'es' ? 'Eliminar' : 'Delete'}</button>
+        <button type="button" class="secondary" style="padding:4px 8px; font-size:11px; margin-right:4px;" onclick="editarVehiculo('${v.id}')">${currentLang === 'es' ? 'Editar' : 'Edit'}</button>
+        <button type="button" class="danger" onclick="eliminarVehiculo('${v.id}')">${currentLang === 'es' ? 'Eliminar' : 'Delete'}</button>
       </td>`;
     tbody.appendChild(tr);
   });
@@ -982,12 +1009,12 @@ function renderMantenimientos() {
     const tr = document.createElement('tr');
     tr.innerHTML = `<td>${fechaMostrar}</td><td>${esc(v ? v.matricula : '—')}</td>
       <td>${m.km||''}</td><td>${esc(tipoTexto)}</td>
-      <td><button class="secondary" style="padding:4px 8px; font-size:11px;" onclick="verDesglose('${m.id}')">${currentLang === 'es' ? 'Ver' : 'View'} (${numOps})</button></td>
+      <td><button type="button" class="secondary" style="padding:4px 8px; font-size:11px;" onclick="verDesglose('${m.id}')">${currentLang === 'es' ? 'Ver' : 'View'} (${numOps})</button></td>
       <td>${fmt(m.mano)}</td><td>${fmt(m.piezas)}</td><td>${fmt(m.mano+m.piezas)}</td>
       <td style="display:flex; flex-direction:column; gap:4px;">
         <div>
-            <button class="secondary" style="padding:4px 8px; font-size:11px;" onclick="editarMantenimiento('${m.id}')">${currentLang === 'es' ? 'Editar' : 'Edit'}</button>
-            <button class="danger" onclick="eliminarMantenimiento('${m.id}')">${currentLang === 'es' ? 'Eliminar' : 'Delete'}</button>
+            <button type="button" class="secondary" style="padding:4px 8px; font-size:11px;" onclick="editarMantenimiento('${m.id}')">${currentLang === 'es' ? 'Editar' : 'Edit'}</button>
+            <button type="button" class="danger" onclick="eliminarMantenimiento('${m.id}')">${currentLang === 'es' ? 'Eliminar' : 'Delete'}</button>
         </div>
       </td>`;
     tbody.appendChild(tr);
