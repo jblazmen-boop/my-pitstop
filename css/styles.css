@@ -638,7 +638,7 @@ body.modo-claro .modal-historico-contenido {
   border-radius: 12px;
   padding: 20px;
   width: 90%;
-  max-width: 500px; /* Un poco más ancho en escritorio */
+  max-width: 500px;
   box-shadow: 0 0 30px rgba(225,29,72,0.4);
 }
 
@@ -750,6 +750,17 @@ body.modo-claro .modal-historico-contenido {
     border-width: 2px; 
   }
   
+  /* ===== ARREGLO DEL CARTEL DE LAS PESTAÑAS EN MÓVIL ===== */
+  .tab::after {
+    bottom: 100% !important; /* Lo ponemos arriba para que no se salga del marco */
+    margin-bottom: 10px !important;
+    transform: translateX(-50%) scale(0.9) !important;
+  }
+  .tab:hover::after { 
+    opacity: 1 !important; 
+    transform: translateX(-50%) scale(1) translateY(-5px) !important; 
+  }
+  
   /* ===== PANTALLA LCD Y PANELES ===== */
   .pantalla-lcd { padding: 4px; border-width: 3px; width: 100%; }
   .panel { padding: 10px; border-left-width: 3px; border-radius: 4px; }
@@ -765,7 +776,7 @@ body.modo-claro .modal-historico-contenido {
   table { margin-top: 10px; display: block; overflow-x: auto; white-space: nowrap; }
   table th, table td { padding: 6px 8px; font-size: 11px; }
 
-  /* ===== MODAL DE FIRMA EN MÓVIL (TAMAÑO Y COORDENADAS CORRECTAS) ===== */
+  /* ===== MODAL DE FIRMA EN MÓVIL ===== */
   .modal-firma-contenido {
     width: 98% !important;
     max-width: 98% !important;
@@ -778,10 +789,9 @@ body.modo-claro .modal-historico-contenido {
     margin-bottom: 10px !important;
   }
 
-  /* Forzamos al canvas a tener un tamaño visual grande y altura fija para que no falle el cálculo */
   .modal-firma-contenido canvas {
     width: 100% !important;
-    height: 200px !important; /* Clave para que no se descuadre en móvil */
+    height: 200px !important;
     touch-action: none !important; 
     background-color: #ffffff !important;
     border-radius: 6px !important;
@@ -792,6 +802,5 @@ body.modo-claro .modal-historico-contenido {
   header { padding: 10px 24px; }
   .logo-container { width: 60px; height: 60px; }
   header h1 { font-size: 40px; }
-  .author { font-size: 18px; }
   .container { margin-top: 10px; }
 }

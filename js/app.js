@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebas
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
+// Registrar el Service Worker para las notificaciones
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').then(() => {
     console.log("Service Worker registrado correctamente.");
@@ -21,7 +22,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let state = { vehiculos: [], mantenimientos: [], catalogoFotos: [] };
+let state = { vehiculos: [], mantenimientos: [], catalogoFotos: [], author: 'J.Blázquez' };
 let repuestosTemporales = [];
 let manoObraTemporal = [];
 let editandoMantenimientoId = null;
@@ -51,7 +52,8 @@ onAuthStateChanged(auth, (user) => {
     modalAuth.style.display = 'flex'; 
     btnLogoutHeader.style.display = 'none';
     if (unsubscribeSnapshot) unsubscribeSnapshot(); 
-    state = { vehiculos: [], mantenimientos: [], catalogoFotos: [] };
+    state = { vehiculos: [], mantenimientos: [], catalogoFotos: [], author: 'J.Blázquez' };
+    actualizarAutor('J.Blázquez');
     renderAll();
   }
 });
@@ -102,7 +104,12 @@ function iniciarSincronizacion(uid) {
       if (!state.vehiculos) state.vehiculos = [];
       if (!state.mantenimientos) state.mantenimientos = [];
       if (!state.catalogoFotos) state.catalogoFotos = [];
+      if (!state.author) state.author = 'J.Blázquez';
       
+      actualizarAutor(state.author);
+      const inputAuthor = document.getElementById('input-author');
+      if(inputAuthor) inputAuthor.value = state.author;
+
       renderAll();
       cargarRecordatorios();
       cargarGastosFijos();
@@ -110,14 +117,26 @@ function iniciarSincronizacion(uid) {
       const datosLocales = localStorage.getItem(STORAGE_KEY);
       if (datosLocales) {
         state = JSON.parse(datosLocales);
+        if(!state.author) state.author = 'J.Blázquez';
         setDoc(userDocRef, state);
       } else {
-        state = { vehiculos: [], mantenimientos: [], catalogoFotos: [] };
+        state = { vehiculos: [], mantenimientos: [], catalogoFotos: [], author: 'J.Blázquez' };
         setDoc(userDocRef, state);
       }
+      actualizarAutor(state.author);
+      const inputAuthor = document.getElementById('input-author');
+      if(inputAuthor) inputAuthor.value = state.author;
+      
       renderAll();
     }
   });
+}
+
+function actualizarAutor(nombre) {
+  state.author = nombre || 'J.Blázquez';
+  const headerAuthor = document.getElementById('header-author');
+  if (headerAuthor) headerAuthor.textContent = 'by ' + state.author;
+  guardar();
 }
 
 function reproducirBeep() {
@@ -421,6 +440,7 @@ function cargar() {
       if (!state.catalogoFotos) state.catalogoFotos = [];
       if (!state.vehiculos) state.vehiculos = [];
       if (!state.mantenimientos) state.mantenimientos = [];
+      if (!state.author) state.author = 'J.Blázquez';
 
       state.vehiculos.forEach(v => { 
         if (!v.proxMant) v.proxMant = ''; 
@@ -570,7 +590,7 @@ function irAInformeDesdeHistorico(idMantenimiento) {
   }, 100);
 }
 
-// ============ MODAL DE FIRMA (CORREGIDO) ============
+// ============ MODAL DE FIRMA (MÓVIL Y ESCRITORIO) ============
 function abrirModalFirma() {
   document.getElementById('modal-firma').style.display = 'flex';
   const canvas = document.getElementById('canvas-firma');
@@ -1707,6 +1727,7 @@ function generarPDF(accion = false) {
         columnStyles: { 0: { cellWidth: 25 }, 1: { cellWidth: 20 }, 2: { cellWidth: 65 }, 3: { cellWidth: 70 } }, margin: { left: 15, right: 15 }
       });
 
+      // FIRMA O RECUADRO
       let yFirma = doc.lastAutoTable.finalY + 20;
       if (yFirma > 220) { doc.addPage(); yFirma = 20; }
       doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
@@ -1772,6 +1793,7 @@ function generarPDF(accion = false) {
       doc.text(`${t.pdf_iva} (${ivaPorcentaje}%):`, 130, y); doc.text(fmt(iva), pageW - 15, y, {align:'right'}); y += 6;
       doc.setFont(undefined, 'bold'); doc.setTextColor(225, 29, 72); doc.text(t.pdf_total, 130, y); doc.text(fmt(totalFinal), pageW - 15, y, {align:'right'});
       
+      // FIRMA O RECUADRO
       if (y > 220) { doc.addPage(); y = 20; }
       y += 20; 
       doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
@@ -1832,6 +1854,7 @@ function importarJSON(event) {
         if (confirm('Esto sobrescribirá tus datos actuales en la nube. ¿Continuar?')) {
           state = importedData;
           if (!state.catalogoFotos) state.catalogoFotos = [];
+          if (!state.author) state.author = 'J.Blázquez';
           guardar(); // Guarda en Firebase
           renderAll(); cargarRecordatorios(); cargarGastosFijos();
           mostrarMsg('msg_backup', 'Datos importados a la nube.', 'ok');
@@ -1845,8 +1868,12 @@ function importarJSON(event) {
 
 function borrarTodo() {
   if (confirm('¿Estás seguro de que quieres borrar TODOS los datos de la nube?')) {
-    state = { vehiculos: [], mantenimientos: [], catalogoFotos: [] };
+    state = { vehiculos: [], mantenimientos: [], catalogoFotos: [], author: 'J.Blázquez' };
     guardar(); // Borra en Firebase
+    actualizarAutor('J.Blázquez');
+    const inputAuthor = document.getElementById('input-author');
+    if(inputAuthor) inputAuthor.value = 'J.Blázquez';
+
     renderAll(); cargarRecordatorios(); cargarGastosFijos();
     mostrarMsg('msg_backup', 'Datos borrados.', 'ok');
   }
@@ -1874,6 +1901,7 @@ if (idiomaGuardado && (idiomaGuardado === 'es' || idiomaGuardado === 'en')) {
 firmaGuardada = localStorage.getItem('pitstop_firma') || null;
 
 cargarTema(); 
+// YA NO LLAMAMOS A cargar() PORQUE FIREBASE LO HACE AL LOGUEARSE
 document.getElementById('m_fecha').value = new Date().toISOString().slice(0,10);
 renderManoObraTemporal();
 renderRepuestosTemporales();
@@ -1902,7 +1930,8 @@ Object.assign(window, {
   renderGrafico, cargarGastosFijos, guardarGastosFijos, exportarGraficoPDF,
   toggleModoInforme, renderTablaSeleccion, toggleAllChecks, generarPDF, exportarExcel,
   cargarRecordatorios, guardarRecordatorio, exportarJSON, importarJSON, borrarTodo,
-  descargarICS, activarNotificaciones, editarAviso, eliminarAvisoVehiculo
+  descargarICS, activarNotificaciones, editarAviso, eliminarAvisoVehiculo, actualizarAutor
 });
+
 
 

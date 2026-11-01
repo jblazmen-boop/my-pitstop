@@ -9,7 +9,7 @@
   <link rel="manifest" href="manifest.json?v=3">
   <meta name="theme-color" content="#111827">
   
-  <link rel="stylesheet" href="css/styles.css?v=15">
+  <link rel="stylesheet" href="css/styles.css?v=17">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -24,7 +24,7 @@
     <div class="header-content">
       <div class="title-block">
         <h1>My PitStop</h1>
-        <span class="author">by J.Blázquez</span>
+        <span class="author" id="header-author">by J.Blázquez</span>
       </div>
     </div>
     <div class="header-controls">
@@ -232,7 +232,6 @@
         <div class="tabla-responsive">
           <table style="margin-top: 10px;">
             <thead>
-              <!-- COLUMNA ACCIONES AÑADIDA -->
               <tr><th data-i18n="vehiculo">Vehículo</th><th data-i18n="prox_mant">Próximo Mantenimiento</th><th data-i18n="prox_itv">Próxima ITV</th><th data-i18n="acciones">Acciones</th></tr>
             </thead>
             <tbody id="tabla_recordatorios_body"></tbody>
@@ -364,6 +363,15 @@
       <!-- BACKUP -->
       <div id="backup" class="panel">
         <h2 data-i18n="copia_seguridad">Copia de seguridad</h2>
+        
+        <!-- NUEVO CAMPO PARA PERSONALIZAR EL AUTOR -->
+        <div style="background: rgba(17, 24, 39, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #374151; margin-bottom: 20px;">
+          <h3 style="color: #e11d48; font-size: 16px; margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">Ajustes de la App</h3>
+          <label>Personalizar nombre en la cabecera (debajo de My PitStop)</label>
+          <input type="text" id="input-author" placeholder="Ej: R.Calvo" value="J.Blázquez" onchange="actualizarAutor(this.value)" maxlength="20">
+          <p style="font-size: 11px; color: #9ca3af; margin-top: 5px;">Así aparecerá "by [Tu Nombre]" debajo del título.</p>
+        </div>
+
         <p data-i18n="copia_texto">Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.</p>
         <div class="actions">
           <button type="button" class="secondary" data-i18n="exportar" onclick="exportarJSON()">⬇ Exportar copia (JSON)</button>
@@ -399,8 +407,10 @@
   </div> <!-- FIN DE LA MÁQUINA DE DIAGNOSIS -->
 </div>
 
-<footer style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px; margin-top: 20px; border-top: 1px solid #374151; background-color: rgba(15, 23, 42, 0.95);">
-  © 2026 My PitStop. <span data-i18n="derechos">Todos los derechos reservados.</span>
+<!-- PIE DE PÁGINA ACTUALIZADO -->
+<footer style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px; margin-top: 20px; border-top: 1px solid #374151; background-color: rgba(15, 23, 42, 0.95); line-height: 1.6;">
+  © 2026 My PitStop. <span data-i18n="derechos">Todos los derechos reservados.</span><br>
+  Creado por <strong style="color: #e2e8f0;">J.Blázquez</strong>
 </footer>
 
 <div id="modal-foto" class="modal" onclick="cerrarModal()">
@@ -470,6 +480,6 @@
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js"></script>
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js"></script>
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js"></script>
-<script type="module" src="js/app.js?v=13"></script>
+<script type="module" src="js/app.js?v=14"></script>
 </body>
 </html>
