@@ -790,33 +790,47 @@ body.modo-claro .modal-historico-contenido {
     border-width: 2px; 
   }
   
-  /* ===== TOOLTIP DE PESTAÑAS EN MÓVIL (auto-ajustable) ===== */
+  /* ===== TOOLTIP BASE: 55x55 fijo (como antes, funcionaba con todos los cortos) ===== */
   .tab::after {
     content: attr(title);
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    min-width: 55px;
-    max-width: 120px;
-    padding: 6px 8px;
+    width: 55px;
+    height: 55px;
     background: rgba(225, 29, 72, 0.95);
     color: #ffffff !important;
+    padding: 4px;
     border-radius: 12px;
     font-size: 9px;
     font-weight: bold;
-    line-height: 1.15;
-    text-align: center;
     white-space: normal;
-    word-break: break-word;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.1;
     border: 2px solid white;
     opacity: 0;
     pointer-events: none;
     z-index: 100;
     box-shadow: 0 0 15px rgba(225, 29, 72, 0.8);
     transition: opacity 0.3s ease;
-    display: block;
     box-sizing: border-box;
+  }
+
+  /* ===== SOLO para los 2 tabs con texto largo: caja auto-ajustable ===== */
+  .tab[data-tab="recordatorios"]::after,
+  .tab[data-tab="mantenimientos"]::after {
+    width: auto;
+    height: auto;
+    min-width: 55px;
+    min-height: 55px;
+    max-width: 130px;
+    padding: 6px 8px;
+    word-break: normal;
+    overflow-wrap: break-word;
   }
   
   .tab:hover::after, .tab:active::after, .tab:focus::after {
