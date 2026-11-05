@@ -9,8 +9,8 @@
   <link rel="manifest" href="manifest.json?v=3">
   <meta name="theme-color" content="#111827">
   
-  <!-- Versión v=30 para forzar la recarga del nuevo CSS -->
-  <link rel="stylesheet" href="css/styles.css?v=30">
+  <!-- Versión v=31 para forzar la recarga del nuevo CSS -->
+  <link rel="stylesheet" href="css/styles.css?v=31">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -305,7 +305,6 @@
               <canvas id="miGrafico"></canvas>
             </div>
             
-            <!-- AQUÍ ESTÁ LA MAGIA: Clase "chart-buttons" en vez de style en línea -->
             <div class="chart-buttons">
               <button type="button" class="primary" onclick="exportarGraficoPDF(false)">
                 <span data-i18n="btn_gen_pdf">GENERAR PDF</span>
@@ -412,11 +411,13 @@
         </div>
 
         <p data-i18n="copia_texto">Tus datos se guardan de forma segura en la nube y se sincronizan en todos tus dispositivos con tu cuenta. Aun así, te recomendamos exportar una copia de seguridad periódicamente.</p>
+        
+        <!-- BOTONES DE COPIA DE SEGURIDAD CON COLORES -->
         <div class="actions">
-          <button type="button" class="secondary" data-i18n="exportar" onclick="exportarJSON()">⬇ Exportar copia (JSON)</button>
-          <button type="button" class="secondary" data-i18n="importar" onclick="document.getElementById('fileInput').click()">⬆ Importar copia</button>
+          <button type="button" class="btn-success" data-i18n="exportar" onclick="exportarJSON()">⬇ Exportar copia (JSON)</button>
+          <button type="button" class="btn-info" data-i18n="importar" onclick="document.getElementById('fileInput').click()">⬆ Importar copia</button>
           <input type="file" id="fileInput" accept=".json" style="display:none" onchange="importarJSON(event)">
-          <!-- Botón de borrar con rayas de peligro racing -->
+          
           <button type="button" class="danger btn-stripes" data-i18n="borrar" onclick="borrarTodo()">🗑 Borrar todos los datos</button>
         </div>
         <div id="msg_backup"></div>
@@ -520,6 +521,6 @@
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js"></script>
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js"></script>
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js"></script>
-<script type="module" src="js/app.js?v=21"></script>
+<script type="module" src="js/app.js?v=22"></script>
 </body>
 </html>

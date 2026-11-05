@@ -532,7 +532,7 @@ button.btn-stripes,
   align-items: center !important;
   justify-content: center !important;
   gap: 6px !important;
-  text-shadow: 0 1px 2px rgba(0,0,0,0.6) !important;
+  text-shadow: none !important; /* Limpia los iconos y emojis */
   border: 1px solid transparent !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -2px 0 rgba(0,0,0,0.5), 0 4px 6px rgba(0,0,0,0.5) !important;
 }
@@ -566,7 +566,7 @@ button.btn-warning {
   background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 40%, #d97706 100%) !important;
   border-color: #78350f !important;
   color: #111827 !important;
-  text-shadow: 0 1px 1px rgba(255,255,255,0.4) !important;
+  text-shadow: none !important;
 }
 
 button.btn-email {
@@ -594,6 +594,26 @@ button.danger.btn-stripes {
   color: #fff !important;
   text-shadow: 0 1px 3px rgba(0,0,0,1) !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), inset 0 -2px 0 rgba(0,0,0,0.8), 0 4px 6px rgba(0,0,0,0.5) !important;
+}
+
+/* Botones de Tabla (Editar / Borrar) - Pequeños y cuadrados */
+td button {
+  padding: 6px 10px !important;
+  font-size: 14px !important;
+  width: auto !important;
+  margin-bottom: 0 !important;
+}
+
+td button.secondary {
+  background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 40%, #d97706 100%) !important;
+  border-color: #78350f !important;
+  color: #111827 !important;
+}
+
+td button.danger {
+  background: linear-gradient(180deg, #f87171 0%, #ef4444 40%, #dc2626 100%) !important;
+  border-color: #7f1d1d !important;
+  color: #fff !important;
 }
 
 /* Efecto HOVER: Se ilumina y levanta */
@@ -666,7 +686,6 @@ td { color: var(--text-main) !important; }
 .msg.err { background: rgba(245, 101, 101, 0.2) !important; color: #fc8181 !important; border: 1px solid #f56565 !important; }
 
 #tabla_repuestos th, #tabla_repuestos td, #tabla_mano_obra th, #tabla_mano_obra td { padding: 8px; }
-td button { margin-right: 4px; }
 
 .form-row { display: flex; gap: 15px; flex-wrap: wrap; margin-bottom: 15px; }
 .form-row .form-group { flex: 1; min-width: 200px; }
@@ -936,7 +955,7 @@ body.modo-claro .modal-historico-contenido {
   
   input, select, textarea { padding: 8px; font-size: 13px; }
 
-  /* BOTONES EN MÓVIL: Ocupan todo el ancho, excepto los del gráfico */
+  /* BOTONES EN MÓVIL: Ocupan todo el ancho, excepto los de la tabla */
   .actions button,
   .panel > button.primary,
   .panel > button.secondary,
@@ -945,6 +964,10 @@ body.modo-claro .modal-historico-contenido {
     font-size: 12px; 
     width: 100%; 
     margin-bottom: 5px; 
+  }
+
+  td button {
+    width: auto !important;
   }
 
   /* Arreglo específico para los botones del gráfico (se apilan en vertical) */
