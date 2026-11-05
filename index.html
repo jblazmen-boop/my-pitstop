@@ -9,7 +9,7 @@
   <link rel="manifest" href="manifest.json?v=3">
   <meta name="theme-color" content="#111827">
   
-  <link rel="stylesheet" href="css/styles.css?v=20">
+  <link rel="stylesheet" href="css/styles.css?v=22">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -20,18 +20,13 @@
 
 <header>
   <div class="header-container">
-    <!-- CONTROLES A LA IZQUIERDA -->
+    <!-- IZQUIERDA: Salir + Luna -->
     <div class="header-controls">
-      <button type="button" class="danger" id="btn-logout-header" style="display: none; margin-right: 10px; padding: 6px 12px; font-size: 13px; text-transform: uppercase;" data-i18n="btn_logout">Salir</button>
-      
+      <button type="button" class="danger" id="btn-logout-header" style="display: none; padding: 6px 12px; font-size: 13px; text-transform: uppercase;" data-i18n="btn_logout">Salir</button>
       <button class="theme-btn" id="btn-tema" onclick="toggleTema()" title="Cambiar Tema">🌙</button>
-      <div class="lang-switch">
-        <button class="lang-btn active" id="lang-es" onclick="setLanguage('es')" title="Español"></button>
-        <button class="lang-btn" id="lang-en" onclick="setLanguage('en')" title="English"></button>
-      </div>
     </div>
 
-    <!-- LOGO CENTRADO -->
+    <!-- CENTRO: Logo -->
     <div class="header-content">
       <div class="title-block">
         <h1>My PitStop</h1>
@@ -39,8 +34,13 @@
       </div>
     </div>
 
-    <!-- ESPACIADOR DERECHA -->
-    <div class="header-spacer"></div>
+    <!-- DERECHA: Banderas -->
+    <div class="header-lang">
+      <div class="lang-switch">
+        <button class="lang-btn active" id="lang-es" onclick="setLanguage('es')" title="Español"></button>
+        <button class="lang-btn" id="lang-en" onclick="setLanguage('en')" title="English"></button>
+      </div>
+    </div>
   </div>
 </header>
 
@@ -224,7 +224,6 @@
           </div>
         </div>
 
-        <!-- NUEVO BLOQUE DEL SEGURO -->
         <div style="background: rgba(17, 24, 39, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #374151; margin-bottom: 20px;">
           <h3 style="color: #e11d48; font-size: 16px; margin-top: 0; margin-bottom: 15px;" data-i18n="seguro">Seguro</h3>
           <div class="grid-avisos">
@@ -233,7 +232,6 @@
           </div>
         </div>
         
-        <!-- BOTONES DE AVISOS -->
         <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
           <button type="button" class="primary" data-i18n="guardar" onclick="guardarRecordatorio()">Guardar Datos</button>
           <button type="button" class="secondary" style="background: #10b981 !important; color: white !important; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;" onclick="descargarICS()" data-i18n="btn_calendar">📅 Añadir al Calendario</button>
@@ -378,7 +376,6 @@
       <div id="backup" class="panel">
         <h2 data-i18n="copia_seguridad">Copia de seguridad</h2>
         
-        <!-- NUEVO BLOQUE DE AJUSTES CON SELECTORES DE COLOR -->
         <div style="background: rgba(17, 24, 39, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #374151; margin-bottom: 20px;">
           <h3 style="color: #e11d48; font-size: 16px; margin-top: 0; margin-bottom: 15px; text-transform: uppercase;" data-i18n="theme_settings">Ajustes de la App</h3>
           
@@ -446,7 +443,7 @@
   </div> <!-- FIN DE LA MÁQUINA DE DIAGNOSIS -->
 </div>
 
-<!-- PIE DE PÁGINA ACTUALIZADO -->
+<!-- PIE DE PÁGINA -->
 <footer style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px; margin-top: 20px; border-top: 1px solid #374151; background-color: rgba(15, 23, 42, 0.95); line-height: 1.6;">
   © 2026 My PitStop. <span data-i18n="derechos">Todos los derechos reservados.</span><br>
   Creado por <strong style="color: #e2e8f0;">J.Blázquez</strong>
@@ -519,6 +516,6 @@
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js"></script>
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js"></script>
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js"></script>
-<script type="module" src="js/app.js?v=16"></script>
+<script type="module" src="js/app.js?v=18"></script>
 </body>
 </html>
