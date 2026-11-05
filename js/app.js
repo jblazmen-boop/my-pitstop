@@ -33,7 +33,6 @@ let firmaGuardada = null;
 let currentUser = null;
 let unsubscribeSnapshot = null;
 
-// ARREGLO DEL SONIDO: Un único contexto de audio que se reutiliza
 let globalAudioCtx = null;
 function getAudioContext() {
   if (!globalAudioCtx) {
@@ -122,7 +121,6 @@ function iniciarSincronizacion(uid) {
       if (!state.themeAccent) state.themeAccent = 'rojo';
       if (!state.themeMachine) state.themeMachine = 'carbono';
       
-      // Asegurar que proxSeguro existe en coches antiguos
       state.vehiculos.forEach(v => { if (!v.proxSeguro) v.proxSeguro = ''; });
 
       actualizarAutor(state.author);
@@ -295,7 +293,7 @@ const translations = {
     btn_share_chart: "Compartir", btn_email_chart: "Correo",
     copia_seguridad: "Ajustes y Copia de Seguridad",
     copia_texto: "Tus datos se guardan de forma segura en la nube y se sincronizan en todos tus dispositivos con tu cuenta. Aun así, te recomendamos exportar una copia de seguridad periódicamente.",
-    exportar: "⬇ Exportar copia (JSON)", importar: "⬆ Importar copia", borrar: "🗑 Borrar todos los datos",
+    exportar: "Exportar copia (JSON)", importar: "Importar copia", borrar: "Borrar todos los datos",
     derechos: "Todos los derechos reservados.", selecciona: "— Selecciona —", no_foto: "— No usar foto —",
     ej_operacion: "Ej: Sustituir correa", ej_referencia: "Ej: MANN-W712", seleccionar_archivo: "Seleccionar archivo",
     ph_matricula: "1234ABC", ph_marca: "Seat", ph_modelo: "León", ph_bastidor: "WVWZZZ...", ph_taller: "Taller Pepe", ph_descripcion: "Filtro de aceite",
@@ -343,8 +341,8 @@ const translations = {
     btn_login: "Iniciar Sesión",
     btn_register: "Registrarse",
     btn_logout: "Salir",
-    btn_calendar: "📅 Añadir al Calendario",
-    btn_alerts: "🔔 Activar Avisos",
+    btn_calendar: "Añadir al Calendario",
+    btn_alerts: "Activar Avisos",
     delete_warning_title: "Borrar Aviso",
     delete_warning_text: "¿Quieres borrar este aviso? (Si lo tenías en tu calendario, tendrás que quitarlo manualmente desde la app de tu calendario).",
     delete_warning_btn: "Sí, borrar",
@@ -361,7 +359,9 @@ const translations = {
     color_carbono: "Carbono (Por defecto)",
     color_dark_blue: "Azul Oscuro",
     color_olive: "Verde Oliva",
-    color_slate: "Gris Pizarra"
+    color_slate: "Gris Pizarra",
+    editar_btn: "Editar",
+    borrar_btn: "Borrar"
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -379,7 +379,7 @@ const translations = {
     btn_share_chart: "Share", btn_email_chart: "Email",
     copia_seguridad: "Settings & Backup",
     copia_texto: "Your data is securely stored in the cloud and synced across all your devices with your account. We still recommend exporting a backup periodically.",
-    exportar: "⬇ Export backup (JSON)", importar: "⬆ Import backup", borrar: "🗑 Delete all data",
+    exportar: "Export backup (JSON)", importar: "Import backup", borrar: "Delete all data",
     derechos: "All rights reserved.", selecciona: "— Select —", no_foto: "— No photo —",
     ej_operacion: "Ex: Replace belt", ej_referencia: "Ex: MANN-W712", seleccionar_archivo: "Select file",
     ph_matricula: "1234ABC", ph_marca: "Seat", ph_modelo: "Leon", ph_bastidor: "WVWZZZ...", ph_taller: "Workshop Joe", ph_descripcion: "Oil filter",
@@ -427,8 +427,8 @@ const translations = {
     btn_login: "Log In",
     btn_register: "Register",
     btn_logout: "Logout",
-    btn_calendar: "📅 Add to Calendar",
-    btn_alerts: "🔔 Activate Alerts",
+    btn_calendar: "Add to Calendar",
+    btn_alerts: "Activate Alerts",
     delete_warning_title: "Delete Alert",
     delete_warning_text: "Do you want to delete this alert? (If you had it in your calendar, you'll need to remove it manually from the calendar app).",
     delete_warning_btn: "Yes, delete",
@@ -445,7 +445,9 @@ const translations = {
     color_carbono: "Carbon (Default)",
     color_dark_blue: "Dark Blue",
     color_olive: "Olive Green",
-    color_slate: "Slate Gray"
+    color_slate: "Slate Gray",
+    editar_btn: "Edit",
+    borrar_btn: "Delete"
   }
 };
 
@@ -499,7 +501,7 @@ function translatePage() {
 
   if(editandoMantenimientoId) {
       document.getElementById('titulo-formulario').textContent = currentLang === 'es' ? 'Editando Mantenimiento' : 'Editing Maintenance';
-      document.getElementById('btn-guardar').textContent = currentLang === 'es' ? '💾 Guardar Cambios' : '💾 Save Changes';
+      document.getElementById('btn-guardar').textContent = currentLang === 'es' ? 'Guardar Cambios' : 'Save Changes';
   } else {
       document.getElementById('titulo-formulario').textContent = translations[currentLang].reg_mantenimiento;
       document.getElementById('btn-guardar').textContent = translations[currentLang].guardar_mant;
@@ -580,9 +582,20 @@ function guardar() {
   setDoc(doc(db, "usuarios", currentUser.uid), state)
     .catch(e => console.error("Error al guardar en la nube:", e));
 }
+
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 function fmt(n) { return (Number(n)||0).toFixed(2) + ' €'; }
 function esc(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// NUEVA FUNCIÓN PARA FORMATEAR FECHAS (DD/MM/AAAA)
+function formatFecha(fechaStr) {
+  if (!fechaStr) return '—';
+  const partes = fechaStr.split('-');
+  if (partes.length === 3) {
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+  }
+  return fechaStr;
+}
 // ==========================================
 // PARTE 2 DE 3 - MODALES, TABS, CRUD Y RENDERIZADO
 // ==========================================
@@ -664,7 +677,7 @@ function cambiarVehiculoHistorico() {
     const ops = (m.manoObra || []).map(o => o.concepto).join(', ') || '';
     return `
       <div class="historial-item" onclick="editarMantenimiento('${m.id}'); cerrarModalHistorico();">
-        <h4>${esc(m.fecha)} - ${esc(tipoTexto)}</h4>
+        <h4>${esc(formatFecha(m.fecha))} - ${esc(tipoTexto)}</h4>
         <p>${m.km ? esc(m.km) + ' km' : ''} ${m.taller ? ' - ' + esc(m.taller) : ''}</p>
         <p>${esc(ops)}</p>
       </div>
@@ -827,7 +840,7 @@ function renderVehiculos() {
         <td>${esc(v.modelo)}</td>
         <td>${esc(v.bastidor || '—')}</td>
         <td>
-          <button type="button" class="danger" onclick="eliminarVehiculo('${v.id}')">🗑</button>
+          <button type="button" class="danger" onclick="eliminarVehiculo('${v.id}')">${translations[currentLang].borrar_btn}</button>
         </td>
       </tr>
     `;
@@ -925,7 +938,7 @@ function renderTablaManoObra() {
       <tr>
         <td>${esc(o.concepto)}</td>
         <td>${fmt(o.precio)}</td>
-        <td><button type="button" class="danger" onclick="eliminarManoObra('${o.id}')">🗑</button></td>
+        <td><button type="button" class="danger" onclick="eliminarManoObra('${o.id}')">${translations[currentLang].borrar_btn}</button></td>
       </tr>
     `;
   });
@@ -1014,7 +1027,7 @@ function renderTablaRepuestos() {
         <td>${esc(r.ref || '—')}</td>
         <td>${fmt(r.precio)}</td>
         <td>${fmt(total)}</td>
-        <td><button type="button" class="danger" onclick="eliminarRepuesto('${r.id}')">🗑</button></td>
+        <td><button type="button" class="danger" onclick="eliminarRepuesto('${r.id}')">${translations[currentLang].borrar_btn}</button></td>
       </tr>
     `;
   });
@@ -1139,7 +1152,7 @@ function editarMantenimiento(id) {
   if (titulo) titulo.textContent = currentLang === 'es' ? 'Editando Mantenimiento' : 'Editing Maintenance';
 
   const btnGuardar = document.getElementById('btn-guardar');
-  if (btnGuardar) btnGuardar.textContent = currentLang === 'es' ? '💾 Guardar Cambios' : '💾 Save Changes';
+  if (btnGuardar) btnGuardar.textContent = currentLang === 'es' ? 'Guardar Cambios' : 'Save Changes';
 
   const btnCancelar = document.getElementById('btn-cancelar');
   if (btnCancelar) btnCancelar.style.display = 'inline-block';
@@ -1210,7 +1223,7 @@ function renderMantenimientos() {
 
     tbody.innerHTML += `
       <tr>
-        <td>${esc(m.fecha)}</td>
+        <td>${esc(formatFecha(m.fecha))}</td>
         <td>${v ? esc(v.matricula) : '—'}</td>
         <td>${esc(m.km || '—')}</td>
         <td>${esc(tipoTexto)}</td>
@@ -1219,8 +1232,8 @@ function renderMantenimientos() {
         <td>${fmt(totalRep)}</td>
         <td>${fmt(total)}</td>
         <td>
-          <button type="button" class="secondary" onclick="editarMantenimiento('${m.id}')">✏️</button>
-          <button type="button" class="danger" onclick="eliminarMantenimiento('${m.id}')">🗑</button>
+          <button type="button" class="secondary" onclick="editarMantenimiento('${m.id}')">${translations[currentLang].editar_btn}</button>
+          <button type="button" class="danger" onclick="eliminarMantenimiento('${m.id}')">${translations[currentLang].borrar_btn}</button>
         </td>
       </tr>
     `;
@@ -1616,12 +1629,12 @@ function renderTablaRecordatorios() {
     tbody.innerHTML += `
       <tr>
         <td>${esc(v.matricula)}</td>
-        <td>${esc(v.proxMant || '—')}${v.proxKmMant ? ' / ' + esc(v.proxKmMant) + ' km' : ''}</td>
-        <td>${esc(v.proxItv || '—')}</td>
-        <td>${esc(v.proxSeguro || '—')}</td>
+        <td>${esc(formatFecha(v.proxMant))}${v.proxKmMant ? ' / ' + esc(v.proxKmMant) + ' km' : ''}</td>
+        <td>${esc(formatFecha(v.proxItv))}</td>
+        <td>${esc(formatFecha(v.proxSeguro))}</td>
         <td>
-          <button type="button" class="secondary" onclick="seleccionarVehiculoRecordatorio('${v.id}')">✏️</button>
-          <button type="button" class="danger" onclick="eliminarRecordatorio('${v.id}')">🗑</button>
+          <button type="button" class="secondary" onclick="seleccionarVehiculoRecordatorio('${v.id}')">${translations[currentLang].editar_btn}</button>
+          <button type="button" class="danger" onclick="eliminarRecordatorio('${v.id}')">${translations[currentLang].borrar_btn}</button>
         </td>
       </tr>
     `;
@@ -1766,7 +1779,7 @@ function comprobarAvisos() {
 
       if (diff >= 0 && diff <= 30) {
         new Notification('My PitStop', {
-          body: `${v.matricula}: ${etiqueta} en ${diff} días (${fecha})`,
+          body: `${v.matricula}: ${etiqueta} en ${diff} días (${formatFecha(fecha)})`,
           icon: 'logo-192.png'
         });
       }
@@ -1823,7 +1836,7 @@ function renderTablaSeleccion() {
     tbody.innerHTML += `
       <tr>
         <td style="text-align:center;"><input type="checkbox" class="chk-mant" value="${m.id}"></td>
-        <td>${esc(m.fecha)}</td>
+        <td>${esc(formatFecha(m.fecha))}</td>
         <td>${esc(m.km || '—')}</td>
         <td>${esc(tipoTexto)}</td>
         <td>${esc(operaciones)}</td>
@@ -1907,7 +1920,7 @@ function generarPDF(modo) {
 
     pdf.setFontSize(11);
     pdf.setTextColor(225, 29, 72);
-    pdf.text(`${idx + 1}. ${m.fecha} - ${tipoTexto}`, 15, y);
+    pdf.text(`${idx + 1}. ${formatFecha(m.fecha)} - ${tipoTexto}`, 15, y);
     y += 5;
 
     pdf.setFontSize(9);
@@ -2024,7 +2037,7 @@ function exportarExcel() {
     const rep = (m.repuestos || []).reduce((s, r) => s + Number(r.cant || 0) * Number(r.precio || 0), 0);
     const ops = (m.manoObra || []).map(o => o.concepto).join(' | ');
 
-    csv += `${m.fecha};${m.km || ''};${tipo};${m.taller || ''};${ops};${mano.toFixed(2)};${rep.toFixed(2)};${(mano + rep).toFixed(2)}\n`;
+    csv += `${formatFecha(m.fecha)};${m.km || ''};${tipo};${m.taller || ''};${ops};${mano.toFixed(2)};${rep.toFixed(2)};${(mano + rep).toFixed(2)}\n`;
   });
 
   const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
@@ -2090,8 +2103,8 @@ function importarJSON(event) {
 
 function borrarTodo() {
   const texto = currentLang === 'es'
-    ? '⚠️ ¿Borrar TODOS los datos? Esto no se puede deshacer.'
-    : '⚠️ Delete ALL data? This cannot be undone.';
+    ? '¿Borrar TODOS los datos? Esto no se puede deshacer.'
+    : 'Delete ALL data? This cannot be undone.';
 
   if (!confirm(texto)) return;
 
