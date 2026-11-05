@@ -9,7 +9,7 @@
   <link rel="manifest" href="manifest.json?v=3">
   <meta name="theme-color" content="#111827">
   
-  <link rel="stylesheet" href="css/styles.css?v=19">
+  <link rel="stylesheet" href="css/styles.css?v=20">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -20,13 +20,7 @@
 
 <header>
   <div class="header-container">
-    <div class="header-spacer"></div>
-    <div class="header-content">
-      <div class="title-block">
-        <h1>My PitStop</h1>
-        <span class="author" id="header-author">by J.Blázquez</span>
-      </div>
-    </div>
+    <!-- CONTROLES A LA IZQUIERDA -->
     <div class="header-controls">
       <button type="button" class="danger" id="btn-logout-header" style="display: none; margin-right: 10px; padding: 6px 12px; font-size: 13px; text-transform: uppercase;" data-i18n="btn_logout">Salir</button>
       
@@ -36,6 +30,17 @@
         <button class="lang-btn" id="lang-en" onclick="setLanguage('en')" title="English"></button>
       </div>
     </div>
+
+    <!-- LOGO CENTRADO -->
+    <div class="header-content">
+      <div class="title-block">
+        <h1>My PitStop</h1>
+        <span class="author" id="header-author">by J.Blázquez</span>
+      </div>
+    </div>
+
+    <!-- ESPACIADOR DERECHA -->
+    <div class="header-spacer"></div>
   </div>
 </header>
 
@@ -373,12 +378,37 @@
       <div id="backup" class="panel">
         <h2 data-i18n="copia_seguridad">Copia de seguridad</h2>
         
-        <!-- NUEVO CAMPO PARA PERSONALIZAR EL AUTOR -->
+        <!-- NUEVO BLOQUE DE AJUSTES CON SELECTORES DE COLOR -->
         <div style="background: rgba(17, 24, 39, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #374151; margin-bottom: 20px;">
-          <h3 style="color: #e11d48; font-size: 16px; margin-top: 0; margin-bottom: 15px; text-transform: uppercase;">Ajustes de la App</h3>
-          <label>Personalizar nombre en la cabecera (debajo de My PitStop)</label>
-          <input type="text" id="input-author" placeholder="Ej: R.Calvo" value="J.Blázquez" onchange="actualizarAutor(this.value)" maxlength="20">
-          <p style="font-size: 11px; color: #9ca3af; margin-top: 5px;">Así aparecerá "by [Tu Nombre]" debajo del título.</p>
+          <h3 style="color: #e11d48; font-size: 16px; margin-top: 0; margin-bottom: 15px; text-transform: uppercase;" data-i18n="theme_settings">Ajustes de la App</h3>
+          
+          <div style="margin-bottom: 15px;">
+            <label data-i18n="author_label">Personalizar nombre en la cabecera</label>
+            <input type="text" id="input-author" placeholder="Ej: R.Calvo" value="J.Blázquez" onchange="actualizarAutor(this.value)" maxlength="20">
+          </div>
+          
+          <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div>
+              <label data-i18n="color_accent">Color de Acento</label>
+              <select id="input-theme-accent" onchange="cambiarColorAcento(this.value)">
+                <option value="rojo" data-i18n="color_red">Rojo (Por defecto)</option>
+                <option value="azul" data-i18n="color_blue">Azul</option>
+                <option value="verde" data-i18n="color_green">Verde</option>
+                <option value="naranja" data-i18n="color_orange">Naranja</option>
+                <option value="morado" data-i18n="color_purple">Morado</option>
+                <option value="rosa" data-i18n="color_pink">Rosa</option>
+              </select>
+            </div>
+            <div>
+              <label data-i18n="color_machine">Color de la Máquina</label>
+              <select id="input-theme-machine" onchange="cambiarColorMaquina(this.value)">
+                <option value="carbono" data-i18n="color_carbono">Carbono (Por defecto)</option>
+                <option value="azul" data-i18n="color_dark_blue">Azul Oscuro</option>
+                <option value="verde" data-i18n="color_olive">Verde Oliva</option>
+                <option value="gris" data-i18n="color_slate">Gris Pizarra</option>
+              </select>
+            </div>
+          </div>
         </div>
 
         <p data-i18n="copia_texto">Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.</p>
@@ -489,6 +519,6 @@
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js"></script>
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js"></script>
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js"></script>
-<script type="module" src="js/app.js?v=15"></script>
+<script type="module" src="js/app.js?v=16"></script>
 </body>
 </html>

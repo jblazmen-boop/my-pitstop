@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebas
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
+// Registrar el Service Worker para las notificaciones
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').then(() => {
     console.log("Service Worker registrado correctamente.");
@@ -21,7 +22,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let state = { vehiculos: [], mantenimientos: [], catalogoFotos: [], author: 'J.Blázquez' };
+let state = { vehiculos: [], mantenimientos: [], catalogoFotos: [], author: 'J.Blázquez', themeAccent: 'rojo', themeMachine: 'carbono' };
 let repuestosTemporales = [];
 let manoObraTemporal = [];
 let editandoMantenimientoId = null;
@@ -32,6 +33,7 @@ let firmaGuardada = null;
 let currentUser = null;
 let unsubscribeSnapshot = null;
 
+// ARREGLO DEL SONIDO: Un único contexto de audio que se reutiliza
 let globalAudioCtx = null;
 function getAudioContext() {
   if (!globalAudioCtx) {
@@ -63,8 +65,9 @@ onAuthStateChanged(auth, (user) => {
     modalAuth.style.display = 'flex'; 
     btnLogoutHeader.style.display = 'none';
     if (unsubscribeSnapshot) unsubscribeSnapshot(); 
-    state = { vehiculos: [], mantenimientos: [], catalogoFotos: [], author: 'J.Blázquez' };
+    state = { vehiculos: [], mantenimientos: [], catalogoFotos: [], author: 'J.Blázquez', themeAccent: 'rojo', themeMachine: 'carbono' };
     actualizarAutor('J.Blázquez');
+    aplicarTemaColores();
     renderAll();
   }
 });
@@ -116,11 +119,14 @@ function iniciarSincronizacion(uid) {
       if (!state.mantenimientos) state.mantenimientos = [];
       if (!state.catalogoFotos) state.catalogoFotos = [];
       if (!state.author) state.author = 'J.Blázquez';
+      if (!state.themeAccent) state.themeAccent = 'rojo';
+      if (!state.themeMachine) state.themeMachine = 'carbono';
       
-      // Inicializar proxSeguro si no existe
+      // Asegurar que proxSeguro existe en coches antiguos
       state.vehiculos.forEach(v => { if (!v.proxSeguro) v.proxSeguro = ''; });
 
       actualizarAutor(state.author);
+      aplicarTemaColores();
       const inputAuthor = document.getElementById('input-author');
       if(inputAuthor) inputAuthor.value = state.author;
 
@@ -132,12 +138,15 @@ function iniciarSincronizacion(uid) {
       if (datosLocales) {
         state = JSON.parse(datosLocales);
         if(!state.author) state.author = 'J.Blázquez';
+        if(!state.themeAccent) state.themeAccent = 'rojo';
+        if(!state.themeMachine) state.themeMachine = 'carbono';
         setDoc(userDocRef, state);
       } else {
-        state = { vehiculos: [], mantenimientos: [], catalogoFotos: [], author: 'J.Blázquez' };
+        state = { vehiculos: [], mantenimientos: [], catalogoFotos: [], author: 'J.Blázquez', themeAccent: 'rojo', themeMachine: 'carbono' };
         setDoc(userDocRef, state);
       }
       actualizarAutor(state.author);
+      aplicarTemaColores();
       const inputAuthor = document.getElementById('input-author');
       if(inputAuthor) inputAuthor.value = state.author;
       
@@ -153,6 +162,50 @@ function actualizarAutor(nombre) {
   guardar();
 }
 
+// ============ COLORES PERSONALIZABLES ============
+const coloresAcento = {
+  rojo: { main: '#e11d48', hover: '#be123c' },
+  azul: { main: '#3b82f6', hover: '#2563eb' },
+  verde: { main: '#10b981', hover: '#059669' },
+  naranja: { main: '#f59e0b', hover: '#d97706' },
+  morado: { main: '#8b5cf6', hover: '#7c3aed' },
+  rosa: { main: '#ec4899', hover: '#db2777' }
+};
+const coloresMaquina = {
+  carbono: { main: '#2a323d', dark: '#303945' },
+  azul: { main: '#1e293b', dark: '#334155' },
+  verde: { main: '#2a3b2a', dark: '#3b4a3b' },
+  gris: { main: '#334155', dark: '#475569' }
+};
+
+function aplicarTemaColores() {
+  const acento = coloresAcento[state.themeAccent] || coloresAcento.rojo;
+  const maquina = coloresMaquina[state.themeMachine] || coloresMaquina.carbono;
+  
+  document.documentElement.style.setProperty('--accent', acento.main);
+  document.documentElement.style.setProperty('--accent-hover', acento.hover);
+  document.documentElement.style.setProperty('--bg-machine', maquina.main);
+  document.documentElement.style.setProperty('--bg-machine-dark', maquina.dark);
+  
+  const selAccent = document.getElementById('input-theme-accent');
+  const selMachine = document.getElementById('input-theme-machine');
+  if (selAccent) selAccent.value = state.themeAccent;
+  if (selMachine) selMachine.value = state.themeMachine;
+}
+
+function cambiarColorAcento(val) {
+  state.themeAccent = val;
+  guardar();
+  aplicarTemaColores();
+}
+
+function cambiarColorMaquina(val) {
+  state.themeMachine = val;
+  guardar();
+  aplicarTemaColores();
+}
+
+// ============ SONIDO Y TEMA ============
 function reproducirBeep() {
   try {
     const ctx = getAudioContext();
@@ -240,7 +293,7 @@ const translations = {
     historico: "Histórico Técnico (sin precios)", fecha_desde: "Fecha desde", fecha_hasta: "Fecha hasta",
     iva: "IVA (%)", btn_gen_pdf: "Generar PDF", btn_share_pdf: "Compartir PDF", btn_email_pdf: "Enviar por Correo",
     btn_share_chart: "Compartir", btn_email_chart: "Correo",
-    copia_seguridad: "Copia de seguridad", copia_texto: "Los datos se guardan en la nube. Exporta una copia local por seguridad.",
+    copia_seguridad: "Copia de seguridad", copia_texto: "Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.",
     exportar: "⬇ Exportar copia (JSON)", importar: "⬆ Importar copia", borrar: "🗑 Borrar todos los datos",
     derechos: "Todos los derechos reservados.", selecciona: "— Selecciona —", no_foto: "— No usar foto —",
     ej_operacion: "Ej: Sustituir correa", ej_referencia: "Ej: MANN-W712", seleccionar_archivo: "Seleccionar archivo",
@@ -293,7 +346,21 @@ const translations = {
     btn_alerts: "🔔 Activar Avisos",
     delete_warning_title: "Borrar Aviso",
     delete_warning_text: "¿Quieres borrar este aviso? (Si lo tenías en tu calendario, tendrás que quitarlo manualmente desde la app de tu calendario).",
-    delete_warning_btn: "Sí, borrar"
+    delete_warning_btn: "Sí, borrar",
+    theme_settings: "Ajustes de la App",
+    author_label: "Personalizar nombre en la cabecera",
+    color_accent: "Color de Acento",
+    color_machine: "Color de la Máquina",
+    color_red: "Rojo (Por defecto)",
+    color_blue: "Azul",
+    color_green: "Verde",
+    color_orange: "Naranja",
+    color_purple: "Morado",
+    color_pink: "Rosa",
+    color_carbono: "Carbono (Por defecto)",
+    color_dark_blue: "Azul Oscuro",
+    color_olive: "Verde Oliva",
+    color_slate: "Gris Pizarra"
   },
   en: {
     vehiculos_titulo: "Vehicles", matricula: "License Plate", marca: "Make", modelo: "Model", bastidor: "VIN Number",
@@ -309,7 +376,7 @@ const translations = {
     historico: "Technical History (no prices)", fecha_desde: "Date from", fecha_hasta: "Date to",
     iva: "VAT (%)", btn_gen_pdf: "Generate PDF", btn_share_pdf: "Share PDF", btn_email_pdf: "Send by Email",
     btn_share_chart: "Share", btn_email_chart: "Email",
-    copia_seguridad: "Backup", copia_texto: "Data is stored in the cloud. Export a local backup for safety.",
+    copia_seguridad: "Backup", copia_texto: "Data is stored in this browser. If you clear your history or change devices, it will be lost. Export a backup regularly.",
     exportar: "⬇ Export backup (JSON)", importar: "⬆ Import backup", borrar: "🗑 Delete all data",
     derechos: "All rights reserved.", selecciona: "— Select —", no_foto: "— No photo —",
     ej_operacion: "Ex: Replace belt", ej_referencia: "Ex: MANN-W712", seleccionar_archivo: "Select file",
@@ -362,7 +429,21 @@ const translations = {
     btn_alerts: "🔔 Activate Alerts",
     delete_warning_title: "Delete Alert",
     delete_warning_text: "Do you want to delete this alert? (If you had it in your calendar, you'll need to remove it manually from the calendar app).",
-    delete_warning_btn: "Yes, delete"
+    delete_warning_btn: "Yes, delete",
+    theme_settings: "App Settings",
+    author_label: "Customize name in header",
+    color_accent: "Accent Color",
+    color_machine: "Machine Color",
+    color_red: "Red (Default)",
+    color_blue: "Blue",
+    color_green: "Green",
+    color_orange: "Orange",
+    color_purple: "Purple",
+    color_pink: "Pink",
+    color_carbono: "Carbon (Default)",
+    color_dark_blue: "Dark Blue",
+    color_olive: "Olive Green",
+    color_slate: "Slate Gray"
   }
 };
 
@@ -459,6 +540,8 @@ function cargar() {
       if (!state.vehiculos) state.vehiculos = [];
       if (!state.mantenimientos) state.mantenimientos = [];
       if (!state.author) state.author = 'J.Blázquez';
+      if (!state.themeAccent) state.themeAccent = 'rojo';
+      if (!state.themeMachine) state.themeMachine = 'carbono';
 
       state.vehiculos.forEach(v => { 
         if (!v.proxMant) v.proxMant = ''; 
@@ -498,1484 +581,1597 @@ function guardar() {
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
 function fmt(n) { return (Number(n)||0).toFixed(2) + ' €'; }
 function esc(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-// ============ MODALES Y FIRMA ============
+// ==========================================
+// PASO 2 DE 3 - MODALES, TABS, CRUD Y RENDERIZADO
+// ==========================================
+
+// ---------- MENSAJES ----------
+function mostrarMsg(id, texto, tipo = 'ok') {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = texto;
+  el.className = 'msg ' + tipo;
+  setTimeout(() => {
+    el.textContent = '';
+    el.className = '';
+  }, 4000);
+}
+
+// ---------- MODAL FOTO ----------
 function abrirModal(src) {
-  document.getElementById('img-modal').src = src;
-  document.getElementById('modal-foto').style.display = 'flex';
-}
-function cerrarModal() {
-  document.getElementById('modal-foto').style.display = 'none';
-}
-
-// ============ MODAL HISTÓRICO RÁPIDO ============
-function abrirModalHistorico() {
-  reproducirBeep();
-  const sel = document.getElementById('modal-select-vehiculo');
-  sel.innerHTML = state.vehiculos.map(v => `<option value="${v.id}">${esc(v.matricula)} — ${esc(v.marca)} ${esc(v.modelo)}</option>`).join('');
-
-  let vehiculoId = '';
-  const selM = document.getElementById('m_vehiculo');
-  const selF = document.getElementById('f_vehiculo');
-  const selG = document.getElementById('g_vehiculo');
-  const selR = document.getElementById('rec_vehiculo');
-  const selI = document.getElementById('i_vehiculo');
-
-  if (selM && selM.value) vehiculoId = selM.value;
-  else if (selF && selF.value) vehiculoId = selF.value;
-  else if (selG && selG.value) vehiculoId = selG.value;
-  else if (selR && selR.value) vehiculoId = selR.value;
-  else if (selI && selI.value) vehiculoId = selI.value;
-  else if (state.vehiculos.length > 0) vehiculoId = state.vehiculos[0].id;
-
-  if (vehiculoId) sel.value = vehiculoId;
-  cargarHistorialEnModal();
-  document.getElementById('modal-historico').style.display = 'flex';
-}
-
-function cambiarVehiculoHistorico() {
-  reproducirBeep();
-  cargarHistorialEnModal();
-}
-
-function cargarHistorialEnModal() {
-  const vehiculoId = document.getElementById('modal-select-vehiculo').value;
-  if (!vehiculoId) return;
-
-  const v = state.vehiculos.find(x => x.id === vehiculoId);
-  if (!v) return;
-
-  document.getElementById('historial-titulo-vehiculo').textContent = `${v.marca} ${v.modelo} (${v.matricula})`;
-
-  let lista = state.mantenimientos.filter(m => m.vehiculoId === vehiculoId).sort((a,b) => b.fecha.localeCompare(a.fecha));
-  lista = lista.slice(0, 5);
-
-  const contenedor = document.getElementById('historial-lista');
-  contenedor.innerHTML = '';
-
-  if (lista.length === 0) {
-    contenedor.innerHTML = `<p style="text-align:center; color:#9ca3af; padding: 20px;">${translations[currentLang].sin_mantenimientos}</p>`;
-  } else {
-    lista.forEach(m => {
-      const fechaMostrar = m.fecha.split('-').reverse().join('/');
-      const tipoTexto = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
-      let ops = [];
-      if (m.manoObra) m.manoObra.forEach(o => ops.push(o.concepto));
-      if (m.repuestos) m.repuestos.forEach(r => ops.push(`${r.cant}x ${r.desc}`));
-
-      const div = document.createElement('div');
-      div.className = 'historial-item';
-      div.onclick = function() { irAInformeDesdeHistorico(m.id); };
-
-      div.innerHTML = `
-        <h4>${fechaMostrar} - ${m.km ? m.km + ' Kms' : 'Sin Kms'}</h4>
-        <p><strong>${tipoTexto}</strong></p>
-        <p style="margin-top: 5px; font-size: 12px;">${ops.join(', ')}</p>
-      `;
-      contenedor.appendChild(div);
-    });
+  const modal = document.getElementById('modal-foto');
+  const img = document.getElementById('img-modal');
+  if (modal && img) {
+    img.src = src;
+    modal.style.display = 'flex';
   }
+}
+
+function cerrarModal() {
+  const modal = document.getElementById('modal-foto');
+  if (modal) modal.style.display = 'none';
+}
+
+// ---------- MODAL HISTÓRICO RÁPIDO ----------
+function abrirModalHistorico() {
+  const modal = document.getElementById('modal-historico');
+  const sel = document.getElementById('modal-select-vehiculo');
+  if (!modal || !sel) return;
+
+  sel.innerHTML = `<option value="">${translations[currentLang].selecciona}</option>` +
+    state.vehiculos.map(v => `<option value="${v.id}">${esc(v.matricula)} - ${esc(v.marca)} ${esc(v.modelo)}</option>`).join('');
+
+  if (state.vehiculos.length > 0) {
+    sel.value = state.vehiculos[0].id;
+  }
+
+  cambiarVehiculoHistorico();
+  modal.style.display = 'flex';
 }
 
 function cerrarModalHistorico(event) {
-  if (event && event.target.id !== 'modal-historico' && !event.target.classList.contains('cerrar-modal') && event.target.tagName !== 'BUTTON') return;
-  document.getElementById('modal-historico').style.display = 'none';
+  if (event && event.target !== event.currentTarget && !event.target.classList.contains('cerrar-modal')) return;
+  const modal = document.getElementById('modal-historico');
+  if (modal) modal.style.display = 'none';
 }
 
-function irAInformeDesdeHistorico(idMantenimiento) {
-  const m = state.mantenimientos.find(x => x.id === idMantenimiento);
-  if (!m) return;
-  document.activeElement.blur();
-  document.getElementById('modal-historico').style.display = 'none';
+function cambiarVehiculoHistorico() {
+  const id = document.getElementById('modal-select-vehiculo')?.value;
+  const lista = document.getElementById('historial-lista');
+  const titulo = document.getElementById('historial-titulo-vehiculo');
+  if (!lista) return;
 
-  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-  document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
-  document.querySelector('.tab[data-tab="informe"]').classList.add('active');
-  document.getElementById('informe').classList.add('active');
+  const v = state.vehiculos.find(x => x.id === id);
+  if (titulo) {
+    titulo.textContent = v
+      ? `${translations[currentLang].modal_historico_titulo}: ${v.matricula}`
+      : translations[currentLang].modal_historico_titulo;
+  }
 
-  document.getElementById('i_modo').value = 'seleccion';
-  document.getElementById('i_tipo_informe').value = 'detallado';
-  toggleModoInforme();
+  const mants = state.mantenimientos
+    .filter(m => m.vehiculoId === id)
+    .sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
-  document.getElementById('i_vehiculo').value = m.vehiculoId;
-  renderTablaSeleccion();
+  if (!mants.length) {
+    lista.innerHTML = `<p class="empty">${translations[currentLang].sin_mantenimientos}</p>`;
+    return;
+  }
 
-  setTimeout(() => {
-    const checkboxes = document.querySelectorAll('.check-mant');
-    checkboxes.forEach(cb => {
-      if (cb.value === idMantenimiento) cb.checked = true;
-      else cb.checked = false;
-    });
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, 100);
+  lista.innerHTML = mants.map(m => {
+    const tipoTexto = tiposMantenimiento[m.tipo]?.[currentLang] || m.tipo || '';
+    const ops = (m.manoObra || []).map(o => o.concepto).join(', ') || '';
+    return `
+      <div class="historial-item" onclick="editarMantenimiento('${m.id}'); cerrarModalHistorico();">
+        <h4>${esc(m.fecha)} - ${esc(tipoTexto)}</h4>
+        <p>${m.km ? esc(m.km) + ' km' : ''} ${m.taller ? ' - ' + esc(m.taller) : ''}</p>
+        <p>${esc(ops)}</p>
+      </div>
+    `;
+  }).join('');
 }
 
-// ============ MODAL DE FIRMA ============
+// ---------- MODAL FIRMA ----------
 function abrirModalFirma() {
-  document.getElementById('modal-firma').style.display = 'flex';
+  const modal = document.getElementById('modal-firma');
   const canvas = document.getElementById('canvas-firma');
-  
-  setTimeout(() => {
-    const rect = canvas.getBoundingClientRect();
-    const ratio = Math.max(window.devicePixelRatio || 1, 1);
-    
-    canvas.width = rect.width * ratio;
-    canvas.height = rect.height * ratio;
-    canvas.getContext("2d").scale(ratio, ratio);
+  if (!modal || !canvas) return;
 
-    if (signaturePad) {
-      signaturePad.off();
-    }
+  modal.style.display = 'flex';
+  canvas.width = canvas.offsetWidth;
+  canvas.height = 250;
 
-    signaturePad = new SignaturePad(canvas, {
-      backgroundColor: 'rgba(255, 255, 255, 0)',
-      penColor: '#1e293b'
-    });
-
-    if (firmaGuardada) {
-      signaturePad.fromDataURL(firmaGuardada);
-    }
-  }, 100);
+  if (signaturePad) {
+    signaturePad.clear();
+  } else if (window.SignaturePad) {
+    signaturePad = new SignaturePad(canvas);
+  }
 }
 
-function cerrarModalFirma() { document.getElementById('modal-firma').style.display = 'none'; }
+function cerrarModalFirma() {
+  const modal = document.getElementById('modal-firma');
+  if (modal) modal.style.display = 'none';
+}
 
-function limpiarFirma() { 
-  if (signaturePad) signaturePad.clear(); 
-  firmaGuardada = null;
-  localStorage.removeItem('pitstop_firma');
+function limpiarFirma() {
+  if (signaturePad) signaturePad.clear();
 }
 
 function guardarFirma() {
-  if (signaturePad && !signaturePad.isEmpty()) {
-    const canvas = document.getElementById('canvas-firma');
-    
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = 400;
-    tempCanvas.height = 200;
-    const ctx = tempCanvas.getContext('2d');
-    
-    ctx.fillStyle = "#ffffff";
-    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-    
-    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, tempCanvas.width, tempCanvas.height);
-    
-    firmaGuardada = tempCanvas.toDataURL('image/png');
-    
-    try {
-      localStorage.setItem('pitstop_firma', firmaGuardada);
-    } catch(e) {
-      console.log("Firma en memoria");
-    }
-    
-    document.getElementById('modal-firma').style.display = 'none';
-    mostrarMsg('msg_informe', currentLang === 'es' ? 'Firma guardada. Puedes generar el PDF.' : 'Signature saved. You can generate the PDF.', 'ok');
-  } else {
-    alert(currentLang === 'es' ? 'Por favor, firme antes de guardar.' : 'Please sign before saving.');
+  if (!signaturePad || signaturePad.isEmpty()) {
+    alert(currentLang === 'es' ? 'Firma vacía. Dibuja tu firma primero.' : 'Empty signature. Draw your signature first.');
+    return;
   }
+
+  firmaGuardada = signaturePad.toDataURL('image/png');
+  cerrarModalFirma();
+  mostrarMsg(
+    'msg_informe',
+    currentLang === 'es'
+      ? 'Firma guardada. Se incluirá al generar el PDF.'
+      : 'Signature saved. It will be included when generating PDF.',
+    'ok'
+  );
 }
 
-// ============ TABS Y EVENTOS ============
-document.querySelectorAll('.tab').forEach(t => {
-  t.onclick = () => {
+// ---------- PESTAÑAS ----------
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
     reproducirBeep();
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById(t.dataset.tab).classList.add('active');
-    
-    // CONTROL DEL CARTEL (TOOLTIP) EN MÓVIL
-    if (window.innerWidth <= 768) {
-      document.querySelectorAll('.tab').forEach(x => x.classList.remove('tooltip-active'));
-      t.classList.add('tooltip-active');
-      setTimeout(() => {
-        t.classList.remove('tooltip-active');
-      }, 1500);
+
+    const target = tab.dataset.tab;
+
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+
+    tab.classList.add('active');
+    const panel = document.getElementById(target);
+    if (panel) panel.classList.add('active');
+
+    if (target === 'grafico') {
+      renderGrafico();
+      cargarGastosFijos();
     }
 
-    if (t.dataset.tab === 'grafico') {
-        renderGrafico();
-        cargarGastosFijos();
+    if (target === 'recordatorios') {
+      cargarRecordatorios();
     }
-    if (t.dataset.tab === 'recordatorios') cargarRecordatorios();
-  };
+
+    if (target === 'informe') {
+      renderTablaSeleccion();
+    }
+
+    if (window.innerWidth <= 768) {
+      tab.classList.add('tooltip-active');
+      setTimeout(() => tab.classList.remove('tooltip-active'), 1200);
+    }
+  });
 });
 
-// ============ CRUD VEHÍCULOS ============
+// ---------- VEHÍCULOS ----------
 function addVehiculo() {
-  const mat = document.getElementById('v_matricula').value.trim().toUpperCase();
+  const matricula = document.getElementById('v_matricula').value.trim().toUpperCase();
   const marca = document.getElementById('v_marca').value.trim();
   const modelo = document.getElementById('v_modelo').value.trim();
-  const bastidor = document.getElementById('v_bastidor').value.trim().toUpperCase();
-  
-  if (!mat) { mostrarMsg('msg_vehiculo', currentLang === 'es' ? 'La matrícula es obligatoria.' : 'License plate is required.', 'err'); return; }
-  if (state.vehiculos.some(v => v.matricula === mat)) {
-    mostrarMsg('msg_vehiculo', currentLang === 'es' ? 'Ya existe un vehículo con esa matrícula.' : 'A vehicle with that plate already exists.', 'err'); return;
+  const bastidor = document.getElementById('v_bastidor').value.trim();
+
+  if (!matricula || !marca || !modelo) {
+    mostrarMsg('msg_vehiculo', currentLang === 'es' ? 'Matrícula, marca y modelo son obligatorios.' : 'Plate, make and model are required.', 'err');
+    return;
   }
-  
-  // Añadido proxSeguro: ''
-  state.vehiculos.push({ id: uid(), matricula: mat, marca, modelo, bastidor, proxMant: '', proxKmMant: '', proxItv: '', proxSeguro: '', ultItvFecha: '', ultItvKm: '', costeSeguro: '', costeItv: '' });
+
+  if (state.vehiculos.some(v => v.matricula === matricula)) {
+    mostrarMsg('msg_vehiculo', currentLang === 'es' ? 'Ese vehículo ya existe.' : 'That vehicle already exists.', 'err');
+    return;
+  }
+
+  const nuevo = {
+    id: uid(),
+    matricula,
+    marca,
+    modelo,
+    bastidor,
+    proxMant: '',
+    proxKmMant: '',
+    proxItv: '',
+    proxSeguro: '',
+    ultItvFecha: '',
+    ultItvKm: '',
+    costeSeguro: '',
+    costeItv: ''
+  };
+
+  state.vehiculos.push(nuevo);
   guardar();
+
   document.getElementById('v_matricula').value = '';
   document.getElementById('v_marca').value = '';
   document.getElementById('v_modelo').value = '';
   document.getElementById('v_bastidor').value = '';
-  mostrarMsg('msg_vehiculo', currentLang === 'es' ? 'Vehículo añadido.' : 'Vehicle added.', 'ok');
-  renderAll();
-  cargarRecordatorios();
-  cargarGastosFijos();
-}
 
-function editarVehiculo(id) {
-  const v = state.vehiculos.find(x => x.id === id);
-  if (!v) return;
-  const marca = prompt(currentLang === 'es' ? "Marca:" : "Make:", v.marca);
-  const modelo = prompt(currentLang === 'es' ? "Modelo:" : "Model:", v.modelo);
-  const bastidor = prompt(currentLang === 'es' ? "Nº Bastidor:" : "VIN:", v.bastidor);
-  if (marca === null) return;
-  v.marca = marca;
-  v.modelo = modelo;
-  v.bastidor = bastidor.toUpperCase();
-  guardar(); renderAll(); cargarRecordatorios(); cargarGastosFijos();
+  renderAll();
+  mostrarMsg('msg_vehiculo', currentLang === 'es' ? 'Vehículo añadido.' : 'Vehicle added.', 'ok');
 }
 
 function eliminarVehiculo(id) {
-  if (!confirm(currentLang === 'es' ? '¿Eliminar vehículo y todos sus mantenimientos?' : 'Delete vehicle and all its maintenance records?')) return;
+  const texto = currentLang === 'es'
+    ? '¿Borrar este vehículo y todos sus mantenimientos?'
+    : 'Delete this vehicle and all its maintenance records?';
+
+  if (!confirm(texto)) return;
+
   state.vehiculos = state.vehiculos.filter(v => v.id !== id);
   state.mantenimientos = state.mantenimientos.filter(m => m.vehiculoId !== id);
-  guardar(); renderAll(); cargarRecordatorios(); cargarGastosFijos();
+
+  guardar();
+  renderAll();
 }
 
-// ============ MANO DE OBRA ============
+function renderVehiculos() {
+  const tbody = document.querySelector('#tabla_vehiculos tbody');
+  if (!tbody) return;
+
+  tbody.innerHTML = '';
+
+  if (!state.vehiculos.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="empty">${currentLang === 'es' ? 'No hay vehículos registrados.' : 'No vehicles registered.'}</td></tr>`;
+    return;
+  }
+
+  state.vehiculos.forEach(v => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${esc(v.matricula)}</td>
+        <td>${esc(v.marca)}</td>
+        <td>${esc(v.modelo)}</td>
+        <td>${esc(v.bastidor || '—')}</td>
+        <td>
+          <button type="button" class="danger" onclick="eliminarVehiculo('${v.id}')">🗑</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+// ---------- SELECTS ----------
+function renderSelects() {
+  const ids = ['m_vehiculo', 'f_vehiculo', 'i_vehiculo', 'rec_vehiculo', 'g_vehiculo', 'modal-select-vehiculo'];
+
+  ids.forEach(id => {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+
+    const valorActual = sel.value;
+    let html = '';
+
+    if (id === 'f_vehiculo' || id === 'g_vehiculo') {
+      html += `<option value="">${translations[currentLang].todos}</option>`;
+    } else {
+      html += `<option value="">${translations[currentLang].selecciona}</option>`;
+    }
+
+    state.vehiculos.forEach(v => {
+      html += `<option value="${v.id}">${esc(v.matricula)} - ${esc(v.marca)} ${esc(v.modelo)}</option>`;
+    });
+
+    sel.innerHTML = html;
+
+    if (valorActual && Array.from(sel.options).some(o => o.value === valorActual)) {
+      sel.value = valorActual;
+    }
+  });
+
+  const catSel = document.getElementById('r_foto_catalogo');
+  if (catSel) {
+    const valorActual = catSel.value;
+    let html = `<option value="">${translations[currentLang].no_foto}</option>`;
+
+    state.catalogoFotos.forEach((f, i) => {
+      const nombre = f.nombre || `Foto ${i + 1}`;
+      html += `<option value="${i}">${esc(nombre)}</option>`;
+    });
+
+    catSel.innerHTML = html;
+
+    if (valorActual && Array.from(catSel.options).some(o => o.value === valorActual)) {
+      catSel.value = valorActual;
+    }
+  }
+}
+
+// ---------- MANO DE OBRA ----------
 function addManoObra() {
   const concepto = document.getElementById('o_concepto').value.trim();
   const precio = parseFloat(document.getElementById('o_precio').value) || 0;
-  if (!concepto) { alert(currentLang === 'es' ? "La operación es obligatoria." : "Operation is required."); return; }
-  manoObraTemporal.push({ concepto, precio });
+
+  if (!concepto || precio <= 0) {
+    alert(currentLang === 'es' ? 'Introduce concepto y precio válido.' : 'Enter a concept and valid price.');
+    return;
+  }
+
+  manoObraTemporal.push({
+    id: uid(),
+    concepto,
+    precio
+  });
+
   document.getElementById('o_concepto').value = '';
   document.getElementById('o_precio').value = '';
-  renderManoObraTemporal();
+
+  renderTablaManoObra();
+  actualizarTotales();
 }
 
-function eliminarManoObraTemporal(index) {
-  manoObraTemporal.splice(index, 1);
-  renderManoObraTemporal();
+function eliminarManoObra(id) {
+  manoObraTemporal = manoObraTemporal.filter(o => o.id !== id);
+  renderTablaManoObra();
+  actualizarTotales();
 }
 
-function renderManoObraTemporal() {
+function renderTablaManoObra() {
   const tbody = document.querySelector('#tabla_mano_obra tbody');
+  if (!tbody) return;
+
   tbody.innerHTML = '';
-  let total = 0;
-  if (manoObraTemporal.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="3" style="text-align:center; color:#888; padding:10px;">${currentLang === 'es' ? 'No hay operaciones añadidas.' : 'No operations added.'}</td></tr>`;
-  } else {
-    manoObraTemporal.forEach((o, i) => {
-      total += o.precio;
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td style="border:1px solid #ddd; padding:6px;">${esc(o.concepto)}</td>
-        <td style="border:1px solid #ddd; padding:6px;">${fmt(o.precio)}</td>
-        <td style="border:1px solid #ddd; padding:6px;"><button type="button" class="danger" style="padding:2px 6px;" onclick="eliminarManoObraTemporal(${i})">X</button></td>`;
-      tbody.appendChild(tr);
-    });
+
+  if (!manoObraTemporal.length) {
+    tbody.innerHTML = `<tr><td colspan="3" class="empty">${currentLang === 'es' ? 'Sin operaciones.' : 'No operations.'}</td></tr>`;
+    return;
   }
-  document.getElementById('total_mano').textContent = fmt(total);
+
+  manoObraTemporal.forEach(o => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${esc(o.concepto)}</td>
+        <td>${fmt(o.precio)}</td>
+        <td><button type="button" class="danger" onclick="eliminarManoObra('${o.id}')">🗑</button></td>
+      </tr>
+    `;
+  });
 }
 
-// ============ REPUESTOS ============
-function addRepuesto() {
+// ---------- REPUESTOS ----------
+function convertirArchivoABase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+async function addRepuesto() {
   const cant = parseInt(document.getElementById('r_cant').value) || 1;
   const desc = document.getElementById('r_desc').value.trim();
-  const ref = document.getElementById('r_ref').value.trim().toUpperCase();
+  const ref = document.getElementById('r_ref').value.trim();
   const precio = parseFloat(document.getElementById('r_precio').value) || 0;
+
+  if (!desc || precio <= 0) {
+    alert(currentLang === 'es' ? 'Introduce descripción y precio válido.' : 'Enter a description and valid price.');
+    return;
+  }
+
+  let foto = '';
+
   const fileInput = document.getElementById('r_foto');
-  const fotoCatalogoId = document.getElementById('r_foto_catalogo').value;
+  const catIndex = document.getElementById('r_foto_catalogo')?.value;
 
-  if (!desc) { alert(currentLang === 'es' ? "La descripción del repuesto es obligatoria." : "Part description is required."); return; }
-
-  if (fotoCatalogoId) {
-    const fotoObj = state.catalogoFotos.find(f => f.id === fotoCatalogoId);
-    if (fotoObj) {
-      guardarRepuesto(cant, desc, ref, precio, fotoObj.base64, fotoObj.id);
-      return;
-    }
+  if (fileInput && fileInput.files && fileInput.files[0]) {
+    foto = await convertirArchivoABase64(fileInput.files[0]);
+  } else if (catIndex !== undefined && catIndex !== '') {
+    const f = state.catalogoFotos[Number(catIndex)];
+    if (f) foto = f.data || f.url || f;
   }
 
-  if (fileInput.files && fileInput.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const img = new Image();
-      img.onload = function() {
-        const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 400;
-        const scaleSize = MAX_WIDTH / img.width;
-        canvas.width = MAX_WIDTH;
-        canvas.height = img.height * scaleSize;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        const fotoBase64 = canvas.toDataURL('image/jpeg', 0.8);
-        
-        const nuevoId = uid();
-        state.catalogoFotos.push({ id: nuevoId, nombre: `${desc} (${ref})`, base64: fotoBase64 });
-        guardar();
-        actualizarDesplegableFotos();
+  repuestosTemporales.push({
+    id: uid(),
+    cant,
+    desc,
+    ref,
+    precio,
+    foto
+  });
 
-        guardarRepuesto(cant, desc, ref, precio, fotoBase64, nuevoId);
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(fileInput.files[0]);
-  } else {
-    guardarRepuesto(cant, desc, ref, precio, null, null);
-  }
-}
-
-function guardarRepuesto(cant, desc, ref, precio, fotoBase64, fotoId) {
-  repuestosTemporales.push({ cant, desc, ref, precio, foto: fotoBase64, fotoId: fotoId });
-  document.getElementById('r_cant').value = 1;
+  document.getElementById('r_cant').value = '1';
   document.getElementById('r_desc').value = '';
   document.getElementById('r_ref').value = '';
   document.getElementById('r_precio').value = '';
-  document.getElementById('r_foto').value = '';
-  document.getElementById('r_foto_catalogo').value = '';
-  
-  const fileLabel = document.getElementById('file-btn-label');
-  if (fileLabel) fileLabel.textContent = translations[currentLang].seleccionar_archivo;
-  
-  renderRepuestosTemporales();
+  if (fileInput) fileInput.value = '';
+  if (document.getElementById('r_foto_catalogo')) document.getElementById('r_foto_catalogo').value = '';
+
+  const labelFile = document.getElementById('file-btn-label');
+  if (labelFile) labelFile.textContent = translations[currentLang].seleccionar_archivo;
+
+  renderTablaRepuestos();
+  actualizarTotales();
 }
 
-function eliminarRepuestoTemporal(index) {
-  repuestosTemporales.splice(index, 1);
-  renderRepuestosTemporales();
+function eliminarRepuesto(id) {
+  repuestosTemporales = repuestosTemporales.filter(r => r.id !== id);
+  renderTablaRepuestos();
+  actualizarTotales();
 }
 
-function renderRepuestosTemporales() {
+function renderTablaRepuestos() {
   const tbody = document.querySelector('#tabla_repuestos tbody');
+  if (!tbody) return;
+
   tbody.innerHTML = '';
-  let total = 0;
-  
-  if (repuestosTemporales.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:#888; padding:10px;">${currentLang === 'es' ? 'No hay repuestos añadidos.' : 'No parts added.'}</td></tr>`;
-  } else {
-    repuestosTemporales.forEach((r, i) => {
-      const subtotal = r.cant * r.precio;
-      total += subtotal;
-      const fotoHtml = r.foto ? `<img src="${r.foto}" class="foto-miniatura" onclick="abrirModal('${r.foto}')" title="Clic para ampliar">` : '-';
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td style="border:1px solid #ddd; padding:6px; text-align:center;">${fotoHtml}</td>
-        <td style="border:1px solid #ddd; padding:6px;">${r.cant}</td>
-        <td style="border:1px solid #ddd; padding:6px;">${esc(r.desc)}</td>
-        <td style="border:1px solid #ddd; padding:6px;">${esc(r.ref)}</td>
-        <td style="border:1px solid #ddd; padding:6px;">${fmt(r.precio)}</td>
-        <td style="border:1px solid #ddd; padding:6px;">${fmt(subtotal)}</td>
-        <td style="border:1px solid #ddd; padding:6px;"><button type="button" class="danger" style="padding:2px 6px;" onclick="eliminarRepuestoTemporal(${i})">X</button></td>`;
-      tbody.appendChild(tr);
-    });
+
+  if (!repuestosTemporales.length) {
+    tbody.innerHTML = `<tr><td colspan="7" class="empty">${currentLang === 'es' ? 'Sin repuestos.' : 'No parts.'}</td></tr>`;
+    return;
   }
-  document.getElementById('total_repuestos').textContent = fmt(total);
-}
 
-function actualizarDesplegableFotos() {
-  const sel = document.getElementById('r_foto_catalogo');
-  const prev = sel.value;
-  sel.innerHTML = `<option value="" data-i18n="no_foto">${translations[currentLang].no_foto}</option>`;
-  state.catalogoFotos.forEach(f => {
-    const opt = document.createElement('option');
-    opt.value = f.id;
-    opt.textContent = f.nombre;
-    sel.appendChild(opt);
+  repuestosTemporales.forEach(r => {
+    const total = Number(r.cant || 0) * Number(r.precio || 0);
+    tbody.innerHTML += `
+      <tr>
+        <td>${r.foto ? `<img src="${r.foto}" class="foto-miniatura" onclick="abrirModal(this.src)">` : '—'}</td>
+        <td>${esc(r.cant)}</td>
+        <td>${esc(r.desc)}</td>
+        <td>${esc(r.ref || '—')}</td>
+        <td>${fmt(r.precio)}</td>
+        <td>${fmt(total)}</td>
+        <td><button type="button" class="danger" onclick="eliminarRepuesto('${r.id}')">🗑</button></td>
+      </tr>
+    `;
   });
-  if (prev) sel.value = prev;
 }
 
-// ============ GUARDAR MANTENIMIENTO ============
+function actualizarTotales() {
+  const totalMano = manoObraTemporal.reduce((s, o) => s + Number(o.precio || 0), 0);
+  const totalRep = repuestosTemporales.reduce((s, r) => s + Number(r.cant || 0) * Number(r.precio || 0), 0);
+
+  const elMano = document.getElementById('total_mano');
+  const elRep = document.getElementById('total_repuestos');
+
+  if (elMano) elMano.textContent = fmt(totalMano);
+  if (elRep) elRep.textContent = fmt(totalRep);
+}
+
+// ---------- GUARDAR / EDITAR MANTENIMIENTO ----------
+function limpiarFormularioMantenimiento() {
+  const ids = ['m_vehiculo', 'm_fecha', 'm_km', 'm_tipo', 'm_taller', 'm_notas', 'o_concepto', 'o_precio', 'r_cant', 'r_desc', 'r_ref', 'r_precio'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+
+  const rCant = document.getElementById('r_cant');
+  if (rCant) rCant.value = '1';
+
+  const rFoto = document.getElementById('r_foto');
+  if (rFoto) rFoto.value = '';
+
+  const rFotoCat = document.getElementById('r_foto_catalogo');
+  if (rFotoCat) rFotoCat.value = '';
+
+  const labelFile = document.getElementById('file-btn-label');
+  if (labelFile) labelFile.textContent = translations[currentLang].seleccionar_archivo;
+
+  manoObraTemporal = [];
+  repuestosTemporales = [];
+
+  renderTablaManoObra();
+  renderTablaRepuestos();
+  actualizarTotales();
+}
+
 function guardarMantenimiento() {
   const vehiculoId = document.getElementById('m_vehiculo').value;
   const fecha = document.getElementById('m_fecha').value;
   const km = document.getElementById('m_km').value;
-  const tipo = document.getElementById('m_tipo').value; 
+  const tipo = document.getElementById('m_tipo').value;
   const taller = document.getElementById('m_taller').value.trim();
   const notas = document.getElementById('m_notas').value.trim();
-  
-  if (!vehiculoId) { mostrarMsg('msg_mantenimiento', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err'); return; }
-  if (!fecha) { mostrarMsg('msg_mantenimiento', currentLang === 'es' ? 'La fecha es obligatoria.' : 'Date is required.', 'err'); return; }
-  if (manoObraTemporal.length === 0 && repuestosTemporales.length === 0) {
-    mostrarMsg('msg_mantenimiento', currentLang === 'es' ? 'Añade al menos una operación o repuesto.' : 'Add at least one operation or part.', 'err'); return;
+
+  if (!vehiculoId || !fecha || !tipo) {
+    mostrarMsg('msg_mantenimiento', currentLang === 'es' ? 'Vehículo, fecha y tipo son obligatorios.' : 'Vehicle, date and type are required.', 'err');
+    return;
   }
 
-  const mano = manoObraTemporal.reduce((sum, o) => sum + o.precio, 0);
-  const piezas = repuestosTemporales.reduce((sum, r) => sum + (r.cant * r.precio), 0);
+  const totalMano = manoObraTemporal.reduce((s, o) => s + Number(o.precio || 0), 0);
+  const totalRep = repuestosTemporales.reduce((s, r) => s + Number(r.cant || 0) * Number(r.precio || 0), 0);
+  const total = totalMano + totalRep;
+
+  const mantenimiento = {
+    id: editandoMantenimientoId || uid(),
+    vehiculoId,
+    fecha,
+    km,
+    tipo,
+    taller,
+    notas,
+    manoObra: JSON.parse(JSON.stringify(manoObraTemporal)),
+    repuestos: JSON.parse(JSON.stringify(repuestosTemporales)),
+    totalMano,
+    totalRep,
+    total
+  };
 
   if (editandoMantenimientoId) {
-    const index = state.mantenimientos.findIndex(m => m.id === editandoMantenimientoId);
-    if (index !== -1) {
-      state.mantenimientos[index] = { 
-        ...state.mantenimientos[index],
-        vehiculoId, fecha, km: Number(km)||0, tipo, mano, piezas, taller, notas,
-        manoObra: [...manoObraTemporal], repuestos: [...repuestosTemporales] 
-      };
-    }
-    mostrarMsg('msg_mantenimiento', currentLang === 'es' ? 'Mantenimiento actualizado con éxito.' : 'Maintenance updated successfully.', 'ok');
+    const idx = state.mantenimientos.findIndex(m => m.id === editandoMantenimientoId);
+    if (idx >= 0) state.mantenimientos[idx] = mantenimiento;
+    editandoMantenimientoId = null;
+
+    const btnCancelar = document.getElementById('btn-cancelar');
+    if (btnCancelar) btnCancelar.style.display = 'none';
   } else {
-    state.mantenimientos.push({ 
-      id: uid(), vehiculoId, fecha, km: Number(km)||0, tipo, mano, piezas, taller, notas,
-      manoObra: [...manoObraTemporal], repuestos: [...repuestosTemporales] 
-    });
-    mostrarMsg('msg_mantenimiento', currentLang === 'es' ? 'Mantenimiento registrado con éxito.' : 'Maintenance recorded successfully.', 'ok');
+    state.mantenimientos.push(mantenimiento);
   }
-  
+
   guardar();
-  cancelarEdicion();
+  limpiarFormularioMantenimiento();
+
+  const titulo = document.getElementById('titulo-formulario');
+  if (titulo) titulo.textContent = translations[currentLang].reg_mantenimiento;
+
+  const btnGuardar = document.getElementById('btn-guardar');
+  if (btnGuardar) btnGuardar.textContent = translations[currentLang].guardar_mant;
+
   renderAll();
+  mostrarMsg('msg_mantenimiento', currentLang === 'es' ? 'Mantenimiento guardado.' : 'Maintenance saved.', 'ok');
 }
 
 function editarMantenimiento(id) {
   const m = state.mantenimientos.find(x => x.id === id);
   if (!m) return;
-  
-  document.getElementById('m_vehiculo').value = m.vehiculoId;
-  document.getElementById('m_fecha').value = m.fecha;
+
+  editandoMantenimientoId = id;
+
+  document.getElementById('m_vehiculo').value = m.vehiculoId || '';
+  document.getElementById('m_fecha').value = m.fecha || '';
   document.getElementById('m_km').value = m.km || '';
-  document.getElementById('m_tipo').value = m.tipo; 
+  document.getElementById('m_tipo').value = m.tipo || '';
   document.getElementById('m_taller').value = m.taller || '';
   document.getElementById('m_notas').value = m.notas || '';
-  
-  manoObraTemporal = m.manoObra ? JSON.parse(JSON.stringify(m.manoObra)) : [];
-  repuestosTemporales = m.repuestos ? JSON.parse(JSON.stringify(m.repuestos)) : [];
-  
-  renderManoObraTemporal();
-  renderRepuestosTemporales();
-  
-  editandoMantenimientoId = id;
-  document.getElementById('btn-guardar').textContent = currentLang === 'es' ? '💾 Guardar Cambios' : '💾 Save Changes';
-  document.getElementById('btn-cancelar').style.display = 'inline-block';
-  document.getElementById('titulo-formulario').textContent = currentLang === 'es' ? 'Editando Mantenimiento' : 'Editing Maintenance';
-  
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  manoObraTemporal = JSON.parse(JSON.stringify(m.manoObra || []));
+  repuestosTemporales = JSON.parse(JSON.stringify(m.repuestos || []));
+
+  renderTablaManoObra();
+  renderTablaRepuestos();
+  actualizarTotales();
+
+  const titulo = document.getElementById('titulo-formulario');
+  if (titulo) titulo.textContent = currentLang === 'es' ? 'Editando Mantenimiento' : 'Editing Maintenance';
+
+  const btnGuardar = document.getElementById('btn-guardar');
+  if (btnGuardar) btnGuardar.textContent = currentLang === 'es' ? '💾 Guardar Cambios' : '💾 Save Changes';
+
+  const btnCancelar = document.getElementById('btn-cancelar');
+  if (btnCancelar) btnCancelar.style.display = 'inline-block';
+
+  const tabMant = document.querySelector('.tab[data-tab="mantenimientos"]');
+  if (tabMant) tabMant.click();
 }
 
 function cancelarEdicion() {
   editandoMantenimientoId = null;
-  manoObraTemporal = [];
-  repuestosTemporales = [];
-  renderManoObraTemporal();
-  renderRepuestosTemporales();
-  
-  document.getElementById('m_fecha').value = new Date().toISOString().slice(0,10);
-  document.getElementById('m_km').value = '';
-  document.getElementById('m_taller').value = '';
-  document.getElementById('m_notas').value = '';
-  document.getElementById('m_vehiculo').value = ''; 
-  document.getElementById('m_tipo').value = 'type_1'; 
+  limpiarFormularioMantenimiento();
 
-  document.getElementById('btn-guardar').textContent = translations[currentLang].guardar_mant;
-  document.getElementById('btn-cancelar').style.display = 'none';
-  document.getElementById('titulo-formulario').textContent = translations[currentLang].reg_mantenimiento;
-  
-  const fileLabel = document.getElementById('file-btn-label');
-  if (fileLabel) fileLabel.textContent = translations[currentLang].seleccionar_archivo;
+  const titulo = document.getElementById('titulo-formulario');
+  if (titulo) titulo.textContent = translations[currentLang].reg_mantenimiento;
+
+  const btnGuardar = document.getElementById('btn-guardar');
+  if (btnGuardar) btnGuardar.textContent = translations[currentLang].guardar_mant;
+
+  const btnCancelar = document.getElementById('btn-cancelar');
+  if (btnCancelar) btnCancelar.style.display = 'none';
 }
 
 function eliminarMantenimiento(id) {
-  if (!confirm(currentLang === 'es' ? '¿Eliminar este mantenimiento?' : 'Delete this maintenance record?')) return;
+  const texto = currentLang === 'es'
+    ? '¿Borrar este mantenimiento?'
+    : 'Delete this maintenance record?';
+
+  if (!confirm(texto)) return;
+
   state.mantenimientos = state.mantenimientos.filter(m => m.id !== id);
-  guardar(); renderAll();
-}
-
-function verDesglose(id) {
-  const m = state.mantenimientos.find(x => x.id === id);
-  if (!m) return;
-  const tipoTexto = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
-  
-  let texto = (currentLang === 'es' ? "DESGLOSE DEL MANTENIMIENTO:" : "MAINTENANCE BREAKDOWN:") + "\n\n";
-  texto += (currentLang === 'es' ? "Tipo: " : "Type: ") + tipoTexto + "\n\n";
-  
-  if (m.manoObra && m.manoObra.length > 0) {
-    texto += (currentLang === 'es' ? "MANO DE OBRA:\n" : "LABOR:\n");
-    m.manoObra.forEach(o => { texto += `- ${o.concepto}: ${fmt(o.precio)}\n`; });
-    texto += "\n";
-  }
-  if (m.repuestos && m.repuestos.length > 0) {
-    texto += (currentLang === 'es' ? "REPUESTOS:\n" : "PARTS:\n");
-    m.repuestos.forEach(r => { texto += `- ${r.cant}x ${r.ref} (${r.desc}): ${fmt(r.cant*r.precio)}\n`; });
-    texto += "\n";
-  }
-  texto += `TOTAL: ${fmt(m.mano + m.piezas)}`;
-  alert(texto);
-}
-
-// ============ GASTOS FIJOS ============
-function cargarGastosFijos() {
-  const sel = document.getElementById('g_vehiculo');
-  if (!sel) return;
-  const vehiculoId = sel.value;
-  
-  const seguroInput = document.getElementById('gf_seguro');
-  const itvInput = document.getElementById('gf_itv');
-
-  if (vehiculoId) {
-    const v = state.vehiculos.find(x => x.id === vehiculoId);
-    if (v) {
-      seguroInput.value = v.costeSeguro || '';
-      itvInput.value = v.costeItv || '';
-    }
-  } else {
-    seguroInput.value = '';
-    itvInput.value = '';
-  }
-}
-
-function guardarGastosFijos() {
-  const vehiculoId = document.getElementById('g_vehiculo').value;
-  const seguro = document.getElementById('gf_seguro').value;
-  const itv = document.getElementById('gf_itv').value;
-  
-  if (!vehiculoId) { mostrarMsg('msg_gastos_fijos', currentLang === 'es' ? 'Selecciona un vehículo en el desplegable de arriba.' : 'Select a vehicle in the dropdown above.', 'err'); return; }
-  
-  const v = state.vehiculos.find(x => x.id === vehiculoId);
-  if (v) {
-    v.costeSeguro = seguro;
-    v.costeItv = itv;
-    guardar();
-    renderGrafico(); 
-    mostrarMsg('msg_gastos_fijos', currentLang === 'es' ? 'Gastos guardados.' : 'Costs saved.', 'ok');
-  }
-}
-
-// ============ RENDERIZADO ============
-function renderAll() {
-  renderVehiculos();
-  renderMantenimientos();
-  renderSelects();
-  if (document.getElementById('bloque_seleccion').style.display === 'block' && document.getElementById('i_vehiculo').value) {
-    renderTablaSeleccion();
-  }
-}
-
-function renderVehiculos() {
-  const tbody = document.querySelector('#tabla_vehiculos tbody');
-  tbody.innerHTML = '';
-  if (state.vehiculos.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" class="empty">${currentLang === 'es' ? 'Aún no hay vehículos. Añade uno arriba.' : 'No vehicles yet. Add one above.'}</td></tr>`;
-    return;
-  }
-  state.vehiculos.forEach(v => {
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${esc(v.matricula)}</td><td>${esc(v.marca)}</td><td>${esc(v.modelo)}</td>
-      <td>${esc(v.bastidor)}</td>
-      <td>
-        <button type="button" class="secondary" style="padding:4px 8px; font-size:11px; margin-right:4px;" onclick="editarVehiculo('${v.id}')">${currentLang === 'es' ? 'Editar' : 'Edit'}</button>
-        <button type="button" class="danger" onclick="eliminarVehiculo('${v.id}')">${currentLang === 'es' ? 'Eliminar' : 'Delete'}</button>
-      </td>`;
-    tbody.appendChild(tr);
-  });
+  guardar();
+  renderAll();
 }
 
 function renderMantenimientos() {
   const tbody = document.querySelector('#tabla_mantenimientos tbody');
-  const filtro = document.getElementById('f_vehiculo').value;
+  if (!tbody) return;
+
+  const filtro = document.getElementById('f_vehiculo')?.value || '';
+
+  let lista = [...state.mantenimientos].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+  if (filtro) {
+    lista = lista.filter(m => m.vehiculoId === filtro);
+  }
+
   tbody.innerHTML = '';
-  let lista = state.mantenimientos.slice().sort((a,b) => b.fecha.localeCompare(a.fecha));
-  if (filtro) lista = lista.filter(m => m.vehiculoId === filtro);
-  if (lista.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="9" class="empty">${currentLang === 'es' ? 'No hay mantenimientos registrados.' : 'No maintenance records found.'}</td></tr>`;
+
+  if (!lista.length) {
+    tbody.innerHTML = `<tr><td colspan="9" class="empty">${currentLang === 'es' ? 'No hay mantenimientos registrados.' : 'No maintenance records.'}</td></tr>`;
     return;
   }
+
   lista.forEach(m => {
     const v = state.vehiculos.find(x => x.id === m.vehiculoId);
-    const fechaMostrar = m.fecha ? m.fecha.split('-').reverse().join('/') : '';
-    let numOps = (m.manoObra ? m.manoObra.length : 0) + (m.repuestos ? m.repuestos.length : 0);
-    const tipoTexto = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
+    const tipoTexto = tiposMantenimiento[m.tipo]?.[currentLang] || m.tipo || '';
 
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${fechaMostrar}</td><td>${esc(v ? v.matricula : '—')}</td>
-      <td>${m.km||''}</td><td>${esc(tipoTexto)}</td>
-      <td><button type="button" class="secondary" style="padding:4px 8px; font-size:11px;" onclick="verDesglose('${m.id}')">${currentLang === 'es' ? 'Ver' : 'View'} (${numOps})</button></td>
-      <td>${fmt(m.mano)}</td><td>${fmt(m.piezas)}</td><td>${fmt(m.mano+m.piezas)}</td>
-      <td style="display:flex; flex-direction:column; gap:4px;">
-        <div>
-            <button type="button" class="secondary" style="padding:4px 8px; font-size:11px;" onclick="editarMantenimiento('${m.id}')">${currentLang === 'es' ? 'Editar' : 'Edit'}</button>
-            <button type="button" class="danger" onclick="eliminarMantenimiento('${m.id}')">${currentLang === 'es' ? 'Eliminar' : 'Delete'}</button>
-        </div>
-      </td>`;
-    tbody.appendChild(tr);
+    const totalMano = m.totalMano != null
+      ? m.totalMano
+      : (m.manoObra || []).reduce((s, o) => s + Number(o.precio || 0), 0);
+
+    const totalRep = m.totalRep != null
+      ? m.totalRep
+      : (m.repuestos || []).reduce((s, r) => s + Number(r.cant || 0) * Number(r.precio || 0), 0);
+
+    const total = m.total != null ? m.total : totalMano + totalRep;
+    const operaciones = (m.manoObra || []).map(o => o.concepto).join(', ') || '—';
+
+    tbody.innerHTML += `
+      <tr>
+        <td>${esc(m.fecha)}</td>
+        <td>${v ? esc(v.matricula) : '—'}</td>
+        <td>${esc(m.km || '—')}</td>
+        <td>${esc(tipoTexto)}</td>
+        <td>${esc(operaciones)}</td>
+        <td>${fmt(totalMano)}</td>
+        <td>${fmt(totalRep)}</td>
+        <td>${fmt(total)}</td>
+        <td>
+          <button type="button" class="secondary" onclick="editarMantenimiento('${m.id}')">✏️</button>
+          <button type="button" class="danger" onclick="eliminarMantenimiento('${m.id}')">🗑</button>
+        </td>
+      </tr>
+    `;
   });
 }
 
-function renderSelects() {
-  const opts = state.vehiculos.map(v => `<option value="${v.id}">${esc(v.matricula)} — ${esc(v.marca)} ${esc(v.modelo)}</option>`).join('');
-  
-  ['m_vehiculo','i_vehiculo','g_vehiculo','rec_vehiculo'].forEach(id => {
-    const sel = document.getElementById(id);
-    if (!sel) return;
-    const prev = sel.value;
-    sel.innerHTML = `<option value="" data-i18n="selecciona">${translations[currentLang].selecciona}</option>` + opts;
-    if (id === 'g_vehiculo') sel.innerHTML = `<option value="" data-i18n="todos">${translations[currentLang].todos}</option>` + opts;
-    if (prev) sel.value = prev;
+// ---------- RENDER GENERAL ----------
+function renderAll() {
+  renderVehiculos();
+  renderSelects();
+  renderMantenimientos();
+  renderTablaManoObra();
+  renderTablaRepuestos();
+  actualizarTotales();
+
+  const inputAuthor = document.getElementById('input-author');
+  if (inputAuthor) inputAuthor.value = state.author;
+
+  aplicarTemaColores();
+
+  if (typeof cargarRecordatorios === 'function') cargarRecordatorios();
+  if (typeof cargarGastosFijos === 'function') cargarGastosFijos();
+  if (typeof renderTablaSeleccion === 'function') renderTablaSeleccion();
+}
+
+// ---------- LISTENERS EXTRA ----------
+const fVehiculo = document.getElementById('f_vehiculo');
+if (fVehiculo) {
+  fVehiculo.addEventListener('change', renderMantenimientos);
+}
+
+const rFotoInput = document.getElementById('r_foto');
+const fileBtnLabel = document.getElementById('file-btn-label');
+if (rFotoInput && fileBtnLabel) {
+  rFotoInput.addEventListener('change', () => {
+    fileBtnLabel.textContent = rFotoInput.files[0]
+      ? rFotoInput.files[0].name
+      : translations[currentLang].seleccionar_archivo;
   });
-  
-  const filtro = document.getElementById('f_vehiculo');
-  const prevF = filtro.value;
-  filtro.innerHTML = `<option value="" data-i18n="todos">${translations[currentLang].todos}</option>` + opts;
-  if (prevF) filtro.value = prevF;
-  
-  actualizarDesplegableFotos();
+}
+// ==========================================
+// PASO 3 DE 3 - GRÁFICOS, AVISOS, PDF, BACKUP E INIT
+// ==========================================
+
+// ---------- GRÁFICO DE GASTOS ----------
+function cargarGastosFijos() {
+  const sel = document.getElementById('g_vehiculo');
+  const id = sel ? sel.value : '';
+
+  const inputSeguro = document.getElementById('gf_seguro');
+  const inputItv = document.getElementById('gf_itv');
+
+  if (id) {
+    const v = state.vehiculos.find(x => x.id === id);
+    if (v) {
+      if (inputSeguro) inputSeguro.value = v.costeSeguro || '';
+      if (inputItv) inputItv.value = v.costeItv || '';
+    }
+  } else {
+    if (inputSeguro) inputSeguro.value = '';
+    if (inputItv) inputItv.value = '';
+  }
+
+  renderGrafico();
 }
 
-document.getElementById('f_vehiculo').addEventListener('change', renderMantenimientos);
-document.getElementById('i_vehiculo').addEventListener('change', renderTablaSeleccion);
+function guardarGastosFijos() {
+  const sel = document.getElementById('g_vehiculo');
+  const id = sel ? sel.value : '';
 
-function toggleAllChecks(source) {
-  const checkboxes = document.querySelectorAll('.check-mant');
-  checkboxes.forEach(cb => cb.checked = source.checked);
+  if (!id) {
+    mostrarMsg('msg_gastos_fijos', currentLang === 'es' ? 'Selecciona un vehículo primero.' : 'Select a vehicle first.', 'err');
+    return;
+  }
+
+  const v = state.vehiculos.find(x => x.id === id);
+  if (!v) return;
+
+  v.costeSeguro = parseFloat(document.getElementById('gf_seguro').value) || '';
+  v.costeItv = parseFloat(document.getElementById('gf_itv').value) || '';
+
+  guardar();
+  renderGrafico();
+  mostrarMsg('msg_gastos_fijos', currentLang === 'es' ? 'Gastos fijos guardados.' : 'Fixed costs saved.', 'ok');
 }
 
-function mostrarMsg(id, texto, tipo) {
-  const el = document.getElementById(id);
-  el.innerHTML = `<div class="msg ${tipo}">${esc(texto)}</div>`;
-  setTimeout(() => { el.innerHTML = ''; }, 4000);
-}
-// ============ GRÁFICO Y ESTADÍSTICAS ============
 function renderGrafico() {
-  if (typeof Chart === 'undefined') return; 
   const canvas = document.getElementById('miGrafico');
   if (!canvas) return;
 
-  const vehiculoId = document.getElementById('g_vehiculo').value;
-  const modo = document.getElementById('g_modo').value;
-  const selectAnioContenedor = document.getElementById('contenedor_anio_grafico');
-  const selectAnio = document.getElementById('g_anio');
+  if (miGraficoInstancia) {
+    miGraficoInstancia.destroy();
+    miGraficoInstancia = null;
+  }
+
+  const selV = document.getElementById('g_vehiculo');
+  const idVehiculo = selV ? selV.value : '';
+
+  const selModo = document.getElementById('g_modo');
+  const modo = selModo ? selModo.value : 'anios';
+
+  const contAnio = document.getElementById('contenedor_anio_grafico');
+  const selAnio = document.getElementById('g_anio');
 
   let lista = state.mantenimientos;
-  if (vehiculoId) lista = lista.filter(m => m.vehiculoId === vehiculoId);
 
-  const aniosDisponibles = [...new Set(lista.filter(m => m.fecha).map(m => m.fecha.split('-')[0]))].sort();
-  
-  if (modo === 'meses') {
-    selectAnioContenedor.style.display = 'block';
-    const prevAnio = selectAnio.value;
-    selectAnio.innerHTML = '';
-    aniosDisponibles.forEach(a => {
-      const opt = document.createElement('option');
-      opt.value = a;
-      opt.textContent = a;
-      selectAnio.appendChild(opt);
-    });
-    if (prevAnio && aniosDisponibles.includes(prevAnio)) selectAnio.value = prevAnio;
-  } else {
-    selectAnioContenedor.style.display = 'none';
+  if (idVehiculo) {
+    lista = lista.filter(m => m.vehiculoId === idVehiculo);
   }
 
-  let etiquetas = [];
-  let dataMano = [];
-  let dataPiezas = [];
-  let gastoTotal = 0;
+  if (modo === 'meses') {
+    if (contAnio) contAnio.style.display = 'block';
+
+    const anios = [...new Set(lista.map(m => (m.fecha || '').slice(0, 4)).filter(Boolean))].sort();
+
+    if (selAnio) {
+      const valorActual = selAnio.value;
+      selAnio.innerHTML = anios.map(a => `<option value="${a}">${a}</option>`).join('');
+
+      if (valorActual && anios.includes(valorActual)) {
+        selAnio.value = valorActual;
+      } else if (anios.length) {
+        selAnio.value = anios[anios.length - 1];
+      }
+    }
+  } else {
+    if (contAnio) contAnio.style.display = 'none';
+  }
+
+  const etiquetas = [];
+  const datosMecanica = [];
+  const datosFijos = [];
+
+  let totalMecanica = 0;
+  let totalFijos = 0;
 
   if (modo === 'anios') {
-    const gastosPorAnio = {};
-    lista.forEach(m => {
-      if (!m.fecha) return;
-      if (m.taller === 'ITV' || (m.manoObra && m.manoObra.some(o => o.concepto.includes('ITV')))) return;
-
-      const anio = m.fecha.split('-')[0];
-      if (!gastosPorAnio[anio]) gastosPorAnio[anio] = { mano: 0, piezas: 0 };
-      gastosPorAnio[anio].mano += m.mano;
-      gastosPorAnio[anio].piezas += m.piezas;
-    });
-
-    etiquetas = Object.keys(gastosPorAnio).sort();
-    
-    const anioActual = new Date().getFullYear().toString();
-    if (!etiquetas.includes(anioActual) && (vehiculoId || state.vehiculos.some(v => v.costeSeguro || v.costeItv))) {
-        etiquetas.push(anioActual);
-        etiquetas.sort();
-        gastosPorAnio[anioActual] = { mano: 0, piezas: 0 };
-    }
-
-    dataMano = etiquetas.map(a => gastosPorAnio[a].mano);
-    dataPiezas = etiquetas.map(a => gastosPorAnio[a].piezas);
-    
-    if (vehiculoId) {
-        const v = state.vehiculos.find(x => x.id === vehiculoId);
-        if (v) {
-            const fijos = (parseFloat(v.costeSeguro)||0) + (parseFloat(v.costeItv)||0);
-            const indexActual = etiquetas.indexOf(anioActual);
-            if (indexActual !== -1) dataMano[indexActual] += fijos;
-        }
-    } else {
-        let fijosTotales = 0;
-        state.vehiculos.forEach(v => fijosTotales += (parseFloat(v.costeSeguro)||0) + (parseFloat(v.costeItv)||0));
-        const indexActual = etiquetas.indexOf(anioActual);
-        if (indexActual !== -1) dataMano[indexActual] += fijosTotales;
-    }
-    
-    gastoTotal = dataMano.reduce((s, v) => s + v, 0) + dataPiezas.reduce((s, v) => s + v, 0);
-
-  } else {
-    const anioSeleccionado = selectAnio.value || aniosDisponibles[0] || new Date().getFullYear();
-    const gastosPorMes = Array(12).fill(0).map(() => ({ mano: 0, piezas: 0 }));
+    const mapa = {};
 
     lista.forEach(m => {
-      if (!m.fecha) return;
-      if (m.taller === 'ITV' || (m.manoObra && m.manoObra.some(o => o.concepto.includes('ITV')))) return;
-      
-      const [anio, mes] = m.fecha.split('-');
-      if (anio === anioSeleccionado) {
-        const mesIndex = parseInt(mes) - 1;
-        gastosPorMes[mesIndex].mano += m.mano;
-        gastosPorMes[mesIndex].piezas += m.piezas;
+      const anio = (m.fecha || '').slice(0, 4);
+      if (!anio) return;
+
+      if (!mapa[anio]) mapa[anio] = 0;
+
+      let total = Number(m.total || 0);
+      if (!total) {
+        const mano = (m.manoObra || []).reduce((s, o) => s + Number(o.precio || 0), 0);
+        const rep = (m.repuestos || []).reduce((s, r) => s + Number(r.cant || 0) * Number(r.precio || 0), 0);
+        total = mano + rep;
       }
+
+      mapa[anio] += total;
     });
 
-    if (anioSeleccionado == new Date().getFullYear().toString()) {
-        if (vehiculoId) {
-            const v = state.vehiculos.find(x => x.id === vehiculoId);
-            if (v) gastosPorMes[0].mano += (parseFloat(v.costeSeguro)||0) + (parseFloat(v.costeItv)||0);
-        } else {
-            let fijosTotales = 0;
-            state.vehiculos.forEach(v => fijosTotales += (parseFloat(v.costeSeguro)||0) + (parseFloat(v.costeItv)||0));
-            gastosPorMes[0].mano += fijosTotales;
-        }
-    }
+    const anios = Object.keys(mapa).sort();
 
-    etiquetas = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-    if (currentLang === 'en') etiquetas = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    
-    dataMano = gastosPorMes.map(m => m.mano);
-    dataPiezas = gastosPorMes.map(m => m.piezas);
-    gastoTotal = dataMano.reduce((s, v) => s + v, 0) + dataPiezas.reduce((s, v) => s + v, 0);
+    anios.forEach(a => {
+      etiquetas.push(a);
+      datosMecanica.push(mapa[a]);
+      totalMecanica += mapa[a];
+
+      let fijo = 0;
+      if (idVehiculo) {
+        const v = state.vehiculos.find(x => x.id === idVehiculo);
+        if (v) fijo = Number(v.costeSeguro || 0) + Number(v.costeItv || 0);
+      }
+      datosFijos.push(fijo);
+      totalFijos += fijo;
+    });
+  } else {
+    const anio = selAnio ? selAnio.value : '';
+    const meses = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+
+    const mapa = {};
+    meses.forEach(mm => { mapa[mm] = 0; });
+
+    lista.forEach(m => {
+      const f = m.fecha || '';
+      if (f.slice(0, 4) !== anio) return;
+      const mm = f.slice(5, 7);
+      if (!mapa[mm]) return;
+
+      let total = Number(m.total || 0);
+      if (!total) {
+        const mano = (m.manoObra || []).reduce((s, o) => s + Number(o.precio || 0), 0);
+        const rep = (m.repuestos || []).reduce((s, r) => s + Number(r.cant || 0) * Number(r.precio || 0), 0);
+        total = mano + rep;
+      }
+
+      mapa[mm] += total;
+    });
+
+    const nombresMeses = currentLang === 'es'
+      ? ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic']
+      : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+    meses.forEach((mm, i) => {
+      etiquetas.push(nombresMeses[i]);
+      datosMecanica.push(mapa[mm]);
+      totalMecanica += mapa[mm];
+
+      let fijo = 0;
+      if (idVehiculo) {
+        const v = state.vehiculos.find(x => x.id === idVehiculo);
+        if (v) fijo = (Number(v.costeSeguro || 0) + Number(v.costeItv || 0)) / 12;
+      }
+      datosFijos.push(fijo);
+      totalFijos += fijo;
+    });
   }
 
-  document.getElementById('texto_gasto_total').textContent = fmt(gastoTotal);
+  const total = totalMecanica + totalFijos;
+  const elTotal = document.getElementById('texto_gasto_total');
+  if (elTotal) elTotal.textContent = fmt(total);
 
   const ctx = canvas.getContext('2d');
-  if (miGraficoInstancia) miGraficoInstancia.destroy();
-
-  let gradientMano = ctx.createLinearGradient(0, 0, 0, 400);
-  gradientMano.addColorStop(0, 'rgba(225, 29, 72, 0.5)');
-  gradientMano.addColorStop(1, 'rgba(225, 29, 72, 0.0)');
-
-  let gradientPiezas = ctx.createLinearGradient(0, 0, 0, 400);
-  gradientPiezas.addColorStop(0, 'rgba(56, 189, 248, 0.5)');
-  gradientPiezas.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
 
   miGraficoInstancia = new Chart(ctx, {
-    type: 'line',
+    type: 'bar',
     data: {
       labels: etiquetas,
       datasets: [
         {
-          label: translations[currentLang].mano_obra + ' + Fijos',
-          data: dataMano,
-          borderColor: '#e11d48', 
-          backgroundColor: gradientMano,
-          borderWidth: 3,
-          pointBackgroundColor: '#e11d48',
-          pointBorderColor: '#fff',
-          pointHoverRadius: 6,
-          tension: 0.4,
-          fill: true
+          label: currentLang === 'es' ? 'Mecánica' : 'Mechanics',
+          data: datosMecanica,
+          backgroundColor: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#e11d48'
         },
         {
-          label: translations[currentLang].repuestos,
-          data: dataPiezas,
-          borderColor: '#38bdf8', 
-          backgroundColor: gradientPiezas,
-          borderWidth: 3,
-          pointBackgroundColor: '#38bdf8',
-          pointBorderColor: '#fff',
-          pointHoverRadius: 6,
-          tension: 0.4,
-          fill: true
+          label: currentLang === 'es' ? 'Fijos' : 'Fixed',
+          data: datosFijos,
+          backgroundColor: '#3b82f6'
         }
       ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { labels: { color: '#e2e8f0', font: { size: 14, weight: 'bold' } } },
-        tooltip: { backgroundColor: 'rgba(15, 23, 42, 0.9)', titleColor: '#fff', bodyColor: '#e2e8f0', borderColor: '#374151', borderWidth: 1 }
+        legend: {
+          labels: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-main').trim() || '#e2e8f0' }
+        }
       },
       scales: {
-        x: { ticks: { color: '#9ca3af', font: { size: 12 } }, grid: { color: 'rgba(55, 65, 81, 0.5)' } },
-        y: { ticks: { color: '#9ca3af', font: { size: 12 } }, grid: { color: 'rgba(55, 65, 81, 0.5)' } }
+        x: {
+          ticks: { color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#9ca3af' },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        },
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: getComputedStyle(document.documentElement).getPropertyValue('--text-muted').trim() || '#9ca3af',
+            callback: v => v + ' €'
+          },
+          grid: { color: 'rgba(255,255,255,0.05)' }
+        }
       }
     }
   });
 }
 
-// ============ PDF DEL GRÁFICO ============
-function exportarGraficoPDF(accion = false) {
-  try {
-    const { jsPDF } = window.jspdf;
-    const t = translations[currentLang];
-    const vehiculoId = document.getElementById('g_vehiculo').value;
-    const v = state.vehiculos.find(x => x.id === vehiculoId);
-    const titulo = v ? `${v.marca} ${v.modelo} (${v.matricula})` : t.todos;
+function exportarGraficoPDF(modo) {
+  const canvas = document.getElementById('miGrafico');
+  if (!canvas) return;
 
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const pageW = doc.internal.pageSize.getWidth();
-    
-    doc.setFillColor(15, 23, 42); doc.rect(0, 0, pageW, 20, 'F'); 
-    doc.setTextColor(255,255,255); doc.setFontSize(16); doc.setFont(undefined, 'bold');
-    doc.text(t.pdf_titulo_grafico, pageW / 2, 13, { align: 'center' });
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p', 'mm', 'a4');
 
-    doc.setTextColor(0,0,0); doc.setFontSize(12); doc.setFont(undefined, 'normal');
-    doc.text(`${t.pdf_vehiculo} ${titulo}`, 15, 35);
-    doc.text(`${t.pdf_fecha_inf} ${new Date().toLocaleDateString()}`, 15, 42);
+  pdf.setFontSize(18);
+  pdf.text(translations[currentLang].pdf_titulo_grafico, 15, 20);
 
-    const totalTexto = document.getElementById('texto_gasto_total').textContent;
-    doc.setFontSize(14); doc.setFont(undefined, 'bold'); doc.setTextColor(225, 29, 72);
-    doc.text(`${t.gasto_total_mix}: ${totalTexto}`, 15, 52);
+  pdf.setFontSize(11);
+  pdf.text(translations[currentLang].pdf_fecha_inf + ' ' + new Date().toLocaleDateString(), 15, 28);
 
-    if (v) {
-      const seguro = parseFloat(v.costeSeguro) || 0;
-      const itv = parseFloat(v.costeItv) || 0;
-      doc.setFontSize(12); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
-      doc.text(`${t.coste_seguro}: ${fmt(seguro)}`, 15, 62);
-      doc.text(`${t.coste_itv}: ${fmt(itv)}`, 15, 68);
-    }
+  const imgData = canvas.toDataURL('image/png');
+  const ancho = 180;
+  const alto = (canvas.height * ancho) / canvas.width;
+  pdf.addImage(imgData, 'PNG', 15, 40, ancho, alto);
 
-    const canvasGrafico = document.getElementById('miGrafico');
-    if (canvasGrafico) {
-      const canvasTemp = document.createElement('canvas');
-      canvasTemp.width = canvasGrafico.width;
-      canvasTemp.height = canvasGrafico.height;
-      const ctx = canvasTemp.getContext('2d');
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvasTemp.width, canvasTemp.height);
-      ctx.drawImage(canvasGrafico, 0, 0);
+  const nombre = 'gastos_' + Date.now() + '.pdf';
+  pdf.save(nombre);
 
-      const imgData = canvasTemp.toDataURL('image/png', 1.0);
-      const imgProps = doc.getImageProperties(imgData);
-      const pdfWidth = pageW - 30; 
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      doc.addImage(imgData, 'PNG', 15, 80, pdfWidth, pdfHeight);
-    }
-
-    const nombre = `Gastos_${v ? v.matricula : 'Todos'}.pdf`;
-
-    if (accion === 'share' && navigator.share && navigator.canShare) {
-      const pdfBlob = doc.output('blob');
-      const file = new File([pdfBlob], nombre, { type: 'application/pdf' });
-      if (navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: nombre, text: 'Resumen de gastos' })
-        .then(() => mostrarMsg('msg_grafico', currentLang === 'es' ? 'Compartido.' : 'Shared.', 'ok'))
-        .catch(() => doc.save(nombre));
-        return;
-      }
-    }
-    
-    if (accion === 'email') {
-        doc.save(nombre);
-        enviarPorCorreo(t.email_asunto_grafico, t.email_cuerpo_grafico);
-        mostrarMsg('msg_grafico', 'PDF descargado.', 'ok');
-    } else {
-        doc.save(nombre);
-        mostrarMsg('msg_grafico', 'Informe generado.', 'ok');
-    }
-
-  } catch (error) {
-    console.error(error);
-    mostrarMsg('msg_grafico', 'Error al generar PDF.', 'err');
-  }
-}
-
-// ============ EXPORTAR A EXCEL (CSV) ============
-function exportarExcel() {
-  const modo = document.getElementById('i_modo').value;
-  const vehiculoId = document.getElementById('i_vehiculo').value;
-  if (!vehiculoId) { mostrarMsg('msg_informe', 'Selecciona un vehículo.', 'err'); return; }
-
-  let lista = [];
-  if (modo === 'seleccion') {
-    const checkboxes = document.querySelectorAll('.check-mant:checked');
-    if (checkboxes.length === 0) { mostrarMsg('msg_informe', 'Selecciona un mantenimiento.', 'err'); return; }
-    const ids = Array.from(checkboxes).map(cb => cb.value);
-    lista = state.mantenimientos.filter(m => ids.includes(m.id));
+  if (modo === 'share' && navigator.share) {
+    navigator.share({
+      title: translations[currentLang].email_asunto_grafico,
+      text: translations[currentLang].email_cuerpo_grafico
+    }).catch(() => {});
+  } else if (modo === 'email') {
+    window.location.href = 'mailto:?subject=' +
+      encodeURIComponent(translations[currentLang].email_asunto_grafico) +
+      '&body=' + encodeURIComponent(translations[currentLang].email_cuerpo_grafico);
   } else {
-    const desde = document.getElementById('i_desde').value;
-    const hasta = document.getElementById('i_hasta').value;
-    lista = state.mantenimientos.filter(m => m.vehiculoId === vehiculoId);
-    if (desde) lista = lista.filter(m => m.fecha >= desde);
-    if (hasta) lista = lista.filter(m => m.fecha <= hasta);
+    mostrarMsg('msg_grafico', currentLang === 'es' ? 'PDF generado.' : 'PDF generated.', 'ok');
   }
-
-  if (lista.length === 0) { mostrarMsg('msg_informe', 'No hay datos.', 'err'); return; }
-
-  let csvContent = "\uFEFFFecha;Matricula;Kms;Tipo;Taller;Operacion/Repuesto;Cantidad;Precio Unitario;Total\n";
-  lista.sort((a,b) => a.fecha.localeCompare(b.fecha));
-
-  lista.forEach(m => {
-    const v = state.vehiculos.find(x => x.id === m.vehiculoId);
-    const fecha = m.fecha.split('-').reverse().join('/');
-    const matricula = v ? v.matricula : '';
-    
-    if (m.manoObra && m.manoObra.length > 0) {
-      m.manoObra.forEach(o => {
-        csvContent += `${fecha};${matricula};${m.km||''};Mano de Obra;${m.taller||''};${o.concepto};1;${o.precio};${o.precio}\n`;
-      });
-    }
-    if (m.repuestos && m.repuestos.length > 0) {
-      m.repuestos.forEach(r => {
-        const subtotal = r.cant * r.precio;
-        csvContent += `${fecha};${matricula};${m.km||''};Repuesto;${m.taller||''};${r.desc} (${r.ref});${r.cant};${r.precio};${subtotal}\n`;
-      });
-    }
-  });
-
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement("a");
-  const url = URL.createObjectURL(blob);
-  link.setAttribute("href", url);
-  link.setAttribute("download", `Excel_Mantenimiento_${vehiculoId ? state.vehiculos.find(x=>x.id===vehiculoId).matricula : 'Todos'}.csv`);
-  document.body.appendChild(link); link.click(); document.body.removeChild(link);
-  mostrarMsg('msg_informe', 'Excel exportado.', 'ok');
 }
 
-// ============ RECORDATORIOS (CON SEGURO) ============
+// ---------- RECORDATORIOS ----------
 function cargarRecordatorios() {
   const sel = document.getElementById('rec_vehiculo');
   if (!sel) return;
-  const vehiculoId = sel.value;
-  
-  const mantInput = document.getElementById('rec_mant');
-  const kmMantInput = document.getElementById('rec_km_mant');
-  const itvInput = document.getElementById('rec_itv');
-  const seguroInput = document.getElementById('rec_seguro');
-  const itvPasadaInput = document.getElementById('rec_itv_pasada');
-  const kmItvPasadaInput = document.getElementById('rec_km_itv_pasada');
-  const tbody = document.getElementById('tabla_recordatorios_body');
-  tbody.innerHTML = '';
 
-  if (vehiculoId) {
-    const v = state.vehiculos.find(x => x.id === vehiculoId);
-    if (v) {
-      mantInput.value = v.proxMant || '';
-      kmMantInput.value = v.proxKmMant || '';
-      itvInput.value = v.proxItv || '';
-      if(seguroInput) seguroInput.value = v.proxSeguro || '';
-      itvPasadaInput.value = v.ultItvFecha || '';
-      kmItvPasadaInput.value = v.ultItvKm || '';
-    }
-  }
+  const valorActual = sel.value;
 
+  let html = `<option value="">${translations[currentLang].selecciona}</option>`;
   state.vehiculos.forEach(v => {
-    // FILTRO CLAVE: Solo mostrar si tiene alguna fecha de aviso (Mantenimiento, ITV o Seguro)
-    if (!v.proxMant && !v.proxItv && !v.proxSeguro) return; 
-
-    const formatDate = (dateStr) => {
-      if (!dateStr) return '—';
-      const fecha = new Date(dateStr); const hoy = new Date();
-      const diffDias = Math.ceil((fecha - hoy) / (1000 * 60 * 60 * 24));
-      const fechaMostrar = dateStr.split('-').reverse().join('/');
-      let color = '#9ca3af';
-      if (diffDias < 0) color = '#ef4444'; else if (diffDias <= 30) color = '#f59e0b'; else color = '#10b981';
-      return `<span style="color: ${color}; font-weight: bold;">${fechaMostrar}</span>`;
-    };
-    
-    const kmMantFormat = v.proxKmMant ? `<span style="color: #38bdf8; font-weight: bold;">${v.proxKmMant} Kms</span><br>` : '';
-
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td>${esc(v.matricula)}</td>
-      <td>${kmMantFormat}${formatDate(v.proxMant)}</td>
-      <td>${formatDate(v.proxItv)}</td>
-      <td>${formatDate(v.proxSeguro)}</td>
-      <td style="white-space: nowrap;">
-          <button type="button" class="secondary" style="padding:4px 8px; font-size:11px; margin-right:4px;" onclick="editarAviso('${v.id}')">${currentLang === 'es' ? 'Editar' : 'Edit'}</button>
-          <button type="button" class="danger" onclick="eliminarAvisoVehiculo('${v.id}')">${currentLang === 'es' ? 'Eliminar' : 'Delete'}</button>
-      </td>`;
-    tbody.appendChild(tr);
+    html += `<option value="${v.id}">${esc(v.matricula)} - ${esc(v.marca)} ${esc(v.modelo)}</option>`;
   });
-}
+  sel.innerHTML = html;
 
-function editarAviso(vehiculoId) {
-  const sel = document.getElementById('rec_vehiculo');
-  if (sel) {
-    sel.value = vehiculoId;
-    cargarRecordatorios(); 
-    window.scrollTo({ top: 0, behavior: 'smooth' }); 
+  if (valorActual && Array.from(sel.options).some(o => o.value === valorActual)) {
+    sel.value = valorActual;
   }
-}
 
-function eliminarAvisoVehiculo(vehiculoId) {
-  const mensaje = currentLang === 'es' 
-    ? "¿Eliminar los avisos (fechas y kms) de este coche?\n\n(Nota: Si lo habías añadido a tu Google Calendar/Apple Calendar, tendrás que borrarlo tú a mano desde tu app de calendario)." 
-    : "Delete alerts (dates and miles) for this car?\n\n(Note: If you added it to your Calendar, you'll need to delete it manually from your calendar app).";
-
-  if (confirm(mensaje)) {
-    const v = state.vehiculos.find(x => x.id === vehiculoId);
+  const id = sel.value;
+  if (id) {
+    const v = state.vehiculos.find(x => x.id === id);
     if (v) {
-      v.proxMant = '';
-      v.proxKmMant = '';
-      v.proxItv = '';
-      v.proxSeguro = '';
-      v.ultItvFecha = '';
-      v.ultItvKm = '';
-      
-      guardar(); 
-      cargarRecordatorios(); 
-      
-      const sel = document.getElementById('rec_vehiculo');
-      if (sel && sel.value === vehiculoId) {
-        document.getElementById('rec_mant').value = '';
-        document.getElementById('rec_km_mant').value = '';
-        document.getElementById('rec_itv').value = '';
-        document.getElementById('rec_seguro').value = '';
-        document.getElementById('rec_itv_pasada').value = '';
-        document.getElementById('rec_km_itv_pasada').value = '';
-      }
-      mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Avisos eliminados.' : 'Alerts deleted.', 'ok');
+      document.getElementById('rec_mant').value = v.proxMant || '';
+      document.getElementById('rec_km_mant').value = v.proxKmMant || '';
+      document.getElementById('rec_itv').value = v.proxItv || '';
+      document.getElementById('rec_itv_pasada').value = v.ultItvFecha || '';
+      document.getElementById('rec_km_itv_pasada').value = v.ultItvKm || '';
+      document.getElementById('rec_seguro').value = v.proxSeguro || '';
     }
+  } else {
+    ['rec_mant','rec_km_mant','rec_itv','rec_itv_pasada','rec_km_itv_pasada','rec_seguro'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
   }
+
+  renderTablaRecordatorios();
 }
 
 function guardarRecordatorio() {
-  const vehiculoId = document.getElementById('rec_vehiculo').value;
-  const mantFecha = document.getElementById('rec_mant').value;
-  const mantKm = document.getElementById('rec_km_mant').value;
-  const itvProx = document.getElementById('rec_itv').value;
-  const seguroProx = document.getElementById('rec_seguro').value;
-  const itvPasada = document.getElementById('rec_itv_pasada').value;
-  const itvKmPasada = document.getElementById('rec_km_itv_pasada').value;
-  
-  if (!vehiculoId) { mostrarMsg('msg_recordatorios', 'Selecciona un vehículo.', 'err'); return; }
-  
-  const v = state.vehiculos.find(x => x.id === vehiculoId);
-  if (v) {
-    v.proxMant = mantFecha; v.proxKmMant = mantKm; v.proxItv = itvProx;
-    v.proxSeguro = seguroProx;
-    v.ultItvFecha = itvPasada; v.ultItvKm = itvKmPasada;
-
-    if (itvPasada) {
-      const itvExistente = state.mantenimientos.find(m => m.vehiculoId === vehiculoId && m.tipo === 'type_10' && m.fecha === itvPasada && m.taller === 'ITV');
-      if (!itvExistente) {
-        state.mantenimientos.push({
-          id: uid(), vehiculoId: vehiculoId, fecha: itvPasada, km: Number(itvKmPasada) || 0, 
-          tipo: 'type_10', mano: 0, piezas: 0, taller: 'ITV', notas: currentLang === 'es' ? 'Registro de ITV pasada' : 'MOT past record',
-          manoObra: [{ concepto: translations[currentLang].itv_nombre, precio: 0 }], repuestos: []
-        });
-        mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Datos guardados e ITV añadida al historial.' : 'Data saved and MOT added to history.', 'ok');
-      } else {
-        mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Datos guardados (ITV ya en historial).' : 'Data saved (MOT already in history).', 'ok');
-      }
-    } else {
-      mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Datos guardados.' : 'Data saved.', 'ok');
-    }
-    guardar(); cargarRecordatorios(); renderAll();
-  }
-}
-
-// ============ CALENDARIO Y NOTIFICACIONES (CON SEGURO) ============
-function descargarICS() {
-  const vehiculoId = document.getElementById('rec_vehiculo').value;
-  if (!vehiculoId) { alert(currentLang === 'es' ? "Selecciona un vehículo primero." : "Select a vehicle first."); return; }
-  
-  const v = state.vehiculos.find(x => x.id === vehiculoId);
-  if (!v) return;
-
-  if (!v.proxItv && !v.proxMant && !v.proxSeguro) {
-    alert(currentLang === 'es' ? "No hay fechas de recordatorio guardadas para este coche." : "There are no reminder dates saved for this car.");
+  const id = document.getElementById('rec_vehiculo')?.value;
+  if (!id) {
+    mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err');
     return;
   }
 
-  let icsContent = "BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//My PitStop//ES\r\n";
+  const v = state.vehiculos.find(x => x.id === id);
+  if (!v) return;
 
-  if (v.proxItv) {
-    const fechaItv = v.proxItv.replace(/-/g, '');
-    icsContent += "BEGIN:VEVENT\r\n";
-    icsContent += `SUMMARY:ITV ${v.matricula} (${v.marca} ${v.modelo})\r\n`;
-    icsContent += `DTSTART;VALUE=DATE:${fechaItv}\r\n`;
-    icsContent += `DESCRIPTION:Recordatorio de ITV para el vehículo ${v.matricula}.\r\n`;
-    icsContent += "END:VEVENT\r\n";
+  const nuevaFechaItvPasada = document.getElementById('rec_itv_pasada').value;
+  const nuevosKmItvPasada = document.getElementById('rec_km_itv_pasada').value;
+
+  const esNuevaItv = nuevaFechaItvPasada &&
+    (nuevaFechaItvPasada !== (v.ultItvFecha || '') || nuevosKmItvPasada !== String(v.ultItvKm || ''));
+
+  v.proxMant = document.getElementById('rec_mant').value;
+  v.proxKmMant = document.getElementById('rec_km_mant').value;
+  v.proxItv = document.getElementById('rec_itv').value;
+  v.proxSeguro = document.getElementById('rec_seguro').value;
+  v.ultItvFecha = nuevaFechaItvPasada;
+  v.ultItvKm = nuevosKmItvPasada;
+
+  if (esNuevaItv && nuevaFechaItvPasada) {
+    state.mantenimientos.push({
+      id: uid(),
+      vehiculoId: id,
+      fecha: nuevaFechaItvPasada,
+      km: nuevosKmItvPasada,
+      tipo: 'type_1',
+      taller: '',
+      notas: translations[currentLang].itv_nombre,
+      manoObra: [],
+      repuestos: [],
+      totalMano: 0,
+      totalRep: 0,
+      total: 0
+    });
   }
 
+  guardar();
+  renderAll();
+  cargarRecordatorios();
+  mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Datos guardados.' : 'Data saved.', 'ok');
+}
+
+function renderTablaRecordatorios() {
+  const tbody = document.getElementById('tabla_recordatorios_body');
+  if (!tbody) return;
+
+  tbody.innerHTML = '';
+
+  if (!state.vehiculos.length) {
+    tbody.innerHTML = `<tr><td colspan="5" class="empty">${currentLang === 'es' ? 'Sin vehículos.' : 'No vehicles.'}</td></tr>`;
+    return;
+  }
+
+  state.vehiculos.forEach(v => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${esc(v.matricula)}</td>
+        <td>${esc(v.proxMant || '—')}${v.proxKmMant ? ' / ' + esc(v.proxKmMant) + ' km' : ''}</td>
+        <td>${esc(v.proxItv || '—')}</td>
+        <td>${esc(v.proxSeguro || '—')}</td>
+        <td>
+          <button type="button" class="secondary" onclick="seleccionarVehiculoRecordatorio('${v.id}')">✏️</button>
+          <button type="button" class="danger" onclick="eliminarRecordatorio('${v.id}')">🗑</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function seleccionarVehiculoRecordatorio(id) {
+  const sel = document.getElementById('rec_vehiculo');
+  if (sel) {
+    sel.value = id;
+    cargarRecordatorios();
+  }
+}
+
+function eliminarRecordatorio(id) {
+  const v = state.vehiculos.find(x => x.id === id);
+  if (!v) return;
+
+  if (!confirm(currentLang === 'es'
+    ? '¿Borrar los avisos de este vehículo? (Si los tenías en el calendario, quítalos manualmente desde tu app de calendario)'
+    : 'Delete this vehicle\'s alerts? (If you had them in your calendar, remove them manually from your calendar app)')) {
+    return;
+  }
+
+  v.proxMant = '';
+  v.proxKmMant = '';
+  v.proxItv = '';
+  v.proxSeguro = '';
+  v.ultItvFecha = '';
+  v.ultItvKm = '';
+
+  guardar();
+  cargarRecordatorios();
+  mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Avisos borrados.' : 'Alerts deleted.', 'ok');
+}
+
+// ---------- CALENDARIO (.ICS) ----------
+function generarICS(titulo, fecha, descripcion) {
+  const dt = fecha.replace(/-/g, '');
+  const uidIcs = uid() + '@mypitstop';
+  const ahora = new Date().toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+
+  return [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//My PitStop//ES',
+    'BEGIN:VEVENT',
+    'UID:' + uidIcs,
+    'DTSTAMP:' + ahora,
+    'DTSTART;VALUE=DATE:' + dt,
+    'SUMMARY:' + titulo,
+    'DESCRIPTION:' + descripcion,
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\r\n');
+}
+
+function descargarICS() {
+  const id = document.getElementById('rec_vehiculo')?.value;
+  if (!id) {
+    mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err');
+    return;
+  }
+
+  const v = state.vehiculos.find(x => x.id === id);
+  if (!v) return;
+
+  const eventos = [];
+
   if (v.proxMant) {
-    const fechaMant = v.proxMant.replace(/-/g, '');
-    icsContent += "BEGIN:VEVENT\r\n";
-    icsContent += `SUMMARY:Mantenimiento ${v.matricula} (${v.marca} ${v.modelo})\r\n`;
-    icsContent += `DTSTART;VALUE=DATE:${fechaMant}\r\n`;
-    icsContent += `DESCRIPTION:Recordatorio de mantenimiento para el vehículo ${v.matricula}.\r\n`;
-    icsContent += "END:VEVENT\r\n";
+    eventos.push(generarICS(
+      `Mantenimiento - ${v.matricula}`,
+      v.proxMant,
+      `Vehículo: ${v.matricula} - ${v.marca} ${v.modelo}`
+    ));
+  }
+
+  if (v.proxItv) {
+    eventos.push(generarICS(
+      `ITV - ${v.matricula}`,
+      v.proxItv,
+      `Revisión ITV: ${v.matricula}`
+    ));
   }
 
   if (v.proxSeguro) {
-    const fechaSeguro = v.proxSeguro.replace(/-/g, '');
-    icsContent += "BEGIN:VEVENT\r\n";
-    icsContent += `SUMMARY:Seguro ${v.matricula} (${v.marca} ${v.modelo})\r\n`;
-    icsContent += `DTSTART;VALUE=DATE:${fechaSeguro}\r\n`;
-    icsContent += `DESCRIPTION:Vencimiento del seguro para el vehículo ${v.matricula}.\r\n`;
-    icsContent += "END:VEVENT\r\n";
+    eventos.push(generarICS(
+      `Seguro - ${v.matricula}`,
+      v.proxSeguro,
+      `Vencimiento seguro: ${v.matricula}`
+    ));
   }
 
-  icsContent += "END:VCALENDAR";
+  if (!eventos.length) {
+    mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'No hay fechas para añadir al calendario.' : 'No dates to add.', 'err');
+    return;
+  }
 
-  const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = `Recordatorios_${v.matricula}.ics`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+  eventos.forEach((ics, i) => {
+    const blob = new Blob([ics], { type: 'text/calendar' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `pitstop_evento_${i + 1}.ics`;
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Archivos .ics descargados.' : '.ics files downloaded.', 'ok');
 }
 
+// ---------- NOTIFICACIONES ----------
 function activarNotificaciones() {
-  if (!("Notification" in window)) {
-    alert(currentLang === 'es' ? "Tu navegador no soporta notificaciones." : "Your browser does not support notifications.");
-    return;
-  }
-  
-  if (Notification.permission === 'denied') {
-    alert(currentLang === 'es' 
-      ? "Has bloqueado las notificaciones en tu navegador. Para activarlas, haz clic en el icono del candado 🔒 (o del deslizador) junto a la barra de direcciones web y permite las notificaciones." 
-      : "You have blocked notifications in your browser. To enable them, click the lock icon 🔒 next to the address bar and allow notifications.");
+  if (!('Notification' in window)) {
+    mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Este navegador no soporta notificaciones.' : 'Browser does not support notifications.', 'err');
     return;
   }
 
-  Notification.requestPermission().then(permission => {
-    if (permission === "granted") {
-      alert(currentLang === 'es' ? "¡Avisos activados! Te avisaremos cuando abras la app si hay fechas importantes." : "Alerts activated! We will notify you when you open the app if there are important dates.");
-      localStorage.setItem('pitstop_push_activo', 'true');
+  Notification.requestPermission().then(perm => {
+    if (perm === 'granted') {
+      mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Avisos activados.' : 'Alerts activated.', 'ok');
       comprobarAvisos();
     } else {
-      alert(currentLang === 'es' ? "Has denegado el permiso para las notificaciones." : "You have denied permission for notifications.");
+      mostrarMsg('msg_recordatorios', currentLang === 'es' ? 'Avisos rechazados.' : 'Alerts denied.', 'err');
     }
   });
 }
 
 function comprobarAvisos() {
-  if (localStorage.getItem('pitstop_push_activo') !== 'true') return;
-  if (Notification.permission !== 'granted') return;
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
 
   const hoy = new Date();
-  hoy.setHours(0,0,0,0);
-  const en7dias = new Date(hoy.getTime() + 7 * 24 * 3600 * 1000);
+  hoy.setHours(0, 0, 0, 0);
 
   state.vehiculos.forEach(v => {
-    const revisarFecha = (fechaStr, tipo) => {
-      if (!fechaStr) return;
-      const [y, m, d] = fechaStr.split('-').map(Number);
-      const fecha = new Date(y, m - 1, d);
-      
-      if (fecha >= hoy && fecha <= en7dias) {
-        const diff = Math.ceil((fecha - hoy) / (1000 * 60 * 60 * 24));
-        let mensaje = diff === 0 ? `¡Hoy vence la ${tipo}!` : `Faltan ${diff} días para la ${tipo}.`;
-        
-        new Notification(`Aviso de ${v.matricula}`, {
-          body: mensaje,
-          icon: 'logo-nuevo.png'
+    const check = (fecha, etiqueta) => {
+      if (!fecha) return;
+      const f = new Date(fecha);
+      if (isNaN(f)) return;
+
+      const diff = Math.ceil((f - hoy) / (1000 * 60 * 60 * 24));
+
+      if (diff >= 0 && diff <= 30) {
+        new Notification('My PitStop', {
+          body: `${v.matricula}: ${etiqueta} en ${diff} días (${fecha})`,
+          icon: 'logo-192.png'
         });
       }
     };
-    revisarFecha(v.proxItv, 'ITV');
-    revisarFecha(v.proxMant, 'Revisión');
-    revisarFecha(v.proxSeguro, 'Seguro');
+
+    check(v.proxMant, currentLang === 'es' ? 'Mantenimiento' : 'Maintenance');
+    check(v.proxItv, currentLang === 'es' ? 'ITV' : 'Inspection');
+    check(v.proxSeguro, currentLang === 'es' ? 'Seguro' : 'Insurance');
   });
 }
 
-// ============ GENERADOR DE PDF (FACTURA / INFORME) ============
+// ---------- INFORME / PDF ----------
 function toggleModoInforme() {
-  const modo = document.getElementById('i_modo').value;
-  document.getElementById('bloque_fechas').style.display = modo === 'fechas' ? 'grid' : 'none';
-  document.getElementById('bloque_seleccion').style.display = modo === 'seleccion' ? 'block' : 'none';
-  if (modo === 'seleccion') renderTablaSeleccion();
+  const modo = document.getElementById('i_modo')?.value;
+  const bloqueFechas = document.getElementById('bloque_fechas');
+  const bloqueSel = document.getElementById('bloque_seleccion');
+
+  if (modo === 'seleccion') {
+    if (bloqueFechas) bloqueFechas.style.display = 'none';
+    if (bloqueSel) bloqueSel.style.display = 'block';
+    renderTablaSeleccion();
+  } else {
+    if (bloqueFechas) bloqueFechas.style.display = 'grid';
+    if (bloqueSel) bloqueSel.style.display = 'none';
+  }
 }
 
 function renderTablaSeleccion() {
-  const vehiculoId = document.getElementById('i_vehiculo').value;
   const tbody = document.querySelector('#tabla_seleccion tbody');
+  if (!tbody) return;
+
+  const idV = document.getElementById('i_vehiculo')?.value || '';
+
+  let lista = state.mantenimientos;
+  if (idV) lista = lista.filter(m => m.vehiculoId === idV);
+
+  lista = [...lista].sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
   tbody.innerHTML = '';
-  if (!vehiculoId) return;
-  
-  const lista = state.mantenimientos.filter(m => m.vehiculoId === vehiculoId).sort((a,b) => a.fecha.localeCompare(b.fecha));
-  if (lista.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:#888; padding:20px;">${currentLang === 'es' ? 'No hay mantenimientos.' : 'No maintenance records.'}</td></tr>`;
+
+  if (!lista.length) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty">${currentLang === 'es' ? 'Sin mantenimientos.' : 'No records.'}</td></tr>`;
     return;
   }
-  
+
   lista.forEach(m => {
-    const total = m.mano + m.piezas;
-    const tipoTexto = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
-    const tr = document.createElement('tr');
-    tr.innerHTML = `<td style="text-align:center;"><input type="checkbox" class="check-mant" value="${m.id}"></td>
-      <td>${m.fecha.split('-').reverse().join('/')}</td><td>${m.km || ''}</td>
-      <td>${esc(tipoTexto)}</td><td>${(m.manoObra || []).map(o => o.concepto).join(', ')}</td><td>${fmt(total)}</td>`;
-    tbody.appendChild(tr);
+    const tipoTexto = tiposMantenimiento[m.tipo]?.[currentLang] || m.tipo || '';
+    const total = Number(m.total || 0) ||
+      (m.manoObra || []).reduce((s, o) => s + Number(o.precio || 0), 0) +
+      (m.repuestos || []).reduce((s, r) => s + Number(r.cant || 0) * Number(r.precio || 0), 0);
+
+    const operaciones = (m.manoObra || []).map(o => o.concepto).join(', ') || '—';
+
+    tbody.innerHTML += `
+      <tr>
+        <td style="text-align:center;"><input type="checkbox" class="chk-mant" value="${m.id}"></td>
+        <td>${esc(m.fecha)}</td>
+        <td>${esc(m.km || '—')}</td>
+        <td>${esc(tipoTexto)}</td>
+        <td>${esc(operaciones)}</td>
+        <td>${fmt(total)}</td>
+      </tr>
+    `;
   });
 }
 
-function generarPDF(accion = false) {
-  try {
-    const { jsPDF } = window.jspdf;
-    const modo = document.getElementById('i_modo').value;
-    const tipoInforme = document.getElementById('i_tipo_informe').value;
-    const t = translations[currentLang]; 
-    const vehiculoId = document.getElementById('i_vehiculo').value;
-    if (!vehiculoId) { mostrarMsg('msg_informe', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err'); return; }
-
-    let lista = [];
-    let desde = '', hasta = '';
-
-    if (modo === 'seleccion') {
-      const checkboxes = document.querySelectorAll('.check-mant:checked');
-      if (checkboxes.length === 0) { mostrarMsg('msg_informe', currentLang === 'es' ? 'Selecciona al menos un mantenimiento.' : 'Select at least one record.', 'err'); return; }
-      const ids = Array.from(checkboxes).map(cb => cb.value);
-      lista = state.mantenimientos.filter(m => ids.includes(m.id));
-    } else {
-      desde = document.getElementById('i_desde').value; hasta = document.getElementById('i_hasta').value;
-      lista = state.mantenimientos.filter(m => m.vehiculoId === vehiculoId);
-      if (desde) lista = lista.filter(m => m.fecha >= desde);
-      if (hasta) lista = lista.filter(m => m.fecha <= hasta);
-    }
-
-    lista.sort((a,b) => a.fecha.localeCompare(b.fecha));
-    if (lista.length === 0) { mostrarMsg('msg_informe', currentLang === 'es' ? 'No hay mantenimientos.' : 'No records.', 'err'); return; }
-
-    const v = state.vehiculos.find(x => x.id === vehiculoId);
-    const ivaPorcentaje = parseFloat(document.getElementById('i_iva').value) || 0;
-
-    const doc = new jsPDF('p', 'mm', 'a4');
-    const pageW = doc.internal.pageSize.getWidth();
-    let y = 15;
-
-    doc.setFillColor(15, 23, 42); doc.rect(0, 0, pageW, 20, 'F'); 
-    doc.setTextColor(255,255,255); doc.setFontSize(16); doc.setFont(undefined, 'bold');
-    const titulo = tipoInforme === 'detallado' ? t.pdf_factura : t.pdf_informe;
-    doc.text(titulo, (pageW - doc.getTextWidth(titulo)) / 2, 13);
-
-    doc.setTextColor(0,0,0); doc.setFontSize(10); doc.setFont(undefined, 'normal');
-    y = 30;
-    doc.setFont(undefined, 'bold'); doc.text(t.pdf_vehiculo, 15, y); doc.setFont(undefined, 'normal'); doc.text(`${v.marca} ${v.modelo}`, 45, y); y += 6;
-    doc.setFont(undefined, 'bold'); doc.text(t.pdf_matricula, 15, y); doc.setFont(undefined, 'normal'); doc.text(v.matricula, 45, y); y += 6;
-    doc.setFont(undefined, 'bold'); doc.text(t.pdf_bastidor, 15, y); doc.setFont(undefined, 'normal'); doc.text(v.bastidor || '—', 45, y); y += 6;
-    doc.setFont(undefined, 'bold'); doc.text(t.pdf_fecha_inf, 15, y); doc.setFont(undefined, 'normal'); doc.text(new Date().toLocaleDateString(currentLang === 'es' ? 'es-ES' : 'en-GB'), 45, y); y += 6;
-    doc.setFont(undefined, 'bold'); doc.text(t.pdf_periodo, 15, y); doc.setFont(undefined, 'normal');
-    const per = modo === 'seleccion' ? (currentLang === 'es' ? 'Selección manual' : 'Manual selection') : (desde ? desde.split('-').reverse().join('/') : 'inicio') + ' — ' + (hasta ? hasta.split('-').reverse().join('/') : 'hoy');
-    doc.text(per, 45, y); y += 10;
-
-    if (tipoInforme === 'historico') {
-      let bodyHistorial = [];
-      lista.forEach(m => {
-        let tipoTraducido = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
-        let manoObraTexto = (m.manoObra || []).map(o => o.concepto).join("\n• ");
-        if (m.taller === 'ITV') { tipoTraducido = 'ITV'; manoObraTexto = translations[currentLang].itv_nombre; }
-        let textoTipoYServicio = tipoTraducido + "\n• " + manoObraTexto;
-        if (m.taller) textoTipoYServicio += `\n\n(${t.pdf_taller_txt} ${m.taller})`;
-        let textoRepuestos = m.repuestos && m.repuestos.length > 0 ? m.repuestos.map(r => `• ${r.desc}${r.ref ? ` (${r.ref})` : ''}`).join("\n") : "—";
-        bodyHistorial.push([ m.fecha.split('-').reverse().join('/'), m.km || '', textoTipoYServicio, textoRepuestos ]);
-      });
-
-      doc.autoTable({
-        startY: y, head: [[t.fecha, t.km, t.pdf_servicios, t.pdf_materiales]], body: bodyHistorial, theme: 'striped',
-        headStyles: { fillColor: [225, 29, 72], textColor: 255, fontSize: 10, fontStyle: 'bold' }, 
-        bodyStyles: { fontSize: 9, valign: 'top', cellPadding: 4 }, alternateRowStyles: { fillColor: [248, 249, 250] }, 
-        columnStyles: { 0: { cellWidth: 25 }, 1: { cellWidth: 20 }, 2: { cellWidth: 65 }, 3: { cellWidth: 70 } }, margin: { left: 15, right: 15 }
-      });
-
-      // FIRMA O RECUADRO
-      let yFirma = doc.lastAutoTable.finalY + 20;
-      if (yFirma > 220) { doc.addPage(); yFirma = 20; }
-      doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
-      doc.text(t.pdf_firma, 15, yFirma);
-      if (firmaGuardada) {
-        try { doc.addImage(firmaGuardada, 'PNG', 15, yFirma + 5, 60, 30); } catch(e) { console.error(e); }
-      } else {
-        doc.setDrawColor(0,0,0); doc.rect(15, yFirma + 5, 60, 30); 
-      }
-      doc.line(15, yFirma + 35, 75, yFirma + 35);
-
-    } else {
-      let totalGlobalMano = 0; let totalGlobalPiezas = 0;
-      lista.forEach((m) => {
-        if (y > 230) { doc.addPage(); y = 20; }
-        let tipoTraducido = tiposMantenimiento[m.tipo] ? tiposMantenimiento[m.tipo][currentLang] : m.tipo;
-        if (m.taller === 'ITV') tipoTraducido = 'ITV';
-
-        doc.setFillColor(240, 242, 245); doc.rect(15, y - 5, pageW - 30, 12, 'F'); 
-        doc.setFontSize(10); doc.setFont(undefined, 'bold'); doc.setTextColor(15, 23, 42);
-        doc.text(`${t.fecha}: ${m.fecha.split('-').reverse().join('/')}`, 18, y);
-        if (m.km) doc.text(`${t.km}: ${m.km}`, 70, y);
-        if (m.taller) doc.text(`${t.pdf_taller_txt} ${m.taller}`, pageW - 18, y, {align:'right'});
-        doc.setFontSize(9); doc.setFont(undefined, 'normal'); doc.setTextColor(100, 100, 100);
-        doc.text(`${t.tipo}: ${tipoTraducido}`, 18, y + 5); y += 12; 
-
-        let bodyMano = (m.manoObra || []).map(o => [ m.taller === 'ITV' ? translations[currentLang].itv_nombre : o.concepto, fmt(o.precio) ]);
-        if (bodyMano.length > 0) {
-          doc.autoTable({
-            startY: y, head: [[t.pdf_mano_obra, t.pdf_importe]], body: bodyMano, theme: 'grid',
-            headStyles: { fillColor: [225, 29, 72], textColor: 255, fontSize: 9 }, bodyStyles: { fontSize: 9 },
-            columnStyles: { 0: { cellWidth: 140 }, 1: { cellWidth: 25, halign: 'right' } }, margin: { left: 15, right: 15 }
-          });
-          y = doc.lastAutoTable.finalY + 5;
-        }
-
-        let bodyRepuestos = (m.repuestos || []).map(r => [ r.cant, r.ref || '-', r.desc, fmt(r.precio), fmt(r.cant * r.precio) ]);
-        if (bodyRepuestos.length > 0) {
-          doc.autoTable({
-            startY: y, head: [[t.cant, t.referencia, t.pdf_desc, t.pdf_precio_ud, t.total]], body: bodyRepuestos, theme: 'grid',
-            headStyles: { fillColor: [225, 29, 72], textColor: 255, fontSize: 9 }, bodyStyles: { fontSize: 9 },
-            columnStyles: { 0: { cellWidth: 15, halign: 'center' }, 1: { cellWidth: 30 }, 2: { cellWidth: 75 }, 3: { cellWidth: 20, halign: 'right' }, 4: { cellWidth: 25, halign: 'right' } }, margin: { left: 15, right: 15 }
-          });
-          y = doc.lastAutoTable.finalY + 5;
-        }
-
-        const subMano = (m.manoObra || []).reduce((s, o) => s + o.precio, 0);
-        const subPiezas = (m.repuestos || []).reduce((s, r) => s + (r.cant * r.precio), 0);
-        totalGlobalMano += subMano; totalGlobalPiezas += subPiezas;
-
-        doc.setFontSize(10); doc.setFont(undefined, 'bold'); doc.setTextColor(225, 29, 72);
-        doc.text(`${t.total}: ${fmt(subMano + subPiezas)}`, pageW - 15, y + 3, {align:'right'});
-        doc.setTextColor(0,0,0); doc.setFont(undefined, 'normal'); y += 15; 
-      });
-
-      if (y > 250) { doc.addPage(); y = 20; }
-      const baseGlobal = totalGlobalMano + totalGlobalPiezas;
-      const iva = baseGlobal * (ivaPorcentaje / 100);
-      const totalFinal = baseGlobal + iva;
-
-      doc.setFontSize(10); doc.setFont(undefined, 'normal');
-      doc.text(t.pdf_base, 130, y); doc.text(fmt(baseGlobal), pageW - 15, y, {align:'right'}); y += 6;
-      doc.text(`${t.pdf_iva} (${ivaPorcentaje}%):`, 130, y); doc.text(fmt(iva), pageW - 15, y, {align:'right'}); y += 6;
-      doc.setFont(undefined, 'bold'); doc.setTextColor(225, 29, 72); doc.text(t.pdf_total, 130, y); doc.text(fmt(totalFinal), pageW - 15, y, {align:'right'});
-      
-      // FIRMA O RECUADRO
-      if (y > 220) { doc.addPage(); y = 20; }
-      y += 20; 
-      doc.setFontSize(10); doc.setFont(undefined, 'normal'); doc.setTextColor(0,0,0);
-      doc.text(t.pdf_firma, 15, y);
-      if (firmaGuardada) {
-        try { doc.addImage(firmaGuardada, 'PNG', 15, y + 5, 60, 30); } catch(e) { console.error(e); }
-      } else {
-        doc.setDrawColor(0,0,0); doc.rect(15, y + 5, 60, 30);
-      }
-      doc.line(15, y + 35, 75, y + 35);
-    }
-
-    const nombre = tipoInforme === 'historico' ? `Historico_${v.matricula}.pdf` : `Factura_${v.matricula}.pdf`;
-    
-    if (accion === 'share' && navigator.share && navigator.canShare) {
-      const pdfBlob = doc.output('blob');
-      const file = new File([pdfBlob], nombre, { type: 'application/pdf' });
-      if (navigator.canShare({ files: [file] })) {
-        navigator.share({ files: [file], title: nombre, text: 'Documento My PitStop' })
-        .then(() => mostrarMsg('msg_informe', 'Compartido.', 'ok')).catch(() => doc.save(nombre));
-        return;
-      }
-    }
-    if (accion === 'email') {
-        doc.save(nombre); enviarPorCorreo(t.email_asunto_informe, t.email_cuerpo_informe);
-        mostrarMsg('msg_informe', 'PDF descargado.', 'ok'); return;
-    }
-    doc.save(nombre);
-    mostrarMsg('msg_informe', 'PDF generado.', 'ok');
-
-  } catch (error) { console.error(error); mostrarMsg('msg_informe', 'Error al generar PDF.', 'err'); }
+function toggleAllChecks(el) {
+  document.querySelectorAll('.chk-mant').forEach(c => c.checked = el.checked);
 }
 
-// ============ FUNCIONES DE APOYO (CORREO Y BACKUP) ============
-function enviarPorCorreo(asunto, cuerpo) {
-    window.location.href = `mailto:?subject=${encodeURIComponent(asunto)}&body=${encodeURIComponent(cuerpo)}`;
+function generarPDF(modo) {
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF('p', 'mm', 'a4');
+
+  const idV = document.getElementById('i_vehiculo')?.value || '';
+  const v = state.vehiculos.find(x => x.id === idV);
+
+  if (!v) {
+    mostrarMsg('msg_informe', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err');
+    return;
+  }
+
+  const modoSel = document.getElementById('i_modo')?.value || 'fechas';
+  const tipoInforme = document.getElementById('i_tipo_informe')?.value || 'detallado';
+  const iva = parseFloat(document.getElementById('i_iva')?.value) || 0;
+
+  let lista = [];
+
+  if (modoSel === 'fechas') {
+    const desde = document.getElementById('i_desde').value;
+    const hasta = document.getElementById('i_hasta').value;
+
+    lista = state.mantenimientos.filter(m => {
+      if (m.vehiculoId !== idV) return false;
+      if (desde && m.fecha < desde) return false;
+      if (hasta && m.fecha > hasta) return false;
+      return true;
+    });
+  } else {
+    const checks = [...document.querySelectorAll('.chk-mant:checked')].map(c => c.value);
+    lista = state.mantenimientos.filter(m => checks.includes(m.id));
+  }
+
+  lista.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+  if (!lista.length) {
+    mostrarMsg('msg_informe', currentLang === 'es' ? 'Sin mantenimientos para el informe.' : 'No records for the report.', 'err');
+    return;
+  }
+
+  const esDetallado = tipoInforme === 'detallado';
+
+  let y = 20;
+
+  pdf.setFontSize(18);
+  pdf.setTextColor(225, 29, 72);
+  pdf.text(esDetallado ? translations[currentLang].pdf_informe : translations[currentLang].historico, 15, y);
+  y += 8;
+
+  pdf.setFontSize(10);
+  pdf.setTextColor(0, 0, 0);
+  pdf.text(`${translations[currentLang].pdf_vehiculo} ${v.marca} ${v.modelo}`, 15, y);
+  y += 5;
+  pdf.text(`${translations[currentLang].pdf_matricula} ${v.matricula}`, 15, y);
+  y += 5;
+  pdf.text(`${translations[currentLang].pdf_bastidor} ${v.bastidor || '—'}`, 15, y);
+  y += 5;
+  pdf.text(`${translations[currentLang].pdf_fecha_inf} ${new Date().toLocaleDateString()}`, 15, y);
+  y += 8;
+
+  let totalManoGlobal = 0;
+  let totalRepGlobal = 0;
+
+  lista.forEach((m, idx) => {
+    if (y > 250) { pdf.addPage(); y = 20; }
+
+    const tipoTexto = tiposMantenimiento[m.tipo]?.[currentLang] || m.tipo || '';
+
+    pdf.setFontSize(11);
+    pdf.setTextColor(225, 29, 72);
+    pdf.text(`${idx + 1}. ${m.fecha} - ${tipoTexto}`, 15, y);
+    y += 5;
+
+    pdf.setFontSize(9);
+    pdf.setTextColor(60, 60, 60);
+    if (m.km) { pdf.text(`Kms: ${m.km}`, 15, y); y += 4; }
+    if (m.taller) { pdf.text(`${translations[currentLang].pdf_taller_txt} ${m.taller}`, 15, y); y += 4; }
+    if (m.notas) { pdf.text(`${m.notas}`, 15, y); y += 4; }
+
+    if (esDetallado) {
+      const mano = m.manoObra || [];
+      const rep = m.repuestos || [];
+
+      if (mano.length) {
+        if (y > 260) { pdf.addPage(); y = 20; }
+        pdf.setTextColor(0, 0, 0);
+        pdf.setFontSize(9);
+        pdf.text(translations[currentLang].pdf_mano_obra + ':', 18, y);
+        y += 4;
+        mano.forEach(o => {
+          if (y > 270) { pdf.addPage(); y = 20; }
+          pdf.text(`  - ${o.concepto}`, 20, y);
+          pdf.text(fmt(o.precio), 180, y, { align: 'right' });
+          y += 4;
+          totalManoGlobal += Number(o.precio || 0);
+        });
+      }
+
+      if (rep.length) {
+        if (y > 260) { pdf.addPage(); y = 20; }
+        pdf.setTextColor(0, 0, 0);
+        pdf.text(translations[currentLang].pdf_repuestos + ':', 18, y);
+        y += 4;
+        rep.forEach(r => {
+          if (y > 270) { pdf.addPage(); y = 20; }
+          const tot = Number(r.cant || 0) * Number(r.precio || 0);
+          pdf.text(`  - ${r.cant}x ${r.desc}`, 20, y);
+          pdf.text(fmt(tot), 180, y, { align: 'right' });
+          y += 4;
+          totalRepGlobal += tot;
+        });
+      }
+    }
+
+    y += 4;
+  });
+
+  if (esDetallado) {
+    if (y > 240) { pdf.addPage(); y = 20; }
+
+    const base = totalManoGlobal + totalRepGlobal;
+    const ivaImporte = base * (iva / 100);
+    const totalFinal = base + ivaImporte;
+
+    y += 5;
+    pdf.setDrawColor(200);
+    pdf.line(15, y, 195, y);
+    y += 6;
+
+    pdf.setFontSize(10);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(`${translations[currentLang].pdf_base} ${fmt(base)}`, 180, y, { align: 'right' });
+    y += 5;
+    pdf.text(`${translations[currentLang].pdf_iva} (${iva}%): ${fmt(ivaImporte)}`, 180, y, { align: 'right' });
+    y += 6;
+
+    pdf.setFontSize(12);
+    pdf.setTextColor(225, 29, 72);
+    pdf.text(`${translations[currentLang].pdf_total} ${fmt(totalFinal)}`, 180, y, { align: 'right' });
+    y += 10;
+  }
+
+  if (firmaGuardada) {
+    if (y > 200) { pdf.addPage(); y = 20; }
+    y += 5;
+    pdf.setFontSize(9);
+    pdf.setTextColor(0, 0, 0);
+    pdf.text(translations[currentLang].pdf_firma, 15, y);
+    y += 4;
+    pdf.addImage(firmaGuardada, 'PNG', 15, y, 60, 25);
+  }
+
+  const nombre = `informe_${v.matricula}_${Date.now()}.pdf`;
+  pdf.save(nombre);
+
+  if (modo === 'share' && navigator.share) {
+    navigator.share({
+      title: translations[currentLang].email_asunto_informe,
+      text: translations[currentLang].email_cuerpo_informe
+    }).catch(() => {});
+  } else {
+    mostrarMsg('msg_informe', currentLang === 'es' ? 'PDF generado.' : 'PDF generated.', 'ok');
+  }
 }
 
+// ---------- EXPORTAR EXCEL ----------
+function exportarExcel() {
+  const idV = document.getElementById('i_vehiculo')?.value || '';
+  const v = state.vehiculos.find(x => x.id === idV);
+
+  if (!v) {
+    mostrarMsg('msg_informe', currentLang === 'es' ? 'Selecciona un vehículo.' : 'Select a vehicle.', 'err');
+    return;
+  }
+
+  const lista = state.mantenimientos
+    .filter(m => m.vehiculoId === idV)
+    .sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+  let csv = 'Fecha;Kms;Tipo;Taller;Operaciones;Mano;Repuestos;Total\n';
+
+  lista.forEach(m => {
+    const tipo = tiposMantenimiento[m.tipo]?.[currentLang] || m.tipo || '';
+    const mano = (m.manoObra || []).reduce((s, o) => s + Number(o.precio || 0), 0);
+    const rep = (m.repuestos || []).reduce((s, r) => s + Number(r.cant || 0) * Number(r.precio || 0), 0);
+    const ops = (m.manoObra || []).map(o => o.concepto).join(' | ');
+
+    csv += `${m.fecha};${m.km || ''};${tipo};${m.taller || ''};${ops};${mano.toFixed(2)};${rep.toFixed(2)};${(mano + rep).toFixed(2)}\n`;
+  });
+
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `mantenimientos_${v.matricula}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+
+  mostrarMsg('msg_informe', currentLang === 'es' ? 'Excel exportado.' : 'Excel exported.', 'ok');
+}
+
+// ---------- BACKUP ----------
 function exportarJSON() {
-  try {
-    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
-    const dlAnchorElem = document.createElement('a');
-    dlAnchorElem.setAttribute("href", dataStr);
-    dlAnchorElem.setAttribute("download", `MyPitStop_Backup_${new Date().toISOString().slice(0,10)}.json`);
-    dlAnchorElem.click();
-    mostrarMsg('msg_backup', 'Copia exportada.', 'ok');
-  } catch (e) { mostrarMsg('msg_backup', 'Error al exportar.', 'err'); }
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `my_pitstop_backup_${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  mostrarMsg('msg_backup', currentLang === 'es' ? 'Copia exportada.' : 'Backup exported.', 'ok');
 }
 
 function importarJSON(event) {
   const file = event.target.files[0];
   if (!file) return;
+
   const reader = new FileReader();
-  reader.onload = function(e) {
+  reader.onload = e => {
     try {
-      const importedData = JSON.parse(e.target.result);
-      if (importedData.vehiculos && importedData.mantenimientos) {
-        if (confirm('Esto sobrescribirá tus datos actuales en la nube. ¿Continuar?')) {
-          state = importedData;
-          if (!state.catalogoFotos) state.catalogoFotos = [];
-          if (!state.author) state.author = 'J.Blázquez';
-          guardar(); // Guarda en Firebase
-          renderAll(); cargarRecordatorios(); cargarGastosFijos();
-          mostrarMsg('msg_backup', 'Datos importados a la nube.', 'ok');
-        }
-      } else { mostrarMsg('msg_backup', 'Archivo no válido.', 'err'); }
-    } catch (err) { mostrarMsg('msg_backup', 'Error al leer archivo.', 'err'); }
-    event.target.value = '';
+      const datos = JSON.parse(e.target.result);
+
+      if (!datos.vehiculos || !datos.mantenimientos) {
+        throw new Error('Estructura inválida');
+      }
+
+      state = datos;
+      if (!state.catalogoFotos) state.catalogoFotos = [];
+      if (!state.author) state.author = 'J.Blázquez';
+      if (!state.themeAccent) state.themeAccent = 'rojo';
+      if (!state.themeMachine) state.themeMachine = 'carbono';
+
+      guardar();
+      actualizarAutor(state.author);
+      aplicarTemaColores();
+      renderAll();
+      cargarRecordatorios();
+
+      const inputAuthor = document.getElementById('input-author');
+      if (inputAuthor) inputAuthor.value = state.author;
+
+      mostrarMsg('msg_backup', currentLang === 'es' ? 'Copia importada.' : 'Backup imported.', 'ok');
+    } catch (err) {
+      mostrarMsg('msg_backup', currentLang === 'es' ? 'Archivo inválido.' : 'Invalid file.', 'err');
+    }
   };
   reader.readAsText(file);
+  event.target.value = '';
 }
 
 function borrarTodo() {
-  if (confirm('¿Estás seguro de que quieres borrar TODOS los datos de la nube?')) {
-    state = { vehiculos: [], mantenimientos: [], catalogoFotos: [], author: 'J.Blázquez' };
-    guardar(); // Borra en Firebase
-    actualizarAutor('J.Blázquez');
-    const inputAuthor = document.getElementById('input-author');
-    if(inputAuthor) inputAuthor.value = 'J.Blázquez';
+  const texto = currentLang === 'es'
+    ? '⚠️ ¿Borrar TODOS los datos? Esto no se puede deshacer.'
+    : '⚠️ Delete ALL data? This cannot be undone.';
 
-    renderAll(); cargarRecordatorios(); cargarGastosFijos();
-    mostrarMsg('msg_backup', 'Datos borrados.', 'ok');
-  }
-}
+  if (!confirm(texto)) return;
 
-async function solicitarPersistencia() {
-  if (navigator.storage && navigator.storage.persist) await navigator.storage.persist();
-}
-function comprobarRecordatorioBackup() {
-  if (localStorage.getItem('pitstop_ultimo_backup') !== new Date().toISOString().slice(0,10) && state.mantenimientos.length > 0) {
-    console.log("Recuerda hacer una copia de seguridad.");
-  }
-}
-function mostrarAvisoGiro() {
-  if (window.innerHeight > window.innerWidth && window.innerWidth < 768) console.log(translations[currentLang].aviso_horizontal);
+  state = { vehiculos: [], mantenimientos: [], catalogoFotos: [], author: 'J.Blázquez', themeAccent: 'rojo', themeMachine: 'carbono' };
+  guardar();
+  actualizarAutor('J.Blázquez');
+  aplicarTemaColores();
+  renderAll();
+  mostrarMsg('msg_backup', currentLang === 'es' ? 'Datos borrados.' : 'Data deleted.', 'ok');
 }
 
-// ============ INIT ============
-const idiomaGuardado = localStorage.getItem('pitstop_idioma');
-if (idiomaGuardado && (idiomaGuardado === 'es' || idiomaGuardado === 'en')) {
+// ---------- INIT ----------
+window.addEventListener('DOMContentLoaded', () => {
+  const idiomaGuardado = localStorage.getItem('pitstop_idioma') || 'es';
   currentLang = idiomaGuardado;
-  setLanguage(currentLang); 
-}
 
-firmaGuardada = localStorage.getItem('pitstop_firma') || null;
+  cargar();
+  cargarTema();
+  encenderMaquina();
+  aplicarTemaColores();
 
-cargarTema(); 
-// YA NO LLAMAMOS A cargar() PORQUE FIREBASE LO HACE AL LOGUEARSE
-document.getElementById('m_fecha').value = new Date().toISOString().slice(0,10);
-renderManoObraTemporal();
-renderRepuestosTemporales();
-translatePage(); 
+  setLanguage(currentLang);
 
-setTimeout(encenderMaquina, 500);
-setTimeout(mostrarAvisoGiro, 2000);
+  const inputAuthor = document.getElementById('input-author');
+  if (inputAuthor) inputAuthor.value = state.author;
 
-solicitarPersistencia();
-setTimeout(comprobarRecordatorioBackup, 1500); 
-setTimeout(comprobarAvisos, 2000); 
+  const btnCancelar = document.getElementById('btn-cancelar');
+  if (btnCancelar) btnCancelar.style.display = 'none';
 
-document.getElementById('r_foto').addEventListener('change', function() {
-  const fileLabel = document.getElementById('file-btn-label');
-  if (this.files && this.files[0]) fileLabel.textContent = this.files[0].name;
-  else fileLabel.textContent = translations[currentLang].seleccionar_archivo;
+  const elTotalMano = document.getElementById('total_mano');
+  const elTotalRep = document.getElementById('total_repuestos');
+  if (elTotalMano) elTotalMano.textContent = '0.00 €';
+  if (elTotalRep) elTotalRep.textContent = '0.00 €';
+
+  toggleModoInforme();
+
+  setTimeout(() => comprobarAvisos(), 2000);
 });
 
-// ============ EXPORTAR FUNCIONES AL WINDOW (CRUCIAL PARA MÓDULOS) ============
+// Re-exponer todas las funciones usadas en onclick/onchange del HTML
 Object.assign(window, {
-  toggleTema, setLanguage, addVehiculo, editarVehiculo, eliminarVehiculo,
-  addManoObra, eliminarManoObraTemporal, addRepuesto, eliminarRepuestoTemporal,
-  guardarMantenimiento, editarMantenimiento, eliminarMantenimiento, cancelarEdicion, verDesglose,
-  abrirModal, cerrarModal, abrirModalHistorico, cambiarVehiculoHistorico, cerrarModalHistorico,
-  irAInformeDesdeHistorico, abrirModalFirma, cerrarModalFirma, limpiarFirma, guardarFirma,
-  renderGrafico, cargarGastosFijos, guardarGastosFijos, exportarGraficoPDF,
-  toggleModoInforme, renderTablaSeleccion, toggleAllChecks, generarPDF, exportarExcel,
-  cargarRecordatorios, guardarRecordatorio, exportarJSON, importarJSON, borrarTodo,
-  descargarICS, activarNotificaciones, editarAviso, eliminarAvisoVehiculo, actualizarAutor
+  addVehiculo,
+  eliminarVehiculo,
+  addManoObra,
+  eliminarManoObra,
+  addRepuesto,
+  eliminarRepuesto,
+  guardarMantenimiento,
+  editarMantenimiento,
+  cancelarEdicion,
+  eliminarMantenimiento,
+  abrirModal,
+  cerrarModal,
+  abrirModalHistorico,
+  cerrarModalHistorico,
+  cambiarVehiculoHistorico,
+  abrirModalFirma,
+  cerrarModalFirma,
+  limpiarFirma,
+  guardarFirma,
+  toggleTema,
+  setLanguage,
+  cargarRecordatorios,
+  guardarRecordatorio,
+  descargarICS,
+  activarNotificaciones,
+  seleccionarVehiculoRecordatorio,
+  eliminarRecordatorio,
+  renderGrafico,
+  cargarGastosFijos,
+  guardarGastosFijos,
+  exportarGraficoPDF,
+  generarPDF,
+  exportarExcel,
+  toggleModoInforme,
+  renderTablaSeleccion,
+  toggleAllChecks,
+  exportarJSON,
+  importarJSON,
+  borrarTodo,
+  actualizarAutor,
+  cambiarColorAcento,
+  cambiarColorMaquina,
+  comprobarAvisos
 });
-
-
