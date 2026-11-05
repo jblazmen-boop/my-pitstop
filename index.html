@@ -9,7 +9,7 @@
   <link rel="manifest" href="manifest.json?v=3">
   <meta name="theme-color" content="#111827">
   
-  <link rel="stylesheet" href="css/styles.css?v=26">
+  <link rel="stylesheet" href="css/styles.css?v=27">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -22,7 +22,7 @@
   <div class="header-container">
     <!-- IZQUIERDA: Salir + Luna -->
     <div class="header-controls">
-      <button type="button" class="danger" id="btn-logout-header" style="display: none; padding: 6px 12px; font-size: 13px; text-transform: uppercase;" data-i18n="btn_logout">Salir</button>
+      <button type="button" class="danger" id="btn-logout-header" style="display: none;" data-i18n="btn_logout">Salir</button>
       <button class="theme-btn" id="btn-tema" onclick="toggleTema()" title="Cambiar Tema">🌙</button>
     </div>
 
@@ -232,10 +232,11 @@
           </div>
         </div>
         
+        <!-- BOTONES DE AVISOS CON ESTILO RACING -->
         <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
           <button type="button" class="primary" data-i18n="guardar" onclick="guardarRecordatorio()">Guardar Datos</button>
-          <button type="button" class="secondary" style="background: #10b981 !important; color: white !important; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;" onclick="descargarICS()" data-i18n="btn_calendar">📅 Añadir al Calendario</button>
-          <button type="button" class="secondary" style="background: #3b82f6 !important; color: white !important; text-transform: uppercase; font-weight: bold; letter-spacing: 1px;" onclick="activarNotificaciones()" data-i18n="btn_alerts">🔔 Activar Avisos</button>
+          <button type="button" class="secondary btn-success" onclick="descargarICS()" data-i18n="btn_calendar">📅 Añadir al Calendario</button>
+          <button type="button" class="secondary btn-info" onclick="activarNotificaciones()" data-i18n="btn_alerts">🔔 Activar Avisos</button>
         </div>
         
         <div id="msg_recordatorios"></div>
@@ -304,13 +305,13 @@
             </div>
             
             <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 0; width: 100%;">
-              <button type="button" class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center;" onclick="exportarGraficoPDF(false)">
+              <button type="button" class="primary" onclick="exportarGraficoPDF(false)">
                 <span data-i18n="btn_gen_pdf">GENERAR PDF</span>
               </button>
-              <button type="button" class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center; background: #25D366 !important; color: #fff !important;" onclick="exportarGraficoPDF('share')">
+              <button type="button" class="secondary btn-success" onclick="exportarGraficoPDF('share')">
                 <span data-i18n="btn_share_chart">COMPARTIR</span> 📲
               </button>
-              <button type="button" class="primary" style="padding: 10px 5px; font-size: 13px; margin: 0; text-align: center; background: #ea4335 !important; color: #fff !important;" onclick="exportarGraficoPDF('email')">
+              <button type="button" class="secondary btn-email" onclick="exportarGraficoPDF('email')">
                 <span data-i18n="btn_email_chart">CORREO</span> ✉️
               </button>
             </div>
@@ -357,15 +358,16 @@
           </div>
         </div>
 
+        <!-- BOTONES DE ACCIÓN INFORME -->
         <div class="actions">
           <button type="button" class="primary" data-i18n="btn_gen_pdf" onclick="generarPDF(false)">Generar PDF</button>
-          <button type="button" class="primary" style="background: #25D366 !important; color: #fff !important;" onclick="generarPDF('share')">
+          <button type="button" class="secondary btn-success" onclick="generarPDF('share')">
             <span data-i18n="btn_share_chart">Compartir</span> 📲
           </button>
-          <button type="button" class="secondary" style="background: #10b981 !important; color: #fff !important; font-weight: bold; text-transform: uppercase;" onclick="exportarExcel()">
+          <button type="button" class="secondary btn-info" onclick="exportarExcel()">
             ⬇ <span data-i18n="btn_export_excel">Exportar a Excel</span>
           </button>
-          <button type="button" class="secondary" style="background: #f59e0b !important; color: #fff !important; font-weight: bold; text-transform: uppercase;" onclick="abrirModalFirma()">
+          <button type="button" class="secondary btn-warning" onclick="abrirModalFirma()">
             ✍️ <span data-i18n="btn_firmar_informe">FIRMAR INFORME/FACTURA</span>
           </button>
         </div>
@@ -413,7 +415,8 @@
           <button type="button" class="secondary" data-i18n="exportar" onclick="exportarJSON()">⬇ Exportar copia (JSON)</button>
           <button type="button" class="secondary" data-i18n="importar" onclick="document.getElementById('fileInput').click()">⬆ Importar copia</button>
           <input type="file" id="fileInput" accept=".json" style="display:none" onchange="importarJSON(event)">
-          <button type="button" class="danger" data-i18n="borrar" onclick="borrarTodo()">🗑 Borrar todos los datos</button>
+          <!-- Botón de borrar con rayas de peligro racing -->
+          <button type="button" class="danger btn-stripes" data-i18n="borrar" onclick="borrarTodo()">🗑 Borrar todos los datos</button>
         </div>
         <div id="msg_backup"></div>
       </div>
