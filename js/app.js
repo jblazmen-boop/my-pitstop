@@ -293,7 +293,8 @@ const translations = {
     historico: "Histórico Técnico (sin precios)", fecha_desde: "Fecha desde", fecha_hasta: "Fecha hasta",
     iva: "IVA (%)", btn_gen_pdf: "Generar PDF", btn_share_pdf: "Compartir PDF", btn_email_pdf: "Enviar por Correo",
     btn_share_chart: "Compartir", btn_email_chart: "Correo",
-    copia_seguridad: "Copia de seguridad", copia_texto: "Los datos se guardan en este navegador. Si borras el historial o cambias de equipo, se pierden. Exporta una copia periódicamente.",
+    copia_seguridad: "Ajustes y Copia de Seguridad",
+    copia_texto: "Tus datos se guardan de forma segura en la nube y se sincronizan en todos tus dispositivos con tu cuenta. Aun así, te recomendamos exportar una copia de seguridad periódicamente.",
     exportar: "⬇ Exportar copia (JSON)", importar: "⬆ Importar copia", borrar: "🗑 Borrar todos los datos",
     derechos: "Todos los derechos reservados.", selecciona: "— Selecciona —", no_foto: "— No usar foto —",
     ej_operacion: "Ej: Sustituir correa", ej_referencia: "Ej: MANN-W712", seleccionar_archivo: "Seleccionar archivo",
@@ -376,7 +377,8 @@ const translations = {
     historico: "Technical History (no prices)", fecha_desde: "Date from", fecha_hasta: "Date to",
     iva: "VAT (%)", btn_gen_pdf: "Generate PDF", btn_share_pdf: "Share PDF", btn_email_pdf: "Send by Email",
     btn_share_chart: "Share", btn_email_chart: "Email",
-    copia_seguridad: "Backup", copia_texto: "Data is stored in this browser. If you clear your history or change devices, it will be lost. Export a backup regularly.",
+    copia_seguridad: "Settings & Backup",
+    copia_texto: "Your data is securely stored in the cloud and synced across all your devices with your account. We still recommend exporting a backup periodically.",
     exportar: "⬇ Export backup (JSON)", importar: "⬆ Import backup", borrar: "🗑 Delete all data",
     derechos: "All rights reserved.", selecciona: "— Select —", no_foto: "— No photo —",
     ej_operacion: "Ex: Replace belt", ej_referencia: "Ex: MANN-W712", seleccionar_archivo: "Select file",
@@ -582,7 +584,7 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
 function fmt(n) { return (Number(n)||0).toFixed(2) + ' €'; }
 function esc(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 // ==========================================
-// PASO 2 DE 3 - MODALES, TABS, CRUD Y RENDERIZADO
+// PARTE 2 DE 3 - MODALES, TABS, CRUD Y RENDERIZADO
 // ==========================================
 
 // ---------- MENSAJES ----------
@@ -1260,7 +1262,7 @@ if (rFotoInput && fileBtnLabel) {
   });
 }
 // ==========================================
-// PASO 3 DE 3 - GRÁFICOS, AVISOS, PDF, BACKUP E INIT
+// PARTE 3 DE 3 - GRÁFICOS, AVISOS, PDF, BACKUP E INIT
 // ==========================================
 
 // ---------- GRÁFICO DE GASTOS ----------

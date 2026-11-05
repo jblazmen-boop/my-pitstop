@@ -81,7 +81,6 @@ header {
   transition: background 0.3s;
 }
 
-/* Grid de 3 columnas: IZQ (Salir+Luna) | CENTRO (Logo) | DER (Banderas) */
 .header-container {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
@@ -114,7 +113,6 @@ header {
   justify-self: end;
 }
 
-/* (header-spacer ya no se usa, pero por compatibilidad) */
 .header-spacer { display: none; }
 
 .theme-btn {
@@ -670,7 +668,7 @@ body.modo-claro .modal-historico-contenido {
     overflow-x: hidden;
   }
 
-  /* ===== CABECERA EN MÓVIL: 2 filas (logo arriba, controles abajo) ===== */
+  /* ===== CABECERA EN MÓVIL: 2 filas ===== */
   .header-container {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -679,7 +677,6 @@ body.modo-claro .modal-historico-contenido {
     column-gap: 8px;
   }
 
-  /* Fila 1: Logo ocupa toda la fila */
   .header-content {
     grid-column: 1 / -1;
     grid-row: 1;
@@ -689,7 +686,6 @@ body.modo-claro .modal-historico-contenido {
   header h1 { font-size: 55px; }
   .author { font-size: 26px; }
 
-  /* Fila 2 izquierda: Salir + Luna */
   .header-controls {
     grid-column: 1;
     grid-row: 2;
@@ -697,7 +693,6 @@ body.modo-claro .modal-historico-contenido {
     gap: 10px;
   }
 
-  /* Fila 2 derecha: Banderas */
   .header-lang {
     grid-column: 3;
     grid-row: 2;
@@ -795,33 +790,33 @@ body.modo-claro .modal-historico-contenido {
     border-width: 2px; 
   }
   
-  /* ===== CARTEL DE PESTAÑAS EN MÓVIL ===== */
+  /* ===== TOOLTIP DE PESTAÑAS EN MÓVIL (auto-ajustable) ===== */
   .tab::after {
     content: attr(title);
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 55px;
-    height: 55px;
+    min-width: 55px;
+    max-width: 120px;
+    padding: 6px 8px;
     background: rgba(225, 29, 72, 0.95);
     color: #ffffff !important;
-    padding: 4px;
     border-radius: 12px;
     font-size: 9px;
     font-weight: bold;
-    white-space: normal;
+    line-height: 1.15;
     text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    line-height: 1.1;
+    white-space: normal;
+    word-break: break-word;
     border: 2px solid white;
     opacity: 0;
     pointer-events: none;
     z-index: 100;
     box-shadow: 0 0 15px rgba(225, 29, 72, 0.8);
     transition: opacity 0.3s ease;
+    display: block;
+    box-sizing: border-box;
   }
   
   .tab:hover::after, .tab:active::after, .tab:focus::after {
