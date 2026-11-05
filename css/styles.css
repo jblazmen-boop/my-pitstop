@@ -23,7 +23,7 @@
   --accent: #e11d48;
   --accent-hover: #be123c;
   
-  color-scheme: dark; /* Arregla los calendarios nativos en modo oscuro */
+  color-scheme: dark; /* Ayuda al navegador a pintar controles nativos en oscuro */
 }
 
 body.modo-claro {
@@ -46,7 +46,7 @@ body.modo-claro {
   --border-light: rgba(0, 0, 0, 0.1);
   --shadow-inset: inset 0 0 10px rgba(0,0,0,0.1);
   
-  color-scheme: light; /* Arregla los calendarios nativos en modo claro */
+  color-scheme: light;
 }
 
 * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -509,11 +509,11 @@ input, select, textarea {
   border: 1px solid var(--border-color) !important; 
   border-radius: 4px; 
   font-size: 14px; 
-  font-weight: 400 !important; /* Quita la negrita excesiva */
+  font-weight: 400 !important;
   background-color: var(--bg-input) !important; 
   color: var(--text-main) !important; 
   transition: border-color 0.2s, box-shadow 0.2s; 
-  text-transform: none !important; /* Por si acaso hereda mayúsculas */
+  text-transform: none !important;
 }
 
 input[type="date"] { 
@@ -521,18 +521,20 @@ input[type="date"] {
   min-height: 40px; 
 }
 
-/* Hace que el icono del calendario nativo sea visible en fondo oscuro */
+/* Fuerza al icono del calendario a ser blanco y brillante */
 input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
-  filter: invert(1);
-  opacity: 0.7;
+  filter: invert(1) brightness(1.5) !important; /* Convierte el icono a blanco puro */
+  opacity: 0.9 !important;
   transition: opacity 0.2s;
 }
 input[type="date"]::-webkit-calendar-picker-indicator:hover {
-  opacity: 1;
+  opacity: 1 !important;
 }
+
+/* En modo claro, devolvemos el icono a su color oscuro original */
 body.modo-claro input[type="date"]::-webkit-calendar-picker-indicator {
-  filter: none;
+  filter: none !important;
 }
 
 input:focus, select:focus, textarea:focus { border-color: var(--accent) !important; box-shadow: 0 0 8px rgba(225, 29, 72, 0.4) !important; outline: none; }
