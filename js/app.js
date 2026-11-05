@@ -2,7 +2,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/13.1.0/firebas
 import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js";
 
-// Registrar el Service Worker para las notificaciones
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').then(() => {
     console.log("Service Worker registrado correctamente.");
@@ -32,6 +31,18 @@ let signaturePad = null;
 let firmaGuardada = null; 
 let currentUser = null;
 let unsubscribeSnapshot = null;
+
+let globalAudioCtx = null;
+function getAudioContext() {
+  if (!globalAudioCtx) {
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
+    if (AudioContext) globalAudioCtx = new AudioContext();
+  }
+  if (globalAudioCtx && globalAudioCtx.state === 'suspended') {
+    globalAudioCtx.resume();
+  }
+  return globalAudioCtx;
+}
 
 const STORAGE_KEY = 'mi_app_mantenimiento_coches'; 
 
@@ -106,6 +117,9 @@ function iniciarSincronizacion(uid) {
       if (!state.catalogoFotos) state.catalogoFotos = [];
       if (!state.author) state.author = 'J.Blázquez';
       
+      // Inicializar proxSeguro si no existe
+      state.vehiculos.forEach(v => { if (!v.proxSeguro) v.proxSeguro = ''; });
+
       actualizarAutor(state.author);
       const inputAuthor = document.getElementById('input-author');
       if(inputAuthor) inputAuthor.value = state.author;
@@ -141,9 +155,8 @@ function actualizarAutor(nombre) {
 
 function reproducirBeep() {
   try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return; 
-    const ctx = new AudioContext();
+    const ctx = getAudioContext();
+    if (!ctx) return; 
     const osc = ctx.createOscillator();
     const gainNode = ctx.createGain();
     osc.type = 'square'; 
@@ -159,9 +172,8 @@ function reproducirBeep() {
 
 function sonidoArranque() {
   try {
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    if (!AudioContext) return;
-    const ctx = new AudioContext();
+    const ctx = getAudioContext();
+    if (!ctx) return;
     const osc = ctx.createOscillator();
     const gainNode = ctx.createGain();
     osc.type = 'sawtooth'; 
@@ -244,6 +256,9 @@ const translations = {
     prox_mant: "Próximo Mantenimiento", itv: "ITV", resumen_avisos: "Resumen de Avisos",
     fecha_prox_mant: "Fecha Próx. Mantenimiento", km_prox_mant: "Kms Próx. Mantenimiento", 
     fecha_prox_itv: "Fecha Próx. ITV", 
+    seguro: "Seguro",
+    fecha_prox_seguro: "Fecha Venc. Seguro",
+    prox_seguro: "Próximo Seguro",
     registro_itv_pasada: "Al rellenar estos campos, se añadirá un registro al historial del coche:",
     fecha_pasada_itv: "Fecha Pasada ITV", km_itv_pasada: "Kms de esa ITV",
     guardar: "Guardar Datos", estado: "Estado", 
@@ -310,6 +325,9 @@ const translations = {
     prox_mant: "Next Maintenance", itv: "Vehicle Inspection", resumen_avisos: "Alerts Summary",
     fecha_prox_mant: "Next Maint. Date", km_prox_mant: "Next Maint. Miles", 
     fecha_prox_itv: "Next Insp. Date", 
+    seguro: "Insurance",
+    fecha_prox_seguro: "Insurance Exp. Date",
+    prox_seguro: "Next Insurance",
     registro_itv_pasada: "By filling these fields, a record will be added to the car's history:",
     fecha_pasada_itv: "Last Insp. Date", km_itv_pasada: "Miles at Last Insp.",
     guardar: "Save Data", estado: "Status", 
@@ -446,6 +464,7 @@ function cargar() {
         if (!v.proxMant) v.proxMant = ''; 
         if (!v.proxKmMant) v.proxKmMant = ''; 
         if (!v.proxItv) v.proxItv = ''; 
+        if (!v.proxSeguro) v.proxSeguro = '';
         if (!v.ultItvFecha) v.ultItvFecha = '';
         if (!v.ultItvKm) v.ultItvKm = '';
         if (!v.costeSeguro) v.costeSeguro = '';
@@ -590,7 +609,7 @@ function irAInformeDesdeHistorico(idMantenimiento) {
   }, 100);
 }
 
-// ============ MODAL DE FIRMA (MÓVIL Y ESCRITORIO) ============
+// ============ MODAL DE FIRMA ============
 function abrirModalFirma() {
   document.getElementById('modal-firma').style.display = 'flex';
   const canvas = document.getElementById('canvas-firma');
@@ -640,7 +659,6 @@ function guardarFirma() {
     
     ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height, 0, 0, tempCanvas.width, tempCanvas.height);
     
-    // PNG para máxima compatibilidad en móviles
     firmaGuardada = tempCanvas.toDataURL('image/png');
     
     try {
@@ -665,6 +683,15 @@ document.querySelectorAll('.tab').forEach(t => {
     t.classList.add('active');
     document.getElementById(t.dataset.tab).classList.add('active');
     
+    // CONTROL DEL CARTEL (TOOLTIP) EN MÓVIL
+    if (window.innerWidth <= 768) {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('tooltip-active'));
+      t.classList.add('tooltip-active');
+      setTimeout(() => {
+        t.classList.remove('tooltip-active');
+      }, 1500);
+    }
+
     if (t.dataset.tab === 'grafico') {
         renderGrafico();
         cargarGastosFijos();
@@ -685,7 +712,8 @@ function addVehiculo() {
     mostrarMsg('msg_vehiculo', currentLang === 'es' ? 'Ya existe un vehículo con esa matrícula.' : 'A vehicle with that plate already exists.', 'err'); return;
   }
   
-  state.vehiculos.push({ id: uid(), matricula: mat, marca, modelo, bastidor, proxMant: '', proxKmMant: '', proxItv: '', ultItvFecha: '', ultItvKm: '', costeSeguro: '', costeItv: '' });
+  // Añadido proxSeguro: ''
+  state.vehiculos.push({ id: uid(), matricula: mat, marca, modelo, bastidor, proxMant: '', proxKmMant: '', proxItv: '', proxSeguro: '', ultItvFecha: '', ultItvKm: '', costeSeguro: '', costeItv: '' });
   guardar();
   document.getElementById('v_matricula').value = '';
   document.getElementById('v_marca').value = '';
@@ -1405,7 +1433,7 @@ function exportarExcel() {
   mostrarMsg('msg_informe', 'Excel exportado.', 'ok');
 }
 
-// ============ RECORDATORIOS ============
+// ============ RECORDATORIOS (CON SEGURO) ============
 function cargarRecordatorios() {
   const sel = document.getElementById('rec_vehiculo');
   if (!sel) return;
@@ -1414,6 +1442,7 @@ function cargarRecordatorios() {
   const mantInput = document.getElementById('rec_mant');
   const kmMantInput = document.getElementById('rec_km_mant');
   const itvInput = document.getElementById('rec_itv');
+  const seguroInput = document.getElementById('rec_seguro');
   const itvPasadaInput = document.getElementById('rec_itv_pasada');
   const kmItvPasadaInput = document.getElementById('rec_km_itv_pasada');
   const tbody = document.getElementById('tabla_recordatorios_body');
@@ -1425,14 +1454,15 @@ function cargarRecordatorios() {
       mantInput.value = v.proxMant || '';
       kmMantInput.value = v.proxKmMant || '';
       itvInput.value = v.proxItv || '';
+      if(seguroInput) seguroInput.value = v.proxSeguro || '';
       itvPasadaInput.value = v.ultItvFecha || '';
       kmItvPasadaInput.value = v.ultItvKm || '';
     }
   }
 
   state.vehiculos.forEach(v => {
-    // FILTRO CLAVE: Solo mostrar si tiene alguna fecha de aviso
-    if (!v.proxMant && !v.proxItv) return; 
+    // FILTRO CLAVE: Solo mostrar si tiene alguna fecha de aviso (Mantenimiento, ITV o Seguro)
+    if (!v.proxMant && !v.proxItv && !v.proxSeguro) return; 
 
     const formatDate = (dateStr) => {
       if (!dateStr) return '—';
@@ -1450,6 +1480,7 @@ function cargarRecordatorios() {
     tr.innerHTML = `<td>${esc(v.matricula)}</td>
       <td>${kmMantFormat}${formatDate(v.proxMant)}</td>
       <td>${formatDate(v.proxItv)}</td>
+      <td>${formatDate(v.proxSeguro)}</td>
       <td style="white-space: nowrap;">
           <button type="button" class="secondary" style="padding:4px 8px; font-size:11px; margin-right:4px;" onclick="editarAviso('${v.id}')">${currentLang === 'es' ? 'Editar' : 'Edit'}</button>
           <button type="button" class="danger" onclick="eliminarAvisoVehiculo('${v.id}')">${currentLang === 'es' ? 'Eliminar' : 'Delete'}</button>
@@ -1478,6 +1509,7 @@ function eliminarAvisoVehiculo(vehiculoId) {
       v.proxMant = '';
       v.proxKmMant = '';
       v.proxItv = '';
+      v.proxSeguro = '';
       v.ultItvFecha = '';
       v.ultItvKm = '';
       
@@ -1489,6 +1521,7 @@ function eliminarAvisoVehiculo(vehiculoId) {
         document.getElementById('rec_mant').value = '';
         document.getElementById('rec_km_mant').value = '';
         document.getElementById('rec_itv').value = '';
+        document.getElementById('rec_seguro').value = '';
         document.getElementById('rec_itv_pasada').value = '';
         document.getElementById('rec_km_itv_pasada').value = '';
       }
@@ -1502,6 +1535,7 @@ function guardarRecordatorio() {
   const mantFecha = document.getElementById('rec_mant').value;
   const mantKm = document.getElementById('rec_km_mant').value;
   const itvProx = document.getElementById('rec_itv').value;
+  const seguroProx = document.getElementById('rec_seguro').value;
   const itvPasada = document.getElementById('rec_itv_pasada').value;
   const itvKmPasada = document.getElementById('rec_km_itv_pasada').value;
   
@@ -1510,6 +1544,7 @@ function guardarRecordatorio() {
   const v = state.vehiculos.find(x => x.id === vehiculoId);
   if (v) {
     v.proxMant = mantFecha; v.proxKmMant = mantKm; v.proxItv = itvProx;
+    v.proxSeguro = seguroProx;
     v.ultItvFecha = itvPasada; v.ultItvKm = itvKmPasada;
 
     if (itvPasada) {
@@ -1531,7 +1566,7 @@ function guardarRecordatorio() {
   }
 }
 
-// ============ CALENDARIO Y NOTIFICACIONES ============
+// ============ CALENDARIO Y NOTIFICACIONES (CON SEGURO) ============
 function descargarICS() {
   const vehiculoId = document.getElementById('rec_vehiculo').value;
   if (!vehiculoId) { alert(currentLang === 'es' ? "Selecciona un vehículo primero." : "Select a vehicle first."); return; }
@@ -1539,7 +1574,7 @@ function descargarICS() {
   const v = state.vehiculos.find(x => x.id === vehiculoId);
   if (!v) return;
 
-  if (!v.proxItv && !v.proxMant) {
+  if (!v.proxItv && !v.proxMant && !v.proxSeguro) {
     alert(currentLang === 'es' ? "No hay fechas de recordatorio guardadas para este coche." : "There are no reminder dates saved for this car.");
     return;
   }
@@ -1561,6 +1596,15 @@ function descargarICS() {
     icsContent += `SUMMARY:Mantenimiento ${v.matricula} (${v.marca} ${v.modelo})\r\n`;
     icsContent += `DTSTART;VALUE=DATE:${fechaMant}\r\n`;
     icsContent += `DESCRIPTION:Recordatorio de mantenimiento para el vehículo ${v.matricula}.\r\n`;
+    icsContent += "END:VEVENT\r\n";
+  }
+
+  if (v.proxSeguro) {
+    const fechaSeguro = v.proxSeguro.replace(/-/g, '');
+    icsContent += "BEGIN:VEVENT\r\n";
+    icsContent += `SUMMARY:Seguro ${v.matricula} (${v.marca} ${v.modelo})\r\n`;
+    icsContent += `DTSTART;VALUE=DATE:${fechaSeguro}\r\n`;
+    icsContent += `DESCRIPTION:Vencimiento del seguro para el vehículo ${v.matricula}.\r\n`;
     icsContent += "END:VEVENT\r\n";
   }
 
@@ -1625,6 +1669,7 @@ function comprobarAvisos() {
     };
     revisarFecha(v.proxItv, 'ITV');
     revisarFecha(v.proxMant, 'Revisión');
+    revisarFecha(v.proxSeguro, 'Seguro');
   });
 }
 
@@ -1932,6 +1977,5 @@ Object.assign(window, {
   cargarRecordatorios, guardarRecordatorio, exportarJSON, importarJSON, borrarTodo,
   descargarICS, activarNotificaciones, editarAviso, eliminarAvisoVehiculo, actualizarAutor
 });
-
 
 

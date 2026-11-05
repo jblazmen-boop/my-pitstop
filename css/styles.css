@@ -218,7 +218,7 @@ header h1 {
 
 .texto-maquina {
   font-family: 'Caveat', cursive !important;
-  font-size: 32px;
+  font-size: 40px; /* AUMENTADO DE 32px A 40px */
   letter-spacing: 1px;
   color: var(--text-muted); 
   text-shadow: -1px -1px 0px rgba(255, 255, 255, 0.1), 1px 1px 1px rgba(0, 0, 0, 0.3), inset 0 0 5px rgba(0,0,0,0.2);
@@ -344,7 +344,7 @@ body.modo-claro .d-pad-digital {
 .pegatinas-der { justify-content: flex-end; }
 
 .logo-pegatina {
-  height: 45px;
+  height: 35px; /* REDUCIDO DE 45px A 35px */
   width: auto;
   object-fit: contain;
   filter: drop-shadow(1px 2px 3px rgba(0,0,0,0.8));
@@ -694,7 +694,7 @@ body.modo-claro .modal-historico-contenido {
   }
   
   .texto-maquina { 
-    font-size: 16px; 
+    font-size: 18px; /* AUMENTADO DE 16px A 18px */
     white-space: nowrap;
     text-align: center;
   }
@@ -714,7 +714,7 @@ body.modo-claro .modal-historico-contenido {
   .logo-bmw     { grid-column: 3; grid-row: 1; justify-self: center; align-self: center; }
   .logo-shell   { grid-column: 3; grid-row: 2; justify-self: center; align-self: center; }
   
-  .logo-pegatina { height: 18px; }
+  .logo-pegatina { height: 15px; } /* REDUCIDO DE 18px A 15px */
 
   /* ===== MARCO INFERIOR Y D-PAD ===== */
   .marco-inferior { 
@@ -780,12 +780,10 @@ body.modo-claro .modal-historico-contenido {
     transition: opacity 0.3s ease;
   }
   
-  /* El hover en móvil no hace nada */
   .tab:hover::after, .tab:active::after, .tab:focus::after {
     opacity: 0 !important;
   }
   
-  /* Esta es la clase que JS activará para mostrar el cartel */
   .tab.tooltip-active::after {
     opacity: 1 !important;
   }

@@ -9,7 +9,7 @@
   <link rel="manifest" href="manifest.json?v=3">
   <meta name="theme-color" content="#111827">
   
-  <link rel="stylesheet" href="css/styles.css?v=18">
+  <link rel="stylesheet" href="css/styles.css?v=19">
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
@@ -218,6 +218,15 @@
             </div>
           </div>
         </div>
+
+        <!-- NUEVO BLOQUE DEL SEGURO -->
+        <div style="background: rgba(17, 24, 39, 0.5); padding: 15px; border-radius: 8px; border: 1px solid #374151; margin-bottom: 20px;">
+          <h3 style="color: #e11d48; font-size: 16px; margin-top: 0; margin-bottom: 15px;" data-i18n="seguro">Seguro</h3>
+          <div class="grid-avisos">
+            <div><label data-i18n="fecha_prox_seguro">Fecha Venc. Seguro</label><input type="date" id="rec_seguro" autocomplete="new-password"></div>
+            <div></div>
+          </div>
+        </div>
         
         <!-- BOTONES DE AVISOS -->
         <div style="margin-top: 15px; display: flex; gap: 10px; flex-wrap: wrap;">
@@ -232,7 +241,7 @@
         <div class="tabla-responsive">
           <table style="margin-top: 10px;">
             <thead>
-              <tr><th data-i18n="vehiculo">Vehículo</th><th data-i18n="prox_mant">Próximo Mantenimiento</th><th data-i18n="prox_itv">Próxima ITV</th><th data-i18n="acciones">Acciones</th></tr>
+              <tr><th data-i18n="vehiculo">Vehículo</th><th data-i18n="prox_mant">Próximo Mantenimiento</th><th data-i18n="prox_itv">Próxima ITV</th><th data-i18n="prox_seguro">Próximo Seguro</th><th data-i18n="acciones">Acciones</th></tr>
             </thead>
             <tbody id="tabla_recordatorios_body"></tbody>
           </table>
@@ -480,6 +489,6 @@
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-app.js"></script>
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-auth.js"></script>
 <script type="module" src="https://www.gstatic.com/firebasejs/13.1.0/firebase-firestore.js"></script>
-<script type="module" src="js/app.js?v=14"></script>
+<script type="module" src="js/app.js?v=15"></script>
 </body>
 </html>
