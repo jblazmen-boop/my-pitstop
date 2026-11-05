@@ -22,6 +22,8 @@
   --shadow-inset: inset 0 0 20px rgba(0,0,0,0.8);
   --accent: #e11d48;
   --accent-hover: #be123c;
+  
+  color-scheme: dark; /* Arregla los calendarios nativos en modo oscuro */
 }
 
 body.modo-claro {
@@ -43,6 +45,8 @@ body.modo-claro {
   --border-color: #cbd5e1;
   --border-light: rgba(0, 0, 0, 0.1);
   --shadow-inset: inset 0 0 10px rgba(0,0,0,0.1);
+  
+  color-scheme: light; /* Arregla los calendarios nativos en modo claro */
 }
 
 * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -497,13 +501,40 @@ h2 { margin-top: 0; font-size: 20px; color: var(--text-title) !important; }
 .grid-avisos { display: grid; grid-template-columns: 1.2fr 1fr 1fr 1fr; gap: 15px; margin-bottom: 20px; align-items: end; }
 
 label { display: block; font-size: 12px; color: var(--text-muted) !important; margin-bottom: 6px; font-weight: 700; }
+
+/* ARREGLO DE LOS INPUTS: FUENTE NORMAL, CALENDARIO VISIBLE Y BIEN CENTRADO */
 input, select, textarea { 
-  width: 100%; padding: 10px; border: 1px solid var(--border-color) !important; border-radius: 4px; font-size: 14px; 
+  width: 100%; 
+  padding: 10px; 
+  border: 1px solid var(--border-color) !important; 
+  border-radius: 4px; 
+  font-size: 14px; 
+  font-weight: 400 !important; /* Quita la negrita excesiva */
   background-color: var(--bg-input) !important; 
   color: var(--text-main) !important; 
   transition: border-color 0.2s, box-shadow 0.2s; 
+  text-transform: none !important; /* Por si acaso hereda mayúsculas */
 }
-input[type="date"] { cursor: pointer; min-height: 40px; }
+
+input[type="date"] { 
+  cursor: pointer; 
+  min-height: 40px; 
+}
+
+/* Hace que el icono del calendario nativo sea visible en fondo oscuro */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(1);
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+body.modo-claro input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: none;
+}
+
 input:focus, select:focus, textarea:focus { border-color: var(--accent) !important; box-shadow: 0 0 8px rgba(225, 29, 72, 0.4) !important; outline: none; }
 textarea { resize: vertical; min-height: 60px; }
 
@@ -532,7 +563,7 @@ button.btn-stripes,
   align-items: center !important;
   justify-content: center !important;
   gap: 6px !important;
-  text-shadow: none !important; /* Limpia los iconos y emojis */
+  text-shadow: none !important; 
   border: 1px solid transparent !important;
   box-shadow: inset 0 1px 0 rgba(255,255,255,0.3), inset 0 -2px 0 rgba(0,0,0,0.5), 0 4px 6px rgba(0,0,0,0.5) !important;
 }
@@ -599,7 +630,7 @@ button.danger.btn-stripes {
 /* Botones de Tabla (Editar / Borrar) - Pequeños y cuadrados */
 td button {
   padding: 6px 10px !important;
-  font-size: 14px !important;
+  font-size: 12px !important;
   width: auto !important;
   margin-bottom: 0 !important;
 }
